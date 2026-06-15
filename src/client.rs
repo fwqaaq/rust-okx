@@ -15,6 +15,7 @@ use crate::error::Error;
 use crate::model::OkxResponse;
 use crate::signing;
 use crate::transport::{DefaultTransport, Transport};
+use crate::OkxRegion;
 
 /// An OKX v5 REST API client, generic over the HTTP [`Transport`].
 ///
@@ -200,7 +201,20 @@ impl<T> OkxClientBuilder<T> {
         self
     }
 
-    /// Override the API base URL (default: [`crate::API_URL`]).
+    /// Select the OKX REST API region.
+    ///
+    /// The default is [`OkxRegion::Global`]. US and AU users registered on
+    /// `app.okx.com` should use [`OkxRegion::Us`]. EU users registered on
+    /// `my.okx.com` should use [`OkxRegion::Eea`].
+    pub fn region(mut self, region: OkxRegion) -> Self {
+        self.base_url = region.api_url().to_owned();
+        self
+    }
+
+    /// Override the API base URL.
+    ///
+    /// This overrides the default global domain and any region selected through
+    /// [`Self::region`].
     pub fn base_url(mut self, base_url: impl Into<String>) -> Self {
         self.base_url = base_url.into();
         self
@@ -235,7 +249,7 @@ impl<T> OkxClientBuilder<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::OkxClient;
+    use crate::{OkxClient, OkxRegion};
     use crate::error::Error;
     use crate::test_util::MockTransport;
 
@@ -254,5 +268,47 @@ mod tests {
             }
             other => panic!("expected Error::Api, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn okx_region_returns_expected_api_urls() {
+        assert_eq!(OkxRegion::Global.api_url(), "https://www.okx.com");
+        assert_eq!(OkxRegion::Us.api_url(), "https://us.okx.com");
+        assert_eq!(OkxRegion::Eea.api_url(), "https://eea.okx.com");
+    }
+
+    #[tokio::test]
+    async fn region_sets_request_base_url() {
+        let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
+        let client = OkxClient::with_transport(mock.clone())
+            .region(OkxRegion::Us)
+            .build();
+
+        client.market().get_ticker("BTC-USDT").await.unwrap();
+
+        let req = mock.captured();
+        assert!(
+            req.uri.starts_with("https://us.okx.com/api/v5/market/ticker"),
+            "unexpected URI: {}",
+            req.uri
+        );
+    }
+
+    #[tokio::test]
+    async fn base_url_overrides_selected_region() {
+        let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
+        let client = OkxClient::with_transport(mock.clone())
+            .region(OkxRegion::Eea)
+            .base_url("https://example.test")
+            .build();
+
+        client.market().get_ticker("BTC-USDT").await.unwrap();
+
+        let req = mock.captured();
+        assert!(
+            req.uri.starts_with("https://example.test/api/v5/market/ticker"),
+            "unexpected URI: {}",
+            req.uri
+        );
     }
 }

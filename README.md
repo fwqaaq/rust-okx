@@ -102,6 +102,23 @@ let client = OkxClient::builder()
     .build();
 ```
 
+### Regional accounts
+
+The default client uses the global OKX API domain. Regional accounts must use
+the matching domain. US and AU users should select `OkxRegion::Us`; EU users
+should select `OkxRegion::Eea`.
+
+If you are not sure which domain applies to your account, check the OKX account
+site where you registered and the matching official regional API documentation.
+
+```rust
+use rust_okx::{OkxClient, OkxRegion};
+
+let client = OkxClient::builder()
+    .region(OkxRegion::Eea)
+    .build();
+```
+
 ## API coverage
 
 Endpoints are reached through accessors on `OkxClient`.
