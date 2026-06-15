@@ -229,10 +229,7 @@ impl<'a, T: Transport> Market<'a, T> {
     /// # Errors
     ///
     /// See [`get_ticker`](Self::get_ticker).
-    pub async fn get_index_components(
-        &self,
-        index: &str,
-    ) -> Result<Vec<IndexComponents>, Error> {
+    pub async fn get_index_components(&self, index: &str) -> Result<Vec<IndexComponents>, Error> {
         let query = IndexComponentsQuery { index };
         self.client.get(INDEX_COMPONENTS, &query, false).await
     }
@@ -758,11 +755,18 @@ mod tests {
         let mock = MockTransport::new(body);
         let client = OkxClient::with_transport(mock.clone()).build();
 
-        let books = client.market().get_order_lite_book("BTC-USDT").await.unwrap();
+        let books = client
+            .market()
+            .get_order_lite_book("BTC-USDT")
+            .await
+            .unwrap();
         assert_eq!(books[0].asks[0].price.as_str(), "42000.2");
 
         let req = mock.captured();
-        assert!(req.uri.ends_with("/api/v5/market/books-lite?instId=BTC-USDT"));
+        assert!(
+            req.uri
+                .ends_with("/api/v5/market/books-lite?instId=BTC-USDT")
+        );
     }
 
     #[tokio::test]
@@ -852,7 +856,11 @@ mod tests {
         let mock = MockTransport::new(body);
         let client = OkxClient::with_transport(mock.clone()).build();
 
-        let trades = client.market().get_trades("BTC-USDT", Some(1)).await.unwrap();
+        let trades = client
+            .market()
+            .get_trades("BTC-USDT", Some(1))
+            .await
+            .unwrap();
         assert_eq!(trades[0].trade_id, "1");
         assert_eq!(trades[0].px.as_str(), "42000.1");
 
@@ -875,7 +883,10 @@ mod tests {
         assert_eq!(trades[0].side, "sell");
 
         let req = mock.captured();
-        assert_eq!(req.query(), Some("instId=BTC-USDT&type=1&before=100&limit=1"));
+        assert_eq!(
+            req.query(),
+            Some("instId=BTC-USDT&type=1&before=100&limit=1")
+        );
         assert!(!req.query().unwrap().contains("after"));
     }
 

@@ -125,7 +125,10 @@ impl<'a, T: Transport> Account<'a, T> {
     /// # Errors
     ///
     /// See [`get_balance`](Self::get_balance).
-    pub async fn get_account_bills(&self, request: &BillsRequest) -> Result<Vec<AccountBill>, Error> {
+    pub async fn get_account_bills(
+        &self,
+        request: &BillsRequest,
+    ) -> Result<Vec<AccountBill>, Error> {
         self.client.get(BILLS, request, true).await
     }
 
@@ -235,10 +238,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// # Errors
     ///
     /// See [`get_balance`](Self::get_balance).
-    pub async fn get_fee_rates(
-        &self,
-        request: &FeeRatesRequest,
-    ) -> Result<Vec<FeeRate>, Error> {
+    pub async fn get_fee_rates(&self, request: &FeeRatesRequest) -> Result<Vec<FeeRate>, Error> {
         self.client.get(FEE_RATES, request, true).await
     }
 
@@ -288,10 +288,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// # Errors
     ///
     /// See [`get_balance`](Self::get_balance).
-    pub async fn get_interest_rate(
-        &self,
-        ccy: Option<&str>,
-    ) -> Result<Vec<InterestRate>, Error> {
+    pub async fn get_interest_rate(&self, ccy: Option<&str>) -> Result<Vec<InterestRate>, Error> {
         let query = BalanceQuery { ccy };
         self.client.get(INTEREST_RATE, &query, true).await
     }
@@ -334,10 +331,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// # Errors
     ///
     /// See [`get_balance`](Self::get_balance).
-    pub async fn get_max_withdrawal(
-        &self,
-        ccy: Option<&str>,
-    ) -> Result<Vec<MaxWithdrawal>, Error> {
+    pub async fn get_max_withdrawal(&self, ccy: Option<&str>) -> Result<Vec<MaxWithdrawal>, Error> {
         let query = BalanceQuery { ccy };
         self.client.get(MAX_WITHDRAWAL, &query, true).await
     }
@@ -2340,7 +2334,11 @@ mod tests {
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
 
-        let result = client.account().set_position_mode("net_mode").await.unwrap();
+        let result = client
+            .account()
+            .set_position_mode("net_mode")
+            .await
+            .unwrap();
         assert_eq!(result[0].pos_mode, "net_mode");
 
         let req = mock.captured();
@@ -2379,8 +2377,8 @@ mod tests {
             {"instId":"BTC-USDT-SWAP","mgnMode":"cross","posSide":"long","lever":"10"}]}"#;
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
-        let request = super::LeverageRequest::new(crate::model::TradeMode::Cross)
-            .inst_id("BTC-USDT-SWAP");
+        let request =
+            super::LeverageRequest::new(crate::model::TradeMode::Cross).inst_id("BTC-USDT-SWAP");
 
         let result = client.account().get_leverage(&request).await.unwrap();
         assert_eq!(result[0].mgn_mode, crate::model::TradeMode::Cross);
@@ -2413,8 +2411,9 @@ mod tests {
             {"instId":"BTC-USDT","availBuy":"1","availSell":"2"}]}"#;
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
-        let request = super::MaxAvailableSizeRequest::new("BTC-USDT", crate::model::TradeMode::Cash)
-            .reduce_only(false);
+        let request =
+            super::MaxAvailableSizeRequest::new("BTC-USDT", crate::model::TradeMode::Cash)
+                .reduce_only(false);
 
         let result = client.account().get_max_avail_size(&request).await.unwrap();
         assert_eq!(result[0].avail_sell.as_str(), "2");
@@ -2433,8 +2432,7 @@ mod tests {
             {"instType":"SPOT","instId":"BTC-USDT","category":"1","maker":"-0.0001","taker":"0.001","ts":"1597026383085"}]}"#;
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
-        let request = super::FeeRatesRequest::new(crate::model::InstType::Spot)
-            .inst_id("BTC-USDT");
+        let request = super::FeeRatesRequest::new(crate::model::InstType::Spot).inst_id("BTC-USDT");
 
         let result = client.account().get_fee_rates(&request).await.unwrap();
         assert_eq!(result[0].maker.as_str(), "-0.0001");
@@ -2451,7 +2449,11 @@ mod tests {
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
 
-        let result = client.account().get_max_withdrawal(Some("USDT")).await.unwrap();
+        let result = client
+            .account()
+            .get_max_withdrawal(Some("USDT"))
+            .await
+            .unwrap();
         assert_eq!(result[0].max_wd.as_str(), "100");
 
         let req = mock.captured();
@@ -2471,7 +2473,11 @@ mod tests {
             .inst_id("BTC-USDT-SWAP")
             .limit(1);
 
-        let result = client.account().get_positions_history(&request).await.unwrap();
+        let result = client
+            .account()
+            .get_positions_history(&request)
+            .await
+            .unwrap();
         assert_eq!(result[0].realized_pnl.as_str(), "5");
 
         let req = mock.captured();
@@ -2585,7 +2591,10 @@ mod tests {
         assert_eq!(result[0].max_loan.as_str(), "1000");
 
         let req = mock.captured();
-        assert_eq!(req.query(), Some("instId=BTC-USDT&mgnMode=cross&mgnCcy=USDT"));
+        assert_eq!(
+            req.query(),
+            Some("instId=BTC-USDT&mgnMode=cross&mgnCcy=USDT")
+        );
         assert!(req.is_signed());
     }
 
@@ -2601,7 +2610,11 @@ mod tests {
             .currency("USDT")
             .limit(1);
 
-        let result = client.account().get_interest_accrued(&request).await.unwrap();
+        let result = client
+            .account()
+            .get_interest_accrued(&request)
+            .await
+            .unwrap();
         assert_eq!(result[0].interest_rate.as_str(), "0.0001");
 
         let req = mock.captured();
@@ -2615,7 +2628,11 @@ mod tests {
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
 
-        let result = client.account().get_interest_rate(Some("USDT")).await.unwrap();
+        let result = client
+            .account()
+            .get_interest_rate(Some("USDT"))
+            .await
+            .unwrap();
         assert_eq!(result[0].ccy, "USDT");
 
         let req = mock.captured();
@@ -2716,7 +2733,11 @@ mod tests {
             .limit_type("1")
             .currency("USDT");
 
-        let result = client.account().get_interest_limits(&request).await.unwrap();
+        let result = client
+            .account()
+            .get_interest_limits(&request)
+            .await
+            .unwrap();
         assert_eq!(result[0].loan_quota.as_str(), "1000");
 
         let req = mock.captured();
@@ -2739,7 +2760,11 @@ mod tests {
                     .leverage("10"),
             ]);
 
-        let result = client.account().get_simulated_margin(&request).await.unwrap();
+        let result = client
+            .account()
+            .get_simulated_margin(&request)
+            .await
+            .unwrap();
         assert_eq!(result[0].details[0].upl.as_str(), "2");
 
         let req = mock.captured();

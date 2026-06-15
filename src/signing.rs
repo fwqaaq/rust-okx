@@ -14,6 +14,12 @@ pub(crate) fn timestamp() -> String {
     format_timestamp(OffsetDateTime::now_utc())
 }
 
+/// Format the current UTC time as epoch seconds for OKX WebSocket login.
+#[cfg(feature = "websocket")]
+pub(crate) fn ws_timestamp() -> String {
+    OffsetDateTime::now_utc().unix_timestamp().to_string()
+}
+
 fn format_timestamp(dt: OffsetDateTime) -> String {
     format!(
         "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}.{:03}Z",
@@ -38,6 +44,15 @@ pub(crate) fn sign(message: &str, secret: &str) -> String {
         Hmac::<Sha256>::new_from_slice(secret.as_bytes()).expect("HMAC accepts keys of any length");
     mac.update(message.as_bytes());
     base64::engine::general_purpose::STANDARD.encode(mac.finalize().into_bytes())
+}
+
+/// Sign the OKX WebSocket login pre-hash for a given epoch-second timestamp.
+#[cfg(feature = "websocket")]
+pub(crate) fn ws_login_sign(timestamp: &str, secret: &str) -> String {
+    sign(
+        &pre_hash(timestamp, "GET", "/users/self/verify", ""),
+        secret,
+    )
 }
 
 #[cfg(test)]

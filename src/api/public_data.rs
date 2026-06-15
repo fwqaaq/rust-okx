@@ -104,9 +104,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
         &self,
         request: &FundingRateHistoryRequest,
     ) -> Result<Vec<FundingRateHistory>, Error> {
-        self.client
-            .get(FUNDING_RATE_HISTORY, request, false)
-            .await
+        self.client.get(FUNDING_RATE_HISTORY, request, false).await
     }
 
     /// Retrieve the price limit for an instrument.
@@ -835,7 +833,10 @@ mod tests {
 
         let req = mock.captured();
         assert_eq!(req.method, http::Method::GET);
-        assert!(req.uri.ends_with("/api/v5/public/instruments?instType=SPOT"));
+        assert!(
+            req.uri
+                .ends_with("/api/v5/public/instruments?instType=SPOT")
+        );
         assert!(!req.is_signed(), "public endpoint must not be signed");
     }
 
@@ -995,7 +996,11 @@ mod tests {
         let mock = MockTransport::new(body);
         let client = OkxClient::with_transport(mock.clone()).build();
 
-        let rows = client.public_data().get_underlying(InstType::Swap).await.unwrap();
+        let rows = client
+            .public_data()
+            .get_underlying(InstType::Swap)
+            .await
+            .unwrap();
         assert_eq!(rows[0], "BTC-USD");
 
         let req = mock.captured();

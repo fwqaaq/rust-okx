@@ -42,6 +42,8 @@ mod signing;
 #[cfg(test)]
 mod test_util;
 pub mod transport;
+#[cfg(feature = "websocket")]
+pub mod ws;
 
 pub use client::{OkxClient, OkxClientBuilder};
 pub use credentials::Credentials;
@@ -50,6 +52,8 @@ pub use model::NumberString;
 #[cfg(feature = "reqwest")]
 pub use transport::ReqwestTransport;
 pub use transport::{Transport, TransportError};
+#[cfg(feature = "websocket")]
+pub use ws::{Arg, OkxWs, OkxWsBuilder, WsChannelGroup, WsConn, WsConnector, WsEvent, WsFrame};
 
 /// Global OKX REST API base URL.
 pub const GLOBAL_API_URL: &str = "https://www.okx.com";

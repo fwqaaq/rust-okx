@@ -185,9 +185,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &OrderHistoryRequest,
     ) -> Result<Vec<Order>, Error> {
-        self.client
-            .get(ORDERS_HISTORY_ARCHIVE, request, true)
-            .await
+        self.client.get(ORDERS_HISTORY_ARCHIVE, request, true).await
     }
 
     /// Retrieve recent fills.
@@ -970,7 +968,11 @@ mod tests {
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
 
-        let result = client.trade().cancel_order("BTC-USDT", "312").await.unwrap();
+        let result = client
+            .trade()
+            .cancel_order("BTC-USDT", "312")
+            .await
+            .unwrap();
         assert_eq!(result[0].ord_id, "312");
 
         let req = mock.captured();
@@ -1034,9 +1036,11 @@ mod tests {
             {"ordId":"312","clOrdId":"b1","reqId":"r1","sCode":"0","sMsg":""}]}"#;
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
-        let requests = vec![super::AmendOrderRequest::new("BTC-USDT")
-            .client_order_id("b1")
-            .new_size("0.03")];
+        let requests = vec![
+            super::AmendOrderRequest::new("BTC-USDT")
+                .client_order_id("b1")
+                .new_size("0.03"),
+        ];
 
         let result = client
             .trade()
@@ -1146,8 +1150,11 @@ mod tests {
              "accFillSz":"0","avgPx":"","state":"canceled","cTime":"1597026383085"}]}"#;
         let mock = MockTransport::new(body);
         let client = signed_client(mock.clone());
-        let request = super::OrderHistoryRequest::new(crate::model::InstType::Spot)
-            .filters(super::OrderListRequest::new().inst_type(crate::model::InstType::Spot).limit(1));
+        let request = super::OrderHistoryRequest::new(crate::model::InstType::Spot).filters(
+            super::OrderListRequest::new()
+                .inst_type(crate::model::InstType::Spot)
+                .limit(1),
+        );
 
         let orders = client
             .trade()

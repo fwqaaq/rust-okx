@@ -4,7 +4,7 @@ Async Rust client for the [OKX v5 REST API](https://www.okx.com/docs-v5/en/) wit
 
 ![MSRV](https://img.shields.io/badge/MSRV-1.85-blue)
 ![Edition](https://img.shields.io/badge/edition-2024-blue)
-![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
+![License](https://img.shields.io/badge/license-MIT-blue)
 ![Default transport](https://img.shields.io/badge/default%20transport-reqwest-green)
 
 > **Status: early / in development.** `rust-okx` is currently a `0.1.x` crate.
@@ -129,7 +129,7 @@ Endpoints are reached through accessors on `OkxClient`.
 | `client.public_data()` | Implemented | Instruments, system time, open interest, funding rate, price limit, mark price, delivery history, position tiers, insurance fund. |
 | `client.account()` | Implemented | Balance, positions, config, bills, leverage, fees, risk state, simulated margin, position builder, borrowing and account settings. |
 | `client.trade()` | Implemented | Place, cancel, amend, close positions, open orders, order history, fills, batch order flows. |
-| WebSocket | Not implemented | Planned as a separate public/private streaming API. |
+| WebSocket | Feature-gated | Public/private/business client, typed events, mockable connection trait, and real public/private integration tests behind `websocket`. |
 | Funding / Asset | Not implemented | Planned for balances, transfers, deposits, withdrawals, bills, and asset valuation. |
 | SubAccount | Not implemented | Planned for sub-account queries, transfers, API keys, and VIP loan allocation. |
 
@@ -192,6 +192,7 @@ All feature flags are additive.
 |---|---:|---|
 | `reqwest` | Yes | Enables the built-in `ReqwestTransport`. |
 | `rust-decimal` | No | Adds `NumberString::to_decimal()`. |
+| `websocket` | No | Enables `OkxWs`, WebSocket event types, and the default `tokio-tungstenite` connector. |
 
 ## Testing
 
@@ -229,6 +230,7 @@ Useful commands:
 cargo test
 cargo test --no-default-features --lib
 cargo test --all-features
+cargo test --features websocket
 cargo test --test market_public
 cargo doc --no-deps
 cargo clippy --all-targets --all-features

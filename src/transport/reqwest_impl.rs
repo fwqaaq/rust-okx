@@ -21,7 +21,6 @@ impl ReqwestTransport {
             client: reqwest::Client::new(),
         }
     }
-
 }
 
 impl Default for ReqwestTransport {

@@ -45,7 +45,11 @@ pub fn live_client() -> Option<OkxClient> {
 /// `x-simulated-trading` header), using the dedicated demo-environment key.
 /// Returns `None` if the `OKX_DEMO_API_*` variables are not all set.
 pub fn demo_client() -> Option<OkxClient> {
-    let creds = credentials("OKX_DEMO_API_KEY", "OKX_DEMO_API_SECRET", "OKX_DEMO_PASSPHRASE")?;
+    let creds = credentials(
+        "OKX_DEMO_API_KEY",
+        "OKX_DEMO_API_SECRET",
+        "OKX_DEMO_PASSPHRASE",
+    )?;
     Some(
         OkxClient::builder()
             .credentials(creds)

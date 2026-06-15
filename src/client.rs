@@ -6,6 +6,7 @@ use http::header::{CONTENT_TYPE, HeaderMap, HeaderName, HeaderValue};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
+use crate::OkxRegion;
 use crate::api::account::Account;
 use crate::api::market::Market;
 use crate::api::public_data::PublicData;
@@ -15,7 +16,6 @@ use crate::error::Error;
 use crate::model::OkxResponse;
 use crate::signing;
 use crate::transport::{DefaultTransport, Transport};
-use crate::OkxRegion;
 
 /// An OKX v5 REST API client, generic over the HTTP [`Transport`].
 ///
@@ -249,9 +249,9 @@ impl<T> OkxClientBuilder<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{OkxClient, OkxRegion};
     use crate::error::Error;
     use crate::test_util::MockTransport;
+    use crate::{OkxClient, OkxRegion};
 
     /// A non-zero OKX response code is surfaced as [`Error::Api`] with the code
     /// and message preserved (offline unit test; the network path is covered by
@@ -288,7 +288,8 @@ mod tests {
 
         let req = mock.captured();
         assert!(
-            req.uri.starts_with("https://us.okx.com/api/v5/market/ticker"),
+            req.uri
+                .starts_with("https://us.okx.com/api/v5/market/ticker"),
             "unexpected URI: {}",
             req.uri
         );
@@ -306,7 +307,8 @@ mod tests {
 
         let req = mock.captured();
         assert!(
-            req.uri.starts_with("https://example.test/api/v5/market/ticker"),
+            req.uri
+                .starts_with("https://example.test/api/v5/market/ticker"),
             "unexpected URI: {}",
             req.uri
         );

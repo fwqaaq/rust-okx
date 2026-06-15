@@ -30,9 +30,14 @@ impl CapturedRequest {
 
     /// Whether the OKX signature headers are present.
     pub fn is_signed(&self) -> bool {
-        ["ok-access-key", "ok-access-sign", "ok-access-timestamp", "ok-access-passphrase"]
-            .iter()
-            .all(|h| self.headers.contains_key(*h))
+        [
+            "ok-access-key",
+            "ok-access-sign",
+            "ok-access-timestamp",
+            "ok-access-passphrase",
+        ]
+        .iter()
+        .all(|h| self.headers.contains_key(*h))
     }
 }
 

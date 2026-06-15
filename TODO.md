@@ -4,13 +4,13 @@
 
 ## WebSocket
 
-- 设计 public/private WebSocket 客户端入口，避免和当前 REST `OkxClient<T: Transport>` 混淆。
-- 设计连接生命周期：connect、login、subscribe、unsubscribe、close。
-- 设计消息 stream API，优先返回自有事件枚举和频道数据模型，不直接暴露底层 WebSocket crate 类型。
-- 覆盖 public channels：tickers、trades、books、books5、candles、instruments、open-interest、funding-rate、price-limit、mark-price 等。
-- 覆盖 private channels：account、positions、balance_and_position、orders、orders-algo、algo-advance、liquidation-warning、account-greeks 等。
-- 设计重连策略：指数退避、订阅恢复、私有频道重新认证、ping/pong 和 idle timeout。
-- 增加 fake server 或 mock WebSocket transport，用于离线测试订阅、取消订阅、认证失败、重连恢复和消息反序列化。
+- Round 4 已完成首版 `websocket` feature：`OkxWs` / `OkxWsBuilder` / `WsConn` / `WsConnector` / `WsEvent` / `Arg`。
+- 已实现 public/private/business 入口、connect/login/subscribe/unsubscribe/close、基础断线重连、订阅恢复、私有重登录、文本 ping/pong。
+- 已实现默认 `tokio-tungstenite` 连接器，且公共 API 不暴露 `tokio` / `tokio_tungstenite` / `serde_json` 类型。
+- 已增加离线 Mock 连接测试，以及真实 `ws_public` / `ws_private` 集成测试。
+- 后续继续扩展 public channels：trades、books、books5、candles、instruments、open-interest、funding-rate、price-limit、mark-price 等 typed examples。
+- 后续继续扩展 private channels：positions、balance_and_position、orders-algo、algo-advance、liquidation-warning、account-greeks 等 typed models。
+- 后续增强重连策略：可配置指数退避、jitter、可注入 sleep、完整 idle timeout 策略和更精细的重连事件。
 
 ## Funding / Asset
 

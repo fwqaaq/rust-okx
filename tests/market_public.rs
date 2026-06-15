@@ -22,7 +22,10 @@ async fn market_ticker_parses() {
 
     assert_eq!(tickers.len(), 1);
     assert_eq!(tickers[0].inst_id, "BTC-USDT");
-    let last: f64 = tickers[0].last.parse().expect("last price should be numeric");
+    let last: f64 = tickers[0]
+        .last
+        .parse()
+        .expect("last price should be numeric");
     assert!(last > 0.0, "BTC-USDT last price should be positive");
 }
 

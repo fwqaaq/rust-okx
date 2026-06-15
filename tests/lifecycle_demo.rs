@@ -42,7 +42,11 @@ async fn demo_place_get_cancel_order() {
         "0.0001",
     )
     .price(price);
-    let placed = client.trade().place_order(&request).await.expect("place_order");
+    let placed = client
+        .trade()
+        .place_order(&request)
+        .await
+        .expect("place_order");
     assert_eq!(
         placed[0].s_code, "0",
         "order was rejected: {}",
@@ -88,7 +92,11 @@ async fn demo_set_and_get_leverage() {
     };
 
     let set = SetLeverageRequest::new("5", TradeMode::Cross).inst_id("BTC-USDT-SWAP");
-    let result = client.account().set_leverage(&set).await.expect("set_leverage");
+    let result = client
+        .account()
+        .set_leverage(&set)
+        .await
+        .expect("set_leverage");
     assert!(!result.is_empty(), "set-leverage should return a row");
 
     let info = client

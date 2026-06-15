@@ -1,0 +1,4 @@
+{
+  "rust-analyzer.cargo.features": ["websocket"],
+  "rust-analyzer.check.features": ["websocket"]
+}
