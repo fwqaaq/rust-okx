@@ -5,7 +5,7 @@
 //! <https://www.okx.com/docs-v5/en/#overview-rest-authentication>.
 
 use base64::Engine;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use sha2::Sha256;
 use time::OffsetDateTime;
 
@@ -55,7 +55,12 @@ mod tests {
 
     #[test]
     fn pre_hash_concatenates_in_order() {
-        let h = pre_hash("2020-12-08T09:08:57.715Z", "GET", "/api/v5/account/balance", "");
+        let h = pre_hash(
+            "2020-12-08T09:08:57.715Z",
+            "GET",
+            "/api/v5/account/balance",
+            "",
+        );
         assert_eq!(h, "2020-12-08T09:08:57.715ZGET/api/v5/account/balance");
     }
 
