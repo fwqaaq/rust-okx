@@ -1,0 +1,34 @@
+pub(super) const SAVINGS_BALANCE: &str = "/api/v5/finance/savings/balance";
+pub(super) const SAVINGS_PURCHASE_REDEMPT: &str = "/api/v5/finance/savings/purchase-redempt";
+pub(super) const SAVINGS_SET_LENDING_RATE: &str = "/api/v5/finance/savings/set-lending-rate";
+pub(super) const SAVINGS_LENDING_HISTORY: &str = "/api/v5/finance/savings/lending-history";
+pub(super) const SAVINGS_PUBLIC_BORROW_INFO: &str = "/api/v5/finance/savings/lending-rate-summary";
+pub(super) const SAVINGS_PUBLIC_BORROW_HISTORY: &str =
+    "/api/v5/finance/savings/lending-rate-history";
+pub(super) const STAKING_DEFI_OFFERS: &str = "/api/v5/finance/staking-defi/offers";
+pub(super) const STAKING_DEFI_PURCHASE: &str = "/api/v5/finance/staking-defi/purchase";
+pub(super) const STAKING_DEFI_REDEEM: &str = "/api/v5/finance/staking-defi/redeem";
+pub(super) const STAKING_DEFI_CANCEL: &str = "/api/v5/finance/staking-defi/cancel";
+pub(super) const STAKING_DEFI_ACTIVE_ORDERS: &str = "/api/v5/finance/staking-defi/orders-active";
+pub(super) const STAKING_DEFI_ORDERS_HISTORY: &str = "/api/v5/finance/staking-defi/orders-history";
+pub(super) const ETH_PRODUCT_INFO: &str = "/api/v5/finance/staking-defi/eth/product-info";
+pub(super) const ETH_PURCHASE: &str = "/api/v5/finance/staking-defi/eth/purchase";
+pub(super) const ETH_REDEEM: &str = "/api/v5/finance/staking-defi/eth/redeem";
+pub(super) const ETH_BALANCE: &str = "/api/v5/finance/staking-defi/eth/balance";
+pub(super) const ETH_HISTORY: &str = "/api/v5/finance/staking-defi/eth/purchase-redeem-history";
+pub(super) const ETH_APY_HISTORY: &str = "/api/v5/finance/staking-defi/eth/apy-history";
+pub(super) const SOL_PRODUCT_INFO: &str = "/api/v5/finance/staking-defi/sol/product-info";
+pub(super) const SOL_PURCHASE: &str = "/api/v5/finance/staking-defi/sol/purchase";
+pub(super) const SOL_REDEEM: &str = "/api/v5/finance/staking-defi/sol/redeem";
+pub(super) const SOL_BALANCE: &str = "/api/v5/finance/staking-defi/sol/balance";
+pub(super) const SOL_HISTORY: &str = "/api/v5/finance/staking-defi/sol/purchase-redeem-history";
+pub(super) const SOL_APY_HISTORY: &str = "/api/v5/finance/staking-defi/sol/apy-history";
+pub(super) const FLEX_BORROW_CURRENCIES: &str = "/api/v5/finance/flexible-loan/borrow-currencies";
+pub(super) const FLEX_COLLATERAL_ASSETS: &str = "/api/v5/finance/flexible-loan/collateral-assets";
+pub(super) const FLEX_MAX_LOAN: &str = "/api/v5/finance/flexible-loan/max-loan";
+pub(super) const FLEX_MAX_REDEEM: &str =
+    "/api/v5/finance/flexible-loan/max-collateral-redeem-amount";
+pub(super) const FLEX_ADJUST_COLLATERAL: &str = "/api/v5/finance/flexible-loan/adjust-collateral";
+pub(super) const FLEX_LOAN_INFO: &str = "/api/v5/finance/flexible-loan/loan-info";
+pub(super) const FLEX_LOAN_HISTORY: &str = "/api/v5/finance/flexible-loan/loan-history";
+pub(super) const FLEX_INTEREST_ACCRUED: &str = "/api/v5/finance/flexible-loan/interest-accrued";

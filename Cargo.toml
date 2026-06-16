@@ -1,6 +1,6 @@
 [package]
 name = "rust-okx"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Async Rust client for the OKX v5 REST API"
@@ -23,10 +23,18 @@ sha2 = "0.11"
 base64 = "0.22"
 time = "0.3.49"
 thiserror = "2"
-reqwest = { version = "0.13.4", default-features = false, features = ["rustls"], optional = true }
+reqwest = { version = "0.13.4", default-features = false, features = [
+  "rustls",
+], optional = true }
 rust_decimal = { version = "1", optional = true }
-tokio-tungstenite = { version = "0.24", default-features = false, features = ["connect", "rustls-tls-webpki-roots"], optional = true }
-futures-util = { version = "0.3", default-features = false, features = ["sink", "std"], optional = true }
+tokio-tungstenite = { version = "0.24", default-features = false, features = [
+  "connect",
+  "rustls-tls-webpki-roots",
+], optional = true }
+futures-util = { version = "0.3", default-features = false, features = [
+  "sink",
+  "std",
+], optional = true }
 tokio = { version = "1", features = ["time", "rt", "net"], optional = true }
 
 [features]
@@ -36,7 +44,13 @@ rust-decimal = ["dep:rust_decimal"]
 websocket = ["dep:tokio-tungstenite", "dep:futures-util", "dep:tokio"]
 
 [dev-dependencies]
-tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "net", "time"] }
+tokio = { version = "1", features = [
+  "macros",
+  "rt",
+  "rt-multi-thread",
+  "net",
+  "time",
+] }
 http = "1"
 bytes = "1"
 dotenvy = "0.15"
@@ -47,4 +61,8 @@ required-features = ["websocket"]
 
 [[example]]
 name = "ws_private"
+required-features = ["websocket"]
+
+[[example]]
+name = "ws_business"
 required-features = ["websocket"]

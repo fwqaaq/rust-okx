@@ -646,6 +646,35 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn business_subscribe_with_credentials_logs_in_before_subscribing() {
+        let conn = MockWsConn::new(vec![MockFrame::Frame(WsFrame::Text(
+            r#"{"event":"login","code":"0","msg":""}"#.to_owned(),
+        ))]);
+        let sent = conn.clone();
+        let connector = MockConnector::new(vec![conn]);
+        let credentials = Credentials::new("key", "secret", "pass");
+        let mut ws = OkxWsBuilder::new(connector, WsChannelGroup::Business, OkxRegion::Global)
+            .credentials(credentials)
+            .connect()
+            .await
+            .unwrap();
+
+        ws.subscribe(&[Arg::new("candle1m").inst_id("BTC-USDT")])
+            .await
+            .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&sent.sent()[0]).unwrap()["op"],
+            "login"
+        );
+
+        let event = ws.next_event().await.unwrap().unwrap();
+        assert!(matches!(event, WsEvent::Login));
+        let subscribe = serde_json::from_str::<Value>(&sent.sent()[1]).unwrap();
+        assert_eq!(subscribe["op"], "subscribe");
+        assert_eq!(subscribe["args"][0]["channel"], "candle1m");
+    }
+
+    #[tokio::test]
     async fn reconnect_replays_public_subscriptions() {
         let first = MockWsConn::new(vec![MockFrame::Error]);
         let second = MockWsConn::new(vec![]);

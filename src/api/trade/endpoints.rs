@@ -1,0 +1,29 @@
+pub(super) const ORDER: &str = "/api/v5/trade/order";
+pub(super) const BATCH_ORDERS: &str = "/api/v5/trade/batch-orders";
+pub(super) const CANCEL_ORDER: &str = "/api/v5/trade/cancel-order";
+pub(super) const CANCEL_BATCH_ORDERS: &str = "/api/v5/trade/cancel-batch-orders";
+pub(super) const AMEND_ORDER: &str = "/api/v5/trade/amend-order";
+pub(super) const AMEND_BATCH_ORDERS: &str = "/api/v5/trade/amend-batch-orders";
+pub(super) const CLOSE_POSITION: &str = "/api/v5/trade/close-position";
+pub(super) const ORDERS_PENDING: &str = "/api/v5/trade/orders-pending";
+pub(super) const ORDERS_HISTORY: &str = "/api/v5/trade/orders-history";
+pub(super) const ORDERS_HISTORY_ARCHIVE: &str = "/api/v5/trade/orders-history-archive";
+pub(super) const FILLS: &str = "/api/v5/trade/fills";
+pub(super) const FILLS_HISTORY: &str = "/api/v5/trade/fills-history";
+pub(super) const ORDER_ALGO: &str = "/api/v5/trade/order-algo";
+pub(super) const CANCEL_ALGOS: &str = "/api/v5/trade/cancel-algos";
+pub(super) const AMEND_ALGOS: &str = "/api/v5/trade/amend-algos";
+pub(super) const ORDERS_ALGO_PENDING: &str = "/api/v5/trade/orders-algo-pending";
+pub(super) const ORDERS_ALGO_HISTORY: &str = "/api/v5/trade/orders-algo-history";
+pub(super) const ORDER_ALGO_DETAILS: &str = "/api/v5/trade/order-algo";
+pub(super) const EASY_CONVERT_CURRENCY_LIST: &str = "/api/v5/trade/easy-convert-currency-list";
+pub(super) const EASY_CONVERT: &str = "/api/v5/trade/easy-convert";
+pub(super) const EASY_CONVERT_HISTORY: &str = "/api/v5/trade/easy-convert-history";
+pub(super) const ONE_CLICK_REPAY_CURRENCY_LIST: &str =
+    "/api/v5/trade/one-click-repay-currency-list";
+pub(super) const ONE_CLICK_REPAY: &str = "/api/v5/trade/one-click-repay";
+pub(super) const ONE_CLICK_REPAY_HISTORY: &str = "/api/v5/trade/one-click-repay-history";
+pub(super) const ONE_CLICK_REPAY_CURRENCY_LIST_V2: &str =
+    "/api/v5/trade/one-click-repay-currency-list-v2";
+pub(super) const ONE_CLICK_REPAY_V2: &str = "/api/v5/trade/one-click-repay-v2";
+pub(super) const ONE_CLICK_REPAY_HISTORY_V2: &str = "/api/v5/trade/one-click-repay-history-v2";

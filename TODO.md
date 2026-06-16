@@ -7,7 +7,7 @@
 - Round 4 已完成首版 `websocket` feature：`OkxWs` / `OkxWsBuilder` / `WsConn` / `WsConnector` / `WsEvent` / `Arg`。
 - 已实现 public/private/business 入口、connect/login/subscribe/unsubscribe/close、基础断线重连、订阅恢复、私有重登录、文本 ping/pong。
 - 已实现默认 `tokio-tungstenite` 连接器，且公共 API 不暴露 `tokio` / `tokio_tungstenite` / `serde_json` 类型。
-- 已增加离线 Mock 连接测试，以及真实 `ws_public` / `ws_private` 集成测试。
+- 已增加离线 Mock 连接测试，以及真实 `ws_public` / `ws_business` / `ws_private` 集成测试。
 - 后续继续扩展 public channels：trades、books、books5、candles、instruments、open-interest、funding-rate、price-limit、mark-price 等 typed examples。
 - 后续继续扩展 private channels：positions、balance_and_position、orders-algo、algo-advance、liquidation-warning、account-greeks 等 typed models。
 - 后续增强重连策略：可配置指数退避、jitter、可注入 sleep、完整 idle timeout 策略和更精细的重连事件。
@@ -34,27 +34,32 @@
 
 ## Trade 高级能力
 
-- Algo order：下单、撤单、改单、批量撤单。
-- Algo 查询：未完成 algo list、历史、详情。
-- 高级订单类型：conditional、oco、trigger、move_order_stop、twap、iceberg。
-- Easy convert：小额兑换列表、兑换执行、历史查询。
-- One-click repay：v1/v2 还款、还款历史和状态。
-- 保持普通订单 API 与 algo API 的类型分离，避免单个请求类型膨胀。
+- Round 6 已完成首版高级 Trade REST 覆盖。
+- 已实现 algo order：下单、撤单、改单、pending list、history、details。
+- 已实现 Easy Convert：小额兑换币种列表、兑换执行、历史查询。
+- 已实现 One-click Repay v1/v2：支持币种列表、执行还款、历史查询。
+- 当前 Rust API 保持普通订单 API 与 algo API 的类型分离，避免单个请求类型膨胀。
+- 后续继续增强高级订单 typed builders：conditional、oco、trigger、move_order_stop、twap、iceberg 的字段级建模和 live lifecycle 覆盖。
 
 ## PublicData / Market 边角能力
 
-- PublicData：option summary、estimated price、discount quota、interest loan quota、VIP loan quota、option tick bands。
-- Market：option trades、market data history、block ticker、block tickers、block trades。
-- 继续使用 `NumberString` 保存数值字符串，新增枚举必须保留 `Unknown(String)`。
+- Round 6 已完成首版 PublicData / Market 边角 REST 覆盖。
+- PublicData 已实现：option summary、estimated price、discount quota、interest loan quota、VIP loan quota、option tick bands、option trades、market data history。
+- Market 已实现：block ticker、block tickers、block trades、option instrument-family trades。
+- 后续继续使用 `NumberString` 保存数值字符串，新增枚举必须保留 `Unknown(String)`。
+- 后续可继续把当前 `RestRow` 长尾响应升级为更细 typed models，但应保持非 breaking 扩展。
 
 ## Convert / Finance 扩展模块
 
-- Convert：询价、兑换、历史、币对和估价。
-- Savings：余额、申购、赎回、利率和历史。
-- StakingDefi：产品列表、申购、赎回、订单和收益。
-- EthStaking / SolStaking：质押、赎回、余额、订单历史。
-- FlexibleLoan：借款、还款、抵押品调整、订单和利率。
-- 这些模块应按功能独立拆分，避免和 Funding 模块互相污染。
+- Round 6 已完成首版 `client.convert()` 和 `client.finance()`。
+- Convert 已实现：currencies、currency-pair、estimate-quote、trade、history。
+- Finance 已实现分组 accessor：
+  - `finance().savings()`：balance、purchase/redemption、set lending rate、lending history、public borrow info/history。
+  - `finance().staking_defi()`：offers、purchase、redeem、cancel、active orders、orders history。
+  - `finance().eth_staking()`：product info、purchase、redeem、balance、purchase/redeem history、APY history。
+  - `finance().sol_staking()`：product info、purchase、redeem、balance、purchase/redeem history、APY history。
+  - `finance().flexible_loan()`：borrow currencies、collateral assets、max loan、max collateral redeem amount、adjust collateral、loan info/history、interest accrued。
+- 后续继续补 gated live lifecycle 测试：convert quote -> trade、savings purchase -> redeem、staking purchase -> cancel/redeem、flexible loan borrow -> adjust collateral -> repay。
 
 ## 低优先级交易扩展
 

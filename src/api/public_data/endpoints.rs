@@ -1,0 +1,21 @@
+pub(super) const INSTRUMENTS: &str = "/api/v5/public/instruments";
+pub(super) const SYSTEM_TIME: &str = "/api/v5/public/time";
+pub(super) const OPEN_INTEREST: &str = "/api/v5/public/open-interest";
+pub(super) const FUNDING_RATE: &str = "/api/v5/public/funding-rate";
+pub(super) const FUNDING_RATE_HISTORY: &str = "/api/v5/public/funding-rate-history";
+pub(super) const PRICE_LIMIT: &str = "/api/v5/public/price-limit";
+pub(super) const MARK_PRICE: &str = "/api/v5/public/mark-price";
+pub(super) const DELIVERY_EXERCISE_HISTORY: &str = "/api/v5/public/delivery-exercise-history";
+pub(super) const POSITION_TIERS: &str = "/api/v5/public/position-tiers";
+pub(super) const UNDERLYING: &str = "/api/v5/public/underlying";
+pub(super) const INSURANCE_FUND: &str = "/api/v5/public/insurance-fund";
+pub(super) const CONVERT_CONTRACT_COIN: &str = "/api/v5/public/convert-contract-coin";
+pub(super) const OPTION_SUMMARY: &str = "/api/v5/public/opt-summary";
+pub(super) const ESTIMATED_PRICE: &str = "/api/v5/public/estimated-price";
+pub(super) const DISCOUNT_RATE_INTEREST_FREE_QUOTA: &str =
+    "/api/v5/public/discount-rate-interest-free-quota";
+pub(super) const INTEREST_RATE_LOAN_QUOTA: &str = "/api/v5/public/interest-rate-loan-quota";
+pub(super) const VIP_INTEREST_RATE_LOAN_QUOTA: &str = "/api/v5/public/vip-interest-rate-loan-quota";
+pub(super) const INSTRUMENT_TICK_BANDS: &str = "/api/v5/public/instrument-tick-bands";
+pub(super) const OPTION_TRADES: &str = "/api/v5/public/option-trades";
+pub(super) const MARKET_DATA_HISTORY: &str = "/api/v5/public/market-data-history";

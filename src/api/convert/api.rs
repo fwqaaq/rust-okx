@@ -1,0 +1,105 @@
+use crate::api::convert::requests::{ConvertCurrencyPairRequest, ConvertCurrencyRequest};
+use crate::client::OkxClient;
+use crate::error::Error;
+use crate::transport::Transport;
+
+use super::requests::{ConvertQuoteRequest, ConvertTradeRequest};
+use super::responses::{ConvertCurrencyPair, ConvertQuote};
+
+const CURRENCIES: &str = "/api/v5/asset/convert/currencies";
+const CURRENCY_PAIR: &str = "/api/v5/asset/convert/currency-pair";
+const ESTIMATE_QUOTE: &str = "/api/v5/asset/convert/estimate-quote";
+const TRADE: &str = "/api/v5/asset/convert/trade";
+const HISTORY: &str = "/api/v5/asset/convert/history";
+
+/// Accessor for OKX Convert endpoints.
+///
+/// Obtain one via [`OkxClient::convert`](crate::OkxClient::convert). All
+/// methods require credentials.
+pub struct Convert<'a, T> {
+    client: &'a OkxClient<T>,
+}
+
+impl<'a, T: Transport> Convert<'a, T> {
+    pub(crate) fn new(client: &'a OkxClient<T>) -> Self {
+        Self { client }
+    }
+
+    /// Retrieve currencies supported by Convert.
+    ///
+    /// `GET /api/v5/asset/convert/currencies`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a
+    /// non-zero OKX code, or transport/decode errors.
+    pub async fn get_currencies(&self) -> Result<Vec<super::responses::ConvertCurrency>, Error> {
+        self.client
+            .get(CURRENCIES, &ConvertCurrencyRequest::new(), true)
+            .await
+    }
+
+    /// Retrieve a Convert currency pair.
+    ///
+    /// `GET /api/v5/asset/convert/currency-pair`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_currencies`](Self::get_currencies).
+    pub async fn get_currency_pair(
+        &self,
+        from_ccy: Option<&str>,
+        to_ccy: Option<&str>,
+    ) -> Result<Vec<ConvertCurrencyPair>, Error> {
+        let mut query = ConvertCurrencyPairRequest::new();
+        if let Some(value) = from_ccy {
+            query = query.param("fromCcy", value);
+        }
+        if let Some(value) = to_ccy {
+            query = query.param("toCcy", value);
+        }
+        self.client.get(CURRENCY_PAIR, &query, true).await
+    }
+
+    /// Estimate a Convert quote.
+    ///
+    /// `POST /api/v5/asset/convert/estimate-quote`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_currencies`](Self::get_currencies).
+    pub async fn estimate_quote(
+        &self,
+        request: &ConvertQuoteRequest,
+    ) -> Result<Vec<ConvertQuote>, Error> {
+        self.client.post(ESTIMATE_QUOTE, request, true).await
+    }
+
+    /// Execute a Convert trade.
+    ///
+    /// `POST /api/v5/asset/convert/trade`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_currencies`](Self::get_currencies).
+    pub async fn convert_trade(
+        &self,
+        request: &ConvertTradeRequest,
+    ) -> Result<Vec<super::responses::ConvertTradeResult>, Error> {
+        self.client.post(TRADE, request, true).await
+    }
+
+    /// Retrieve Convert history.
+    ///
+    /// `GET /api/v5/asset/convert/history`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_currencies`](Self::get_currencies).
+    pub async fn get_convert_history(
+        &self,
+        request: &super::requests::ConvertHistoryRequest,
+    ) -> Result<Vec<super::responses::ConvertHistory>, Error> {
+        self.client.get(HISTORY, request, true).await
+    }
+}

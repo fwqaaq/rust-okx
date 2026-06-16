@@ -4,6 +4,7 @@
 use std::fmt;
 use std::str::FromStr;
 
+use serde::ser::{SerializeMap, SerializeSeq};
 use serde::{Deserialize, Serialize};
 
 /// The OKX response envelope: `{ "code": "...", "msg": "...", "data": [...] }`.
@@ -90,6 +91,169 @@ impl fmt::Display for NumberString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.0)
     }
+}
+
+/// A flexible request-parameter builder for low-frequency OKX endpoints.
+///
+/// This type is used by edge APIs whose parameters differ substantially across
+/// endpoint families. Prefer endpoint-specific request builders where the crate
+/// provides one.
+#[derive(Debug, Clone, Default)]
+pub struct RequestParams {
+    fields: Vec<(String, ParamValue)>,
+}
+
+impl RequestParams {
+    /// Create an empty parameter set.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Add a string parameter.
+    pub fn param(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
+        self.fields
+            .push((key.into(), ParamValue::String(value.into())));
+        self
+    }
+
+    /// Add a boolean parameter.
+    pub fn bool_param(mut self, key: impl Into<String>, value: bool) -> Self {
+        self.fields.push((key.into(), ParamValue::Bool(value)));
+        self
+    }
+
+    /// Add an array-of-strings parameter.
+    pub fn string_list<I, S>(mut self, key: impl Into<String>, values: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        self.fields.push((
+            key.into(),
+            ParamValue::StringList(values.into_iter().map(Into::into).collect()),
+        ));
+        self
+    }
+
+    /// Return true when no parameters are set.
+    pub fn is_empty(&self) -> bool {
+        self.fields.is_empty()
+    }
+}
+
+impl Serialize for RequestParams {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut map = serializer.serialize_map(Some(self.fields.len()))?;
+        for (key, value) in &self.fields {
+            map.serialize_entry(key, value)?;
+        }
+        map.end()
+    }
+}
+
+#[derive(Debug, Clone)]
+enum ParamValue {
+    String(String),
+    Bool(bool),
+    StringList(Vec<String>),
+}
+
+impl Serialize for ParamValue {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Self::String(value) => serializer.serialize_str(value),
+            Self::Bool(value) => serializer.serialize_bool(*value),
+            Self::StringList(values) => {
+                let mut seq = serializer.serialize_seq(Some(values.len()))?;
+                for value in values {
+                    seq.serialize_element(value)?;
+                }
+                seq.end()
+            }
+        }
+    }
+}
+
+/// A broad OKX response row for low-frequency endpoints.
+///
+/// OKX edge endpoints often return sparse, feature-dependent objects. Fields
+/// default when absent so deserialization remains forward-compatible.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct RestRow {
+    /// Instrument type.
+    #[serde(default, rename = "instType")]
+    pub inst_type: String,
+    /// Instrument ID.
+    #[serde(default, rename = "instId")]
+    pub inst_id: String,
+    /// Instrument family.
+    #[serde(default, rename = "instFamily")]
+    pub inst_family: String,
+    /// Currency code.
+    #[serde(default)]
+    pub ccy: String,
+    /// Order ID.
+    #[serde(default, rename = "ordId")]
+    pub ord_id: String,
+    /// Client order ID.
+    #[serde(default, rename = "clOrdId")]
+    pub cl_ord_id: String,
+    /// Algo order ID.
+    #[serde(default, rename = "algoId")]
+    pub algo_id: String,
+    /// Client algo order ID.
+    #[serde(default, rename = "algoClOrdId")]
+    pub algo_cl_ord_id: String,
+    /// Quote ID.
+    #[serde(default, rename = "quoteId")]
+    pub quote_id: String,
+    /// Request ID.
+    #[serde(default, rename = "reqId")]
+    pub req_id: String,
+    /// Product ID.
+    #[serde(default, rename = "productId")]
+    pub product_id: String,
+    /// Operation type.
+    #[serde(default, rename = "type")]
+    pub row_type: String,
+    /// State or status.
+    #[serde(default)]
+    pub state: String,
+    /// Status.
+    #[serde(default)]
+    pub status: String,
+    /// Side.
+    #[serde(default)]
+    pub side: String,
+    /// Amount.
+    #[serde(default)]
+    pub amt: NumberString,
+    /// Size.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Rate.
+    #[serde(default)]
+    pub rate: NumberString,
+    /// Balance.
+    #[serde(default)]
+    pub bal: NumberString,
+    /// Available balance.
+    #[serde(default)]
+    pub avail_bal: NumberString,
+    /// Timestamp.
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Success code.
+    #[serde(default, rename = "sCode")]
+    pub s_code: String,
+    /// Success message.
+    #[serde(default, rename = "sMsg")]
+    pub s_msg: String,
 }
 
 /// Defines a string-backed enum that round-trips through the OKX wire format and

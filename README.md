@@ -96,8 +96,8 @@ let client = OkxClient::builder()
 
 ## Feature Overview
 
-- Typed REST accessors: `market`, `public_data`, `account`, `funding`, and
-  `trade`.
+- Typed REST accessors: `market`, `public_data`, `account`, `funding`,
+  `convert`, `finance`, and `trade`.
 - Demo trading support through `OkxClientBuilder::demo_trading(true)`.
 - Regional API domains through `OkxRegion`.
 - Lossless numeric strings through `NumberString`.
@@ -107,6 +107,17 @@ let client = OkxClient::builder()
   retries, request recording, or replacing the HTTP stack.
 - Optional `rust-decimal` feature for `NumberString::to_decimal()`.
 - Optional `websocket` feature for typed WebSocket clients and events.
+
+## Examples
+
+```sh
+cargo run --example login
+cargo run --example funding
+cargo run --example trade_live
+cargo run --features websocket --example ws_public
+cargo run --features websocket --example ws_business
+cargo run --features websocket --example ws_private
+```
 
 ## Testing
 
@@ -119,17 +130,19 @@ cargo test --no-default-features --lib
 cargo test --all-features
 ```
 
-For live account, demo trading, or funding asset mutation tests, see
-[`.env.example`](.env.example). Mutation tests are disabled unless
-`OKX_ENABLE_ASSET_MUTATION=1` is set.
+For live account, demo trading, asset mutation, advanced trade, convert, or
+finance tests, see [`.env.example`](.env.example). Mutation tests are disabled
+unless the matching `OKX_ENABLE_*_MUTATION=1` switch is set.
 
 ## Roadmap
 
-Current REST coverage includes market data, public data, account, funding, and
-trade endpoints. WebSocket support is available behind the `websocket` feature.
+Current REST coverage includes market data, public data, account, funding,
+convert, finance, and trade endpoints. WebSocket support is available behind
+the `websocket` feature.
 
-The next major areas are SubAccount, advanced trade APIs, and finance modules.
-See [TODO.md](TODO.md) for the detailed backlog.
+The next major areas are SubAccount, RFQ/block trading, grid/copy trading,
+spread trading, trading-data analytics, and status endpoints. See
+[TODO.md](TODO.md) for the detailed backlog.
 
 ## Disclaimer
 

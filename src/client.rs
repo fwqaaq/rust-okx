@@ -8,6 +8,8 @@ use serde::de::DeserializeOwned;
 
 use crate::OkxRegion;
 use crate::api::account::Account;
+use crate::api::convert::Convert;
+use crate::api::finance::Finance;
 use crate::api::funding::Funding;
 use crate::api::market::Market;
 use crate::api::public_data::PublicData;
@@ -27,7 +29,8 @@ use crate::transport::{DefaultTransport, Transport};
 ///
 /// API groups are reached through accessor methods: [`market`](Self::market),
 /// [`public_data`](Self::public_data), [`account`](Self::account),
-/// [`funding`](Self::funding), and [`trade`](Self::trade).
+/// [`funding`](Self::funding), [`convert`](Self::convert),
+/// [`finance`](Self::finance), and [`trade`](Self::trade).
 pub struct OkxClient<T = DefaultTransport> {
     transport: T,
     credentials: Option<Credentials>,
@@ -70,6 +73,16 @@ impl<T: Transport> OkxClient<T> {
     /// Access the (authenticated) funding-account and asset endpoints.
     pub fn funding(&self) -> Funding<'_, T> {
         Funding::new(self)
+    }
+
+    /// Access the (authenticated) asset conversion endpoints.
+    pub fn convert(&self) -> Convert<'_, T> {
+        Convert::new(self)
+    }
+
+    /// Access the finance endpoints.
+    pub fn finance(&self) -> Finance<'_, T> {
+        Finance::new(self)
     }
 
     /// Access the (authenticated) trading endpoints.
