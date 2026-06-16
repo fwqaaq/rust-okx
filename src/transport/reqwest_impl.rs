@@ -21,6 +21,14 @@ impl ReqwestTransport {
             client: reqwest::Client::new(),
         }
     }
+
+    /// Create a transport from a preconfigured [`reqwest::Client`].
+    ///
+    /// This is useful when an application needs an explicit proxy, custom
+    /// certificate roots, connect timeouts, or other reqwest-specific options.
+    pub fn from_client(client: reqwest::Client) -> Self {
+        Self { client }
+    }
 }
 
 impl Default for ReqwestTransport {

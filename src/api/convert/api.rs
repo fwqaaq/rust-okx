@@ -1,10 +1,15 @@
-use crate::api::convert::requests::{ConvertCurrencyPairRequest, ConvertCurrencyRequest};
 use crate::client::OkxClient;
 use crate::error::Error;
+use crate::model::ValidateRequest;
 use crate::transport::Transport;
 
-use super::requests::{ConvertQuoteRequest, ConvertTradeRequest};
-use super::responses::{ConvertCurrencyPair, ConvertQuote};
+use super::requests::{
+    ConvertCurrenciesRequest, ConvertCurrencyPairRequest, ConvertHistoryRequest,
+    ConvertQuoteRequest, ConvertTradeRequest,
+};
+use super::responses::{
+    ConvertCurrency, ConvertCurrencyPair, ConvertHistory, ConvertQuote, ConvertTradeResult,
+};
 
 const CURRENCIES: &str = "/api/v5/asset/convert/currencies";
 const CURRENCY_PAIR: &str = "/api/v5/asset/convert/currency-pair";
@@ -33,32 +38,26 @@ impl<'a, T: Transport> Convert<'a, T> {
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a
     /// non-zero OKX code, or transport/decode errors.
-    pub async fn get_currencies(&self) -> Result<Vec<super::responses::ConvertCurrency>, Error> {
-        self.client
-            .get(CURRENCIES, &ConvertCurrencyRequest::new(), true)
-            .await
+    pub async fn get_currencies(&self) -> Result<Vec<ConvertCurrency>, Error> {
+        let request = ConvertCurrenciesRequest::new();
+        request.validate()?;
+        self.client.get(CURRENCIES, &request, true).await
     }
 
-    /// Retrieve a Convert currency pair.
+    /// Retrieve limits and metadata for a Convert currency pair.
     ///
     /// `GET /api/v5/asset/convert/currency-pair`. Authenticated.
     ///
     /// # Errors
     ///
-    /// See [`get_currencies`](Self::get_currencies).
+    /// Returns [`Error::InvalidRequest`] when a required request field is empty.
+    /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn get_currency_pair(
         &self,
-        from_ccy: Option<&str>,
-        to_ccy: Option<&str>,
+        request: &ConvertCurrencyPairRequest,
     ) -> Result<Vec<ConvertCurrencyPair>, Error> {
-        let mut query = ConvertCurrencyPairRequest::new();
-        if let Some(value) = from_ccy {
-            query = query.param("fromCcy", value);
-        }
-        if let Some(value) = to_ccy {
-            query = query.param("toCcy", value);
-        }
-        self.client.get(CURRENCY_PAIR, &query, true).await
+        request.validate()?;
+        self.client.get(CURRENCY_PAIR, request, true).await
     }
 
     /// Estimate a Convert quote.
@@ -67,11 +66,14 @@ impl<'a, T: Transport> Convert<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_currencies`](Self::get_currencies).
+    /// Returns [`Error::InvalidRequest`] when required fields are empty or a
+    /// client request ID is invalid. See [`get_currencies`](Self::get_currencies)
+    /// for transport and API errors.
     pub async fn estimate_quote(
         &self,
         request: &ConvertQuoteRequest,
     ) -> Result<Vec<ConvertQuote>, Error> {
+        request.validate()?;
         self.client.post(ESTIMATE_QUOTE, request, true).await
     }
 
@@ -81,25 +83,31 @@ impl<'a, T: Transport> Convert<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_currencies`](Self::get_currencies).
+    /// Returns [`Error::InvalidRequest`] when required fields are empty or a
+    /// client request ID is invalid. See [`get_currencies`](Self::get_currencies)
+    /// for transport and API errors.
     pub async fn convert_trade(
         &self,
         request: &ConvertTradeRequest,
-    ) -> Result<Vec<super::responses::ConvertTradeResult>, Error> {
+    ) -> Result<Vec<ConvertTradeResult>, Error> {
+        request.validate()?;
         self.client.post(TRADE, request, true).await
     }
 
-    /// Retrieve Convert history.
+    /// Retrieve Convert trade history.
     ///
     /// `GET /api/v5/asset/convert/history`. Authenticated.
     ///
     /// # Errors
     ///
-    /// See [`get_currencies`](Self::get_currencies).
+    /// Returns [`Error::InvalidRequest`] when the limit or client request ID is
+    /// invalid. See [`get_currencies`](Self::get_currencies) for transport and
+    /// API errors.
     pub async fn get_convert_history(
         &self,
-        request: &super::requests::ConvertHistoryRequest,
-    ) -> Result<Vec<super::responses::ConvertHistory>, Error> {
+        request: &ConvertHistoryRequest,
+    ) -> Result<Vec<ConvertHistory>, Error> {
+        request.validate()?;
         self.client.get(HISTORY, request, true).await
     }
 }

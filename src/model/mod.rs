@@ -93,45 +93,95 @@ impl fmt::Display for NumberString {
     }
 }
 
-/// A flexible request-parameter builder for low-frequency OKX endpoints.
+/// A validation failure detected before an HTTP request is sent.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[non_exhaustive]
+pub enum RequestValidationError {
+    /// A required string field was empty.
+    #[error("request field `{field}` must not be empty")]
+    EmptyField {
+        /// OKX wire-field name.
+        field: &'static str,
+    },
+
+    /// A string field exceeded the endpoint's documented maximum length.
+    #[error("request field `{field}` must be at most {max} characters")]
+    TooLong {
+        /// OKX wire-field name.
+        field: &'static str,
+        /// Maximum allowed character count.
+        max: usize,
+    },
+
+    /// A field did not match the endpoint's required textual format.
+    #[error("request field `{field}` has invalid format: {expected}")]
+    InvalidFormat {
+        /// OKX wire-field name.
+        field: &'static str,
+        /// Human-readable description of the expected format.
+        expected: &'static str,
+    },
+
+    /// A numeric request value was outside the endpoint's documented range.
+    #[error("request field `{field}` must be between {min} and {max}")]
+    OutOfRange {
+        /// OKX wire-field name.
+        field: &'static str,
+        /// Inclusive lower bound.
+        min: u64,
+        /// Inclusive upper bound.
+        max: u64,
+    },
+}
+
+/// Validation implemented by typed request models.
 ///
-/// This type is used by edge APIs whose parameters differ substantially across
-/// endpoint families. Prefer endpoint-specific request builders where the crate
-/// provides one.
+/// Endpoint accessors call this before serializing and sending a request so
+/// obvious client-side mistakes fail without consuming an OKX rate-limit slot.
+pub trait ValidateRequest {
+    /// Validate all constraints represented by this SDK version.
+    fn validate(&self) -> Result<(), RequestValidationError>;
+}
+
+/// A flexible, untyped request-parameter builder for unsupported or newly
+/// introduced OKX fields.
+///
+/// Prefer endpoint-specific request types whenever one exists. Adding the same
+/// key more than once replaces its previous value while preserving insertion
+/// order, preventing duplicate JSON object keys.
 #[derive(Debug, Clone, Default)]
-pub struct RequestParams {
+pub struct RawRequestParams {
     fields: Vec<(String, ParamValue)>,
 }
 
-impl RequestParams {
+impl RawRequestParams {
     /// Create an empty parameter set.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Add a string parameter.
+    /// Add or replace a string parameter.
     pub fn param(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
-        self.fields
-            .push((key.into(), ParamValue::String(value.into())));
+        self.set(key.into(), ParamValue::String(value.into()));
         self
     }
 
-    /// Add a boolean parameter.
+    /// Add or replace a boolean parameter.
     pub fn bool_param(mut self, key: impl Into<String>, value: bool) -> Self {
-        self.fields.push((key.into(), ParamValue::Bool(value)));
+        self.set(key.into(), ParamValue::Bool(value));
         self
     }
 
-    /// Add an array-of-strings parameter.
+    /// Add or replace an array-of-strings parameter.
     pub fn string_list<I, S>(mut self, key: impl Into<String>, values: I) -> Self
     where
         I: IntoIterator<Item = S>,
         S: Into<String>,
     {
-        self.fields.push((
+        self.set(
             key.into(),
             ParamValue::StringList(values.into_iter().map(Into::into).collect()),
-        ));
+        );
         self
     }
 
@@ -139,9 +189,17 @@ impl RequestParams {
     pub fn is_empty(&self) -> bool {
         self.fields.is_empty()
     }
+
+    fn set(&mut self, key: String, value: ParamValue) {
+        if let Some((_, existing)) = self.fields.iter_mut().find(|(name, _)| name == &key) {
+            *existing = value;
+        } else {
+            self.fields.push((key, value));
+        }
+    }
 }
 
-impl Serialize for RequestParams {
+impl Serialize for RawRequestParams {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut map = serializer.serialize_map(Some(self.fields.len()))?;
         for (key, value) in &self.fields {
@@ -150,6 +208,12 @@ impl Serialize for RequestParams {
         map.end()
     }
 }
+
+/// Backward-compatible name for [`RawRequestParams`].
+///
+/// New endpoint implementations should expose typed request structs instead of
+/// accepting this alias directly.
+pub type RequestParams = RawRequestParams;
 
 #[derive(Debug, Clone)]
 enum ParamValue {
@@ -425,5 +489,17 @@ mod tests {
         assert_eq!(v, InstType::Unknown("FUTURE_THING".to_owned()));
         // And serializes back to the original wire value.
         assert_eq!(serde_json::to_string(&v).unwrap(), "\"FUTURE_THING\"");
+    }
+
+    #[test]
+    fn raw_request_params_replace_duplicate_keys() {
+        let params = RawRequestParams::new()
+            .param("ccy", "BTC")
+            .param("ccy", "ETH");
+
+        assert_eq!(
+            serde_json::to_value(params).unwrap(),
+            serde_json::json!({"ccy": "ETH"})
+        );
     }
 }

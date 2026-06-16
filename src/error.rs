@@ -1,5 +1,6 @@
 //! Error types returned by the crate.
 
+use crate::model::RequestValidationError;
 use crate::transport::TransportError;
 
 /// A boxed, thread-safe error used as the `source` of opaque variants so that
@@ -19,6 +20,10 @@ pub enum Error {
     /// The underlying HTTP transport failed (connection, TLS, timeout, …).
     #[error("transport error: {0}")]
     Transport(#[from] TransportError),
+
+    /// The typed request failed client-side validation before it was sent.
+    #[error("invalid request: {0}")]
+    InvalidRequest(#[from] RequestValidationError),
 
     /// The request could not be encoded (query string or JSON body).
     #[error("failed to encode request: {0}")]

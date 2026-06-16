@@ -11,6 +11,8 @@
 //! it incurs no boxing or dynamic dispatch — the [`OkxClient`](crate::OkxClient)
 //! is generic over `T: Transport`.
 
+use std::error::Error as StdError;
+use std::fmt;
 use std::future::Future;
 
 use bytes::Bytes;
@@ -38,23 +40,44 @@ pub type DefaultTransport = UnconfiguredTransport;
 #[derive(Debug, Clone, Copy, Default)]
 pub struct UnconfiguredTransport;
 
+type BoxError = Box<dyn StdError + Send + Sync>;
+
 /// An opaque transport-layer error.
 ///
 /// The concrete source error (e.g. `reqwest::Error`) is boxed so it does not
 /// leak into this crate's public API.
-#[derive(Debug, thiserror::Error)]
-#[error("{0}")]
-pub struct TransportError(Box<dyn std::error::Error + Send + Sync>);
+#[derive(Debug)]
+pub struct TransportError(BoxError);
 
 impl TransportError {
     /// Wrap any boxable error as a [`TransportError`].
-    pub fn new(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> Self {
+    pub fn new(error: impl Into<BoxError>) -> Self {
         Self(error.into())
     }
 
     /// Create a [`TransportError`] from a message string.
     pub fn message(message: impl Into<String>) -> Self {
         Self(message.into().into())
+    }
+}
+
+impl fmt::Display for TransportError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)?;
+
+        let mut source = self.0.source();
+        while let Some(error) = source {
+            write!(f, ": {error}")?;
+            source = error.source();
+        }
+
+        Ok(())
+    }
+}
+
+impl StdError for TransportError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        Some(self.0.as_ref())
     }
 }
 

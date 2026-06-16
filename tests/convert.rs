@@ -5,8 +5,11 @@ mod common;
 use std::env;
 
 use common::live_client;
+use rust_okx::api::convert::{
+    ConvertCurrencyPairRequest, ConvertHistoryRequest, ConvertQuoteRequest, ConvertTradeRequest,
+};
+use rust_okx::model::OrderSide;
 use rust_okx::OkxClient;
-use rust_okx::api::convert::{ConvertHistoryRequest, ConvertQuoteRequest, ConvertTradeRequest};
 
 fn client_or_skip(test: &str) -> Option<OkxClient> {
     let client = live_client();
@@ -41,14 +44,17 @@ async fn convert_read_only_live() {
         .get_currencies()
         .await
         .expect("convert/currencies");
+
+    let pair = ConvertCurrencyPairRequest::new("BTC", "USDT");
     let _ = client
         .convert()
-        .get_currency_pair(Some("BTC"), Some("USDT"))
+        .get_currency_pair(&pair)
         .await
         .expect("convert/currency-pair");
+
     let _ = client
         .convert()
-        .get_convert_history(&ConvertHistoryRequest::new().param("limit", "10"))
+        .get_convert_history(&ConvertHistoryRequest::new().limit(10))
         .await
         .expect("convert/history");
 }
@@ -62,16 +68,26 @@ async fn convert_quote_and_trade_live_when_enabled() {
         return;
     }
 
-    let from_ccy = env_non_empty("OKX_TEST_CONVERT_FROM_CCY").expect("from ccy");
-    let to_ccy = env_non_empty("OKX_TEST_CONVERT_TO_CCY").expect("to ccy");
-    let side = env_non_empty("OKX_TEST_CONVERT_SIDE").expect("side");
+    let base_ccy = env_non_empty("OKX_TEST_CONVERT_FROM_CCY").expect("from ccy");
+    let quote_ccy = env_non_empty("OKX_TEST_CONVERT_TO_CCY").expect("to ccy");
+    let side = match env_non_empty("OKX_TEST_CONVERT_SIDE")
+        .expect("side")
+        .as_str()
+    {
+        "buy" => OrderSide::Buy,
+        "sell" => OrderSide::Sell,
+        other => panic!("OKX_TEST_CONVERT_SIDE must be buy or sell, got {other}"),
+    };
     let amount = env_non_empty("OKX_TEST_CONVERT_AMOUNT").expect("amount");
-    let quote = ConvertQuoteRequest::new()
-        .param("baseCcy", from_ccy)
-        .param("quoteCcy", to_ccy)
-        .param("side", side)
-        .param("rfqSz", amount);
+    let size_ccy = env_non_empty("OKX_TEST_CONVERT_SIZE_CCY").expect("size ccy");
 
+    let quote = ConvertQuoteRequest::new(
+        base_ccy.clone(),
+        quote_ccy.clone(),
+        side.clone(),
+        amount.clone(),
+        size_ccy.clone(),
+    );
     let quotes = client
         .convert()
         .estimate_quote(&quote)
@@ -81,7 +97,15 @@ async fn convert_quote_and_trade_live_when_enabled() {
     let quote_id = env_non_empty("OKX_TEST_CONVERT_QUOTE_ID")
         .or_else(|| quotes.first().map(|row| row.quote_id.clone()))
         .expect("quote id");
-    let trade = ConvertTradeRequest::new().param("quoteId", quote_id);
+
+    let trade = ConvertTradeRequest::new(
+        quote_id,
+        base_ccy,
+        quote_ccy,
+        side,
+        amount,
+        size_ccy,
+    );
     let _ = client
         .convert()
         .convert_trade(&trade)
