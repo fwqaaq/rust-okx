@@ -1,11 +1,11 @@
 use std::time::Duration;
 
 use rust_okx::api::market::Candle;
-use rust_okx::{Arg, OkxRegion, OkxWs, WsEvent};
+use rust_okx::{Arg, OkxWs, WsEvent};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut ws = OkxWs::business(OkxRegion::Global).connect().await?;
+    let mut ws = OkxWs::business().connect().await?;
     let arg = Arg::new("candle1m").inst_id("BTC-USDT");
     ws.subscribe(std::slice::from_ref(&arg)).await?;
 

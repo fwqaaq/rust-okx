@@ -2,7 +2,116 @@
 
 use serde::Deserialize;
 
-use crate::NumberString;
+use crate::model::{NumberString, RestRow};
+
+/// Generic row for forward-compatible WebSocket channels whose payloads are
+/// sparse or feature-dependent.
+pub type WsRow = RestRow;
+
+/// Public-data `instruments` channel row.
+pub type InstrumentUpdate = RestRow;
+
+/// Public-data `event-contract-markets` channel row.
+pub type EventContractMarketUpdate = RestRow;
+
+/// Public-data `open-interest` channel row.
+pub type OpenInterestUpdate = RestRow;
+
+/// Public-data `funding-rate` channel row.
+pub type FundingRateUpdate = RestRow;
+
+/// Public-data `price-limit` channel row.
+pub type PriceLimitUpdate = RestRow;
+
+/// Public-data `opt-summary` channel row.
+pub type OptionSummaryUpdate = RestRow;
+
+/// Public-data `estimated-price` channel row.
+pub type EstimatedPriceUpdate = RestRow;
+
+/// Public-data `mark-price` channel row.
+pub type MarkPriceUpdate = RestRow;
+
+/// Public-data `index-tickers` channel row.
+pub type IndexTickerUpdate = RestRow;
+
+/// Public-data mark/index candlestick channel row.
+pub type ReferenceCandleUpdate = RestRow;
+
+/// Public-data `liquidation-orders` channel row.
+pub type LiquidationOrderUpdate = RestRow;
+
+/// Public-data `adl-warning` channel row.
+pub type AdlWarningUpdate = RestRow;
+
+/// Public-data `economic-calendar` channel row.
+pub type EconomicCalendarUpdate = RestRow;
+
+/// Private `positions` channel row.
+pub type PositionUpdate = RestRow;
+
+/// Private `balance_and_position` channel row.
+pub type BalanceAndPositionUpdate = RestRow;
+
+/// Private `liquidation-warning` channel row.
+pub type LiquidationWarningUpdate = RestRow;
+
+/// Private `account-greeks` channel row.
+pub type AccountGreeksUpdate = RestRow;
+
+/// Private `fills` channel row.
+pub type FillUpdate = RestRow;
+
+/// Private `orders-algo` channel row.
+pub type AlgoOrderUpdate = RestRow;
+
+/// Private `algo-advance` channel row.
+pub type AdvancedAlgoOrderUpdate = RestRow;
+
+/// Trading-bot channel row.
+pub type TradingBotUpdate = RestRow;
+
+/// Copy-trading notification row.
+pub type CopyTradingNotification = RestRow;
+
+/// Block-trading RFQ channel row.
+pub type BlockRfqUpdate = RestRow;
+
+/// Block-trading quote channel row.
+pub type BlockQuoteUpdate = RestRow;
+
+/// Block-trading structure-block-trades channel row.
+pub type StructureBlockTradeUpdate = RestRow;
+
+/// Public block-trade channel row.
+pub type PublicBlockTradeUpdate = RestRow;
+
+/// Block ticker channel row.
+pub type BlockTickerUpdate = RestRow;
+
+/// Spread order channel row.
+pub type SpreadOrderUpdate = RestRow;
+
+/// Spread trade channel row.
+pub type SpreadTradeUpdate = RestRow;
+
+/// Spread order-book channel row.
+pub type SpreadOrderBookUpdate = RestRow;
+
+/// Spread ticker channel row.
+pub type SpreadTickerUpdate = RestRow;
+
+/// Spread candlestick channel row.
+pub type SpreadCandleUpdate = RestRow;
+
+/// Funding `deposit-info` channel row.
+pub type DepositInfoUpdate = RestRow;
+
+/// Funding `withdrawal-info` channel row.
+pub type WithdrawalInfoUpdate = RestRow;
+
+/// Status channel row.
+pub type StatusUpdate = RestRow;
 
 /// An order book push from `books`, `books5`, or related channels.
 #[derive(Debug, Clone, Deserialize)]

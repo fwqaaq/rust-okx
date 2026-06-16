@@ -1,11 +1,11 @@
 use std::time::Duration;
 
 use rust_okx::api::market::Ticker;
-use rust_okx::{Arg, OkxRegion, OkxWs, WsEvent};
+use rust_okx::{Arg, OkxWs, WsEvent};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut ws = OkxWs::public(OkxRegion::Global).connect().await?;
+    let mut ws = OkxWs::public().connect().await?;
     let arg = Arg::new("tickers").inst_id("BTC-USDT");
     ws.subscribe(std::slice::from_ref(&arg)).await?;
 

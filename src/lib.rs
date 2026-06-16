@@ -53,7 +53,10 @@ pub use model::NumberString;
 pub use transport::ReqwestTransport;
 pub use transport::{Transport, TransportError};
 #[cfg(feature = "websocket")]
-pub use ws::{Arg, OkxWs, OkxWsBuilder, WsChannelGroup, WsConn, WsConnector, WsEvent, WsFrame};
+pub use ws::{
+    Arg, OkxWs, OkxWsBuilder, Push, WsChannelConnectionCount, WsChannelGroup, WsConn, WsConnector,
+    WsEvent, WsFrame, WsNotice, WsOperation,
+};
 
 /// Global OKX REST API base URL.
 pub const GLOBAL_API_URL: &str = "https://www.okx.com";

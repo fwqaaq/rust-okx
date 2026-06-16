@@ -7,9 +7,23 @@
 - Round 4 已完成首版 `websocket` feature：`OkxWs` / `OkxWsBuilder` / `WsConn` / `WsConnector` / `WsEvent` / `Arg`。
 - 已实现 public/private/business 入口、connect/login/subscribe/unsubscribe/close、基础断线重连、订阅恢复、私有重登录、文本 ping/pong。
 - 已实现默认 `tokio-tungstenite` 连接器，且公共 API 不暴露 `tokio` / `tokio_tungstenite` / `serde_json` 类型。
-- 已增加离线 Mock 连接测试，以及真实 `ws_public` / `ws_business` / `ws_private` 集成测试。
-- 后续继续扩展 public channels：trades、books、books5、candles、instruments、open-interest、funding-rate、price-limit、mark-price 等 typed examples。
-- 后续继续扩展 private channels：positions、balance_and_position、orders-algo、algo-advance、liquidation-warning、account-greeks 等 typed models。
+- 已增加纯序列化/解析测试，以及真实 `ws_public` / `ws_business` / `ws_private` 集成测试；需要登录的测试统一读取 `.env` 的 OKX 凭据，缺失时跳过。
+- Round 7 目标：WebSocket 不再只停留在连接层，按 OKX v5 官方文档补齐频道清单、频道参数 helper、操作响应事件和 WS 交易操作发送能力。
+- Core：连接、登录、订阅、取消订阅、服务升级 notice、`channel-conn-count` 连接数通知、公共错误码、public/private/business/demo endpoint。
+- Trading account 私有频道：`account`、`positions`、`balance_and_position`、`liquidation-warning`、`account-greeks`。
+- Trade 私有频道：`orders`、`fills`。
+- Trade WebSocket 交易 API：`order`、`batch-orders`、`cancel-order`、`batch-cancel-orders`、`amend-order`、`batch-amend-orders`、`mass-cancel`。
+- Algo/Grid/Recurring/Copy 私有频道：`orders-algo`、`algo-advance`、`grid-orders-spot`、`grid-orders-contract`、`grid-positions`、`grid-sub-orders`、`recurring-buy-orders`、`copytrading-notification`。
+- Market data 公共/业务频道：`tickers`、`candle*`、`trades`、`trades-all`、`books`、`books5`、`books-l2-tbt`、`books50-l2-tbt`、`bbo-tbt`、`option-trades`、`call-auction-details`。
+- Public data 公共/业务频道：`instruments`、`event-contract-markets`、`open-interest`、`funding-rate`、`price-limit`、`opt-summary`、`estimated-price`、`mark-price`、`index-tickers`、`mark-price-candle*`、`index-candle*`、`liquidation-orders`、`adl-warning`、`economic-calendar`。
+- Block trading 私有频道：`rfqs`、`quotes`、`struc-block-trades`。
+- Block trading 公共频道：`public-struc-block-trades`、`public-block-trades`、`block-tickers`。
+- Spread trading WebSocket 交易 API：`sprd-order`、`sprd-amend-order`、`sprd-cancel-order`、`sprd-mass-cancel`。
+- Spread trading 私有频道：`sprd-orders`、`sprd-trades`。
+- Spread trading 公共/业务频道：`sprd-bbo-tbt`、`sprd-books5`、`sprd-books-l2-tbt`、`sprd-public-trades`、`sprd-tickers`、`sprd-candle*`。
+- Funding account 私有频道：`deposit-info`、`withdrawal-info`。
+- Status 公共频道：`status`。
+- 后续继续把当前宽松 row 的长尾频道逐步升级为更细 typed models；新增枚举必须保留 `Unknown(String)`，所有数值字符串继续使用 `NumberString`。
 - 后续增强重连策略：可配置指数退避、jitter、可注入 sleep、完整 idle timeout 策略和更精细的重连事件。
 
 ## Funding / Asset

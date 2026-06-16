@@ -1,14 +1,12 @@
 use std::env;
 use std::time::Duration;
 
-use rust_okx::{Arg, Credentials, OkxRegion, OkxWs, WsEvent};
+use rust_okx::{Arg, Credentials, OkxWs, WsEvent};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let _ = dotenvy::dotenv();
-    let mut ws = OkxWs::private(live_credentials()?, OkxRegion::Global)
-        .connect()
-        .await?;
+    let mut ws = OkxWs::private(live_credentials()?).connect().await?;
 
     let args = [Arg::new("account"), Arg::new("orders").inst_type("ANY")];
     ws.subscribe(&args).await?;
