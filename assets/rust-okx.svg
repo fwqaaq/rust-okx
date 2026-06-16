@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">rust-okx icon</title>
+  <desc id="desc">A minimal icon with a hexagon, code brackets, and a small market line.</desc>
+
+  <rect width="256" height="256" rx="48" fill="#111827"/>
+  <path d="M128 42 202 85v86l-74 43-74-43V85l74-43Z" fill="none" stroke="#f97316" stroke-width="14" stroke-linejoin="round"/>
+
+  <path d="M99 101 72 128l27 27" fill="none" stroke="#f9fafb" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M157 101 184 128l-27 27" fill="none" stroke="#f9fafb" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M98 151h24l14-38 14 22h20" fill="none" stroke="#22c55e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

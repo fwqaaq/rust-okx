@@ -14,13 +14,13 @@
 
 ## Funding / Asset
 
-- 新增 `funding` 或 `asset` 模块，覆盖资金账户余额和币种信息。
-- 资金划转：funds transfer、transfer state、资金划转历史、账户间划转场景。
-- 充值：充值地址、充值历史、充值到账状态。
-- 提现：提现、取消提现、提现历史、链上手续费、地址校验。
-- 闪电网络：Lightning deposit、Lightning withdraw、invoice 查询。
-- 资产估值和资金账单：asset valuation、funding bills、asset bills。
-- 保持 Funding 与 Account 的模型边界清晰，避免把资金账户类型混入交易账户 API。
+- Round 5 已完成首版 `client.funding()`：覆盖 Python SDK `FundingAPI` 中的 `/api/v5/asset/*` 端点。
+- 已实现资金账户查询：currencies、balances、non-tradable assets、deposit address、deposit history、withdrawal history、funding bills、asset valuation、deposit/withdraw status。
+- 已实现资产操作：funds transfer、transfer state、withdrawal、cancel withdrawal、purchase/redempt、convert dust assets、Lightning deposit / withdrawal。
+- 已增加 `.env` 驱动的真实集成测试；mutating 端点需要 `OKX_ENABLE_ASSET_MUTATION=1` 和对应参数才执行。
+- 后续继续补 SubAccount asset endpoints：subaccount balances、subaccount transfer、transfer state、transfer history。
+- 后续继续补 Finance/Savings/Staking/FlexibleLoan 模块，避免和 Funding 模块混用。
+- 后续可增强 live lifecycle 覆盖：transfer -> transfer-state、withdrawal -> cancel-withdrawal、deposit/withdraw status 回查。
 
 ## SubAccount
 

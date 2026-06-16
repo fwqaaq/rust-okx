@@ -5,6 +5,7 @@
 //! models for that area.
 
 pub mod account;
+pub mod funding;
 pub mod market;
 pub mod public_data;
 pub mod trade;

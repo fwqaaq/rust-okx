@@ -40,3 +40,11 @@ tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "net", "
 http = "1"
 bytes = "1"
 dotenvy = "0.15"
+
+[[example]]
+name = "ws_public"
+required-features = ["websocket"]
+
+[[example]]
+name = "ws_private"
+required-features = ["websocket"]
