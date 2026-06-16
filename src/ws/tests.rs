@@ -78,19 +78,60 @@ fn parse_notice_and_channel_connection_count_events() {
     }
 
     let count = parse_text_event(
-        r#"{"event":"channel-conn-count","arg":{"channel":"orders","instType":"ANY"},"connCount":"2","connId":"abc"}"#,
+        r#"{"event":"channel-conn-count","channel":"orders","connCount":"2","connId":"abc"}"#,
     )
     .unwrap()
     .unwrap();
     match count {
         WsEvent::ChannelConnectionCount(count) => {
-            assert_eq!(count.arg.channel, "orders");
-            assert_eq!(count.arg.inst_type.as_deref(), Some("ANY"));
+            assert_eq!(count.channel, "orders");
             assert_eq!(count.conn_count.as_str(), "2");
             assert_eq!(count.conn_id, "abc");
         }
         other => panic!("expected channel count, got {other:?}"),
     }
+
+    let limit_error = parse_text_event(
+        r#"{"event":"channel-conn-count-error","channel":"orders","connCount":"30","connId":"abc"}"#,
+    )
+    .unwrap()
+    .unwrap();
+    match limit_error {
+        WsEvent::ChannelConnectionCountError(count) => {
+            assert_eq!(count.channel, "orders");
+            assert_eq!(count.conn_count.as_str(), "30");
+            assert_eq!(count.conn_id, "abc");
+        }
+        other => panic!("expected channel count error, got {other:?}"),
+    }
+}
+
+#[test]
+fn parse_balance_and_position_push() {
+    let event = parse_text_event(
+        r#"{"arg":{"channel":"balance_and_position","uid":"77982378738415879"},"data":[{"pTime":"1597026383085","eventType":"snapshot","balData":[{"ccy":"BTC","cashBal":"1","uTime":"1597026383085"}],"posData":[{"posId":"1111111111","tradeId":"2","instId":"BTC-USD-191018","instType":"FUTURES","mgnMode":"cross","posSide":"long","pos":"10","ccy":"BTC","posCcy":"","avgPx":"3320","nonSettleAvgPx":"","settledPnl":"","uTime":"1597026383085"}],"trades":[{"instId":"BTC-USD-191018","tradeId":"2"}]}]}"#,
+    )
+    .unwrap()
+    .unwrap();
+
+    let WsEvent::Push(push) = event else {
+        panic!("expected push");
+    };
+    assert_eq!(push.arg.channel, "balance_and_position");
+    assert_eq!(
+        push.arg.extra.get("uid").map(String::as_str),
+        Some("77982378738415879")
+    );
+
+    let rows: Vec<crate::ws::model::BalanceAndPositionUpdate> = push.parse().unwrap();
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].p_time.as_str(), "1597026383085");
+    assert_eq!(rows[0].event_type, "snapshot");
+    assert_eq!(rows[0].bal_data[0].ccy, "BTC");
+    assert_eq!(rows[0].bal_data[0].cash_bal.as_str(), "1");
+    assert_eq!(rows[0].pos_data[0].inst_id, "BTC-USD-191018");
+    assert_eq!(rows[0].pos_data[0].pos.as_str(), "10");
+    assert_eq!(rows[0].trades[0].trade_id, "2");
 }
 
 #[test]

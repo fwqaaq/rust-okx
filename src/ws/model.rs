@@ -51,7 +51,101 @@ pub type EconomicCalendarUpdate = RestRow;
 pub type PositionUpdate = RestRow;
 
 /// Private `balance_and_position` channel row.
-pub type BalanceAndPositionUpdate = RestRow;
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BalanceAndPositionUpdate {
+    /// Push time in Unix milliseconds.
+    #[serde(default)]
+    pub p_time: NumberString,
+    /// Event that triggered the push, such as `snapshot`, `filled`, or `transferred`.
+    #[serde(default)]
+    pub event_type: String,
+    /// Changed balance rows. This can be empty when only positions changed.
+    #[serde(default)]
+    pub bal_data: Vec<BalanceAndPositionBalance>,
+    /// Changed position rows. This can be empty when only balances changed.
+    #[serde(default)]
+    pub pos_data: Vec<BalanceAndPositionPosition>,
+    /// Trades associated with this update.
+    #[serde(default)]
+    pub trades: Vec<BalanceAndPositionTrade>,
+}
+
+/// Balance row in a `balance_and_position` push.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BalanceAndPositionBalance {
+    /// Currency.
+    #[serde(default)]
+    pub ccy: String,
+    /// Cash balance.
+    #[serde(default)]
+    pub cash_bal: NumberString,
+    /// Update time in Unix milliseconds.
+    #[serde(default)]
+    pub u_time: NumberString,
+}
+
+/// Position row in a `balance_and_position` push.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BalanceAndPositionPosition {
+    /// Position ID.
+    #[serde(default)]
+    pub pos_id: String,
+    /// Last trade ID.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Instrument type.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Margin mode.
+    #[serde(default)]
+    pub mgn_mode: String,
+    /// Position side.
+    #[serde(default)]
+    pub pos_side: String,
+    /// Position quantity.
+    #[serde(default)]
+    pub pos: NumberString,
+    /// Margin currency.
+    #[serde(default)]
+    pub ccy: String,
+    /// Position currency for margin positions.
+    #[serde(default)]
+    pub pos_ccy: String,
+    /// Average open price.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Non-settlement entry price.
+    #[serde(default)]
+    pub non_settle_avg_px: NumberString,
+    /// Accumulated settled P&L.
+    #[serde(default)]
+    pub settled_pnl: NumberString,
+    /// Update time in Unix milliseconds.
+    #[serde(default)]
+    pub u_time: NumberString,
+}
+
+/// Trade row in a `balance_and_position` push.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BalanceAndPositionTrade {
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Trade ID.
+    #[serde(default)]
+    pub trade_id: String,
+}
 
 /// Private `liquidation-warning` channel row.
 pub type LiquidationWarningUpdate = RestRow;

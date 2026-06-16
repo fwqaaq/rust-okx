@@ -179,8 +179,8 @@ impl<C: WsConnector> OkxWs<C> {
                         return Ok(Some(event));
                     }
                 }
-                WsFrame::Ping(_) => {
-                    self.conn.send_text("pong".to_owned()).await?;
+                WsFrame::Ping(payload) => {
+                    self.conn.send_pong(payload).await?;
                 }
                 WsFrame::Pong(_) => continue,
                 WsFrame::Close => {

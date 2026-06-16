@@ -29,6 +29,8 @@ pub enum WsEvent {
     Notice(WsNotice),
     /// Connection-count notification for channels with connection limits.
     ChannelConnectionCount(WsChannelConnectionCount),
+    /// Connection-count limit error. The server terminated this channel subscription.
+    ChannelConnectionCountError(WsChannelConnectionCount),
     /// WebSocket operation response, e.g. order placement or cancellation.
     Operation(WsOperation),
     /// Channel data push.
@@ -53,8 +55,8 @@ pub struct WsNotice {
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub struct WsChannelConnectionCount {
-    /// Channel argument associated with the notification.
-    pub arg: Arg,
+    /// Channel name associated with the notification.
+    pub channel: String,
     /// Current connection count for the channel.
     pub conn_count: NumberString,
     /// WebSocket connection ID.
@@ -140,11 +142,10 @@ pub(crate) fn parse_text_event(text: &str) -> Result<Option<WsEvent>, Error> {
             msg: string_field(&value, "msg"),
         }))),
         Some("channel-conn-count") => Ok(Some(WsEvent::ChannelConnectionCount(
-            WsChannelConnectionCount {
-                arg: parse_arg(&value)?,
-                conn_count: string_field(&value, "connCount").into(),
-                conn_id: string_field(&value, "connId"),
-            },
+            parse_channel_connection_count(&value),
+        ))),
+        Some("channel-conn-count-error") => Ok(Some(WsEvent::ChannelConnectionCountError(
+            parse_channel_connection_count(&value),
         ))),
         _ if value.get("arg").is_some() && value.get("data").is_some() => {
             let arg = parse_arg(&value)?;
@@ -160,6 +161,14 @@ pub(crate) fn parse_text_event(text: &str) -> Result<Option<WsEvent>, Error> {
         }
         _ if value.get("op").is_some() => Ok(Some(WsEvent::Operation(parse_operation(&value)?))),
         _ => Ok(None),
+    }
+}
+
+fn parse_channel_connection_count(value: &Value) -> WsChannelConnectionCount {
+    WsChannelConnectionCount {
+        channel: string_field(value, "channel"),
+        conn_count: string_field(value, "connCount").into(),
+        conn_id: string_field(value, "connId"),
     }
 }
 

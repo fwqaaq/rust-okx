@@ -28,6 +28,9 @@ pub trait WsConn: Send {
     /// Send a text frame.
     fn send_text(&mut self, text: String) -> impl Future<Output = Result<(), Error>> + Send;
 
+    /// Send a pong control frame with the supplied ping payload.
+    fn send_pong(&mut self, payload: Bytes) -> impl Future<Output = Result<(), Error>> + Send;
+
     /// Receive the next frame.
     fn recv(&mut self) -> impl Future<Output = Result<Option<WsFrame>, Error>> + Send;
 
@@ -83,6 +86,18 @@ mod tungstenite_impl {
             async move {
                 self.inner
                     .send(Message::Text(text))
+                    .await
+                    .map_err(|e| Error::Transport(TransportError::new(e)))
+            }
+        }
+
+        fn send_pong(
+            &mut self,
+            payload: Bytes,
+        ) -> impl Future<Output = Result<(), Error>> + Send {
+            async move {
+                self.inner
+                    .send(Message::Pong(payload.to_vec()))
                     .await
                     .map_err(|e| Error::Transport(TransportError::new(e)))
             }
