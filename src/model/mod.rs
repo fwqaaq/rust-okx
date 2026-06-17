@@ -7,6 +7,15 @@ use std::str::FromStr;
 use serde::ser::{SerializeMap, SerializeSeq};
 use serde::{Deserialize, Serialize};
 
+mod validation;
+
+pub use validation::{RequestValidationError, ValidateRequest};
+pub(crate) use validation::{
+    at_least_one, at_most_one, exactly_one, length_range, max_length, non_empty,
+    optional_non_empty, range_u64, reject_when_present, require_when, validate_client_request_id,
+    validate_side,
+};
+
 /// The OKX response envelope: `{ "code": "...", "msg": "...", "data": [...] }`.
 ///
 /// Internal — the client unwraps it and returns `data` (or an [`Error::Api`]).
@@ -91,56 +100,6 @@ impl fmt::Display for NumberString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.0)
     }
-}
-
-/// A validation failure detected before an HTTP request is sent.
-#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
-#[non_exhaustive]
-pub enum RequestValidationError {
-    /// A required string field was empty.
-    #[error("request field `{field}` must not be empty")]
-    EmptyField {
-        /// OKX wire-field name.
-        field: &'static str,
-    },
-
-    /// A string field exceeded the endpoint's documented maximum length.
-    #[error("request field `{field}` must be at most {max} characters")]
-    TooLong {
-        /// OKX wire-field name.
-        field: &'static str,
-        /// Maximum allowed character count.
-        max: usize,
-    },
-
-    /// A field did not match the endpoint's required textual format.
-    #[error("request field `{field}` has invalid format: {expected}")]
-    InvalidFormat {
-        /// OKX wire-field name.
-        field: &'static str,
-        /// Human-readable description of the expected format.
-        expected: &'static str,
-    },
-
-    /// A numeric request value was outside the endpoint's documented range.
-    #[error("request field `{field}` must be between {min} and {max}")]
-    OutOfRange {
-        /// OKX wire-field name.
-        field: &'static str,
-        /// Inclusive lower bound.
-        min: u64,
-        /// Inclusive upper bound.
-        max: u64,
-    },
-}
-
-/// Validation implemented by typed request models.
-///
-/// Endpoint accessors call this before serializing and sending a request so
-/// obvious client-side mistakes fail without consuming an OKX rate-limit slot.
-pub trait ValidateRequest {
-    /// Validate all constraints represented by this SDK version.
-    fn validate(&self) -> Result<(), RequestValidationError>;
 }
 
 /// A flexible, untyped request-parameter builder for unsupported or newly
@@ -387,12 +346,14 @@ string_enum! {
         Spot = "SPOT",
         /// Margin.
         Margin = "MARGIN",
-        /// Perpetual swap.
+        /// Perpetual Futures.
         Swap = "SWAP",
-        /// Futures.
+        /// Expiry Futures.
         Futures = "FUTURES",
         /// Option.
         Option = "OPTION",
+        /// Event Contracts
+        Events = "EVENTS",
     }
 }
 

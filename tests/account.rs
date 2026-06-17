@@ -116,7 +116,7 @@ async fn read_only_suite(client: &OkxClient, label: &str) {
     ok!(
         client
             .account()
-            .get_account_instruments(&AccountInstrumentsRequest::new().inst_type(InstType::Spot)),
+            .get_account_instruments(&AccountInstrumentsRequest::new(InstType::Spot)),
         "account/instruments"
     );
 }

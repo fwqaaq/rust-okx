@@ -1,8 +1,9 @@
 use serde::Serialize;
 
-use crate::model::{OrderSide, RequestValidationError, ValidateRequest};
-
-const CLIENT_REQUEST_ID_MAX_LEN: usize = 32;
+use crate::model::{
+    OrderSide, RequestValidationError, ValidateRequest, non_empty, range_u64,
+    validate_client_request_id, validate_side,
+};
 
 /// Convert mode used by currency-pair, quote, and trade requests.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
@@ -62,8 +63,8 @@ impl ConvertCurrencyPairRequest {
 
 impl ValidateRequest for ConvertCurrencyPairRequest {
     fn validate(&self) -> Result<(), RequestValidationError> {
-        require_non_empty("fromCcy", &self.from_ccy)?;
-        require_non_empty("toCcy", &self.to_ccy)
+        non_empty("fromCcy", &self.from_ccy)?;
+        non_empty("toCcy", &self.to_ccy)
     }
 }
 
@@ -126,11 +127,11 @@ impl ConvertQuoteRequest {
 
 impl ValidateRequest for ConvertQuoteRequest {
     fn validate(&self) -> Result<(), RequestValidationError> {
-        require_non_empty("baseCcy", &self.base_ccy)?;
-        require_non_empty("quoteCcy", &self.quote_ccy)?;
+        non_empty("baseCcy", &self.base_ccy)?;
+        non_empty("quoteCcy", &self.quote_ccy)?;
         validate_side(&self.side)?;
-        require_non_empty("rfqSz", &self.rfq_sz)?;
-        require_non_empty("rfqSzCcy", &self.rfq_sz_ccy)?;
+        non_empty("rfqSz", &self.rfq_sz)?;
+        non_empty("rfqSzCcy", &self.rfq_sz_ccy)?;
         validate_client_request_id("clQReqId", self.cl_q_req_id.as_deref())
     }
 }
@@ -197,12 +198,12 @@ impl ConvertTradeRequest {
 
 impl ValidateRequest for ConvertTradeRequest {
     fn validate(&self) -> Result<(), RequestValidationError> {
-        require_non_empty("quoteId", &self.quote_id)?;
-        require_non_empty("baseCcy", &self.base_ccy)?;
-        require_non_empty("quoteCcy", &self.quote_ccy)?;
+        non_empty("quoteId", &self.quote_id)?;
+        non_empty("baseCcy", &self.base_ccy)?;
+        non_empty("quoteCcy", &self.quote_ccy)?;
         validate_side(&self.side)?;
-        require_non_empty("sz", &self.sz)?;
-        require_non_empty("szCcy", &self.sz_ccy)?;
+        non_empty("sz", &self.sz)?;
+        non_empty("szCcy", &self.sz_ccy)?;
         validate_client_request_id("clTReqId", self.cl_t_req_id.as_deref())
     }
 }
@@ -264,62 +265,15 @@ impl ValidateRequest for ConvertHistoryRequest {
     fn validate(&self) -> Result<(), RequestValidationError> {
         validate_client_request_id("clTReqId", self.cl_t_req_id.as_deref())?;
 
-        if let Some(limit) = &self.limit {
-            let parsed = limit
-                .parse::<u64>()
-                .expect("ConvertHistoryRequest::limit stores a u8 as decimal text");
-            if !(1..=100).contains(&parsed) {
-                return Err(RequestValidationError::OutOfRange {
-                    field: "limit",
-                    min: 1,
-                    max: 100,
-                });
+        match &self.limit {
+            Some(limit) => {
+                let parsed = limit
+                    .parse::<u64>()
+                    .expect("ConvertHistoryRequest::limit stores a u8 as decimal text");
+
+                range_u64("limit", parsed, 1, 100)
             }
+            None => Ok(()),
         }
-
-        Ok(())
     }
-}
-
-fn require_non_empty(field: &'static str, value: &str) -> Result<(), RequestValidationError> {
-    if value.is_empty() {
-        Err(RequestValidationError::EmptyField { field })
-    } else {
-        Ok(())
-    }
-}
-
-fn validate_side(side: &OrderSide) -> Result<(), RequestValidationError> {
-    match side {
-        OrderSide::Buy | OrderSide::Sell => Ok(()),
-        _ => Err(RequestValidationError::InvalidFormat {
-            field: "side",
-            expected: "buy or sell",
-        }),
-    }
-}
-
-fn validate_client_request_id(
-    field: &'static str,
-    value: Option<&str>,
-) -> Result<(), RequestValidationError> {
-    let Some(value) = value else {
-        return Ok(());
-    };
-
-    require_non_empty(field, value)?;
-    if value.chars().count() > CLIENT_REQUEST_ID_MAX_LEN {
-        return Err(RequestValidationError::TooLong {
-            field,
-            max: CLIENT_REQUEST_ID_MAX_LEN,
-        });
-    }
-    if !value.bytes().all(|byte| byte.is_ascii_alphanumeric()) {
-        return Err(RequestValidationError::InvalidFormat {
-            field,
-            expected: "1-32 ASCII alphanumeric characters",
-        });
-    }
-
-    Ok(())
 }

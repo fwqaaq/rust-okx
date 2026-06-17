@@ -1,6 +1,9 @@
 use serde::Serialize;
 
-use crate::model::{InstType, PositionSide, RequestParams, TradeMode};
+use crate::model::{
+    InstType, PositionSide, RequestParams, RequestValidationError, TradeMode, ValidateRequest,
+    optional_non_empty, reject_when_present, require_when,
+};
 
 /// Query parameters for VIP interest-accrued records.
 pub type VipInterestAccruedRequest = RequestParams;
@@ -447,12 +450,12 @@ impl FeeRatesRequest {
 }
 
 /// Query parameters for account instruments.
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct AccountInstrumentsRequest {
-    #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
-    inst_type: Option<InstType>,
-    #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<String>,
+    #[serde(rename = "instType")]
+    inst_type: InstType,
+    #[serde(rename = "seriesId", skip_serializing_if = "Option::is_none")]
+    series_id: Option<String>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
     inst_family: Option<String>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
@@ -461,19 +464,18 @@ pub struct AccountInstrumentsRequest {
 
 impl AccountInstrumentsRequest {
     /// Create an empty account-instruments query.
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(inst_type: InstType) -> Self {
+        Self {
+            inst_type,
+            series_id: None,
+            inst_family: None,
+            inst_id: None,
+        }
     }
 
-    /// Set the instrument type filter.
-    pub fn inst_type(mut self, inst_type: InstType) -> Self {
-        self.inst_type = Some(inst_type);
-        self
-    }
-
-    /// Set the underlying filter.
-    pub fn underlying(mut self, underlying: impl Into<String>) -> Self {
-        self.underlying = Some(underlying.into());
+    /// Set the series_id filter.
+    pub fn series_id(mut self, series_id: impl Into<String>) -> Self {
+        self.series_id = Some(series_id.into());
         self
     }
 
@@ -487,6 +489,56 @@ impl AccountInstrumentsRequest {
     pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
+    }
+}
+
+impl ValidateRequest for AccountInstrumentsRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        // Setting Option<String> disallow empty string.
+        optional_non_empty("seriesId", self.series_id.as_deref())?;
+        optional_non_empty("instFamily", self.inst_family.as_deref())?;
+        optional_non_empty("instId", self.inst_id.as_deref())?;
+
+        match &self.inst_type {
+            InstType::Events => {
+                // Series ID, e.g. BTC-ABOVE-DAILY. Required when instType is EVENTS
+                require_when("seriesId", self.series_id.as_deref(), "instType is EVENTS")?;
+                reject_when_present(
+                    "instFamily",
+                    self.inst_family.as_ref(),
+                    "instType is EVENTS",
+                )?;
+            }
+
+            // Only applicable to FUTURES/SWAP/OPTION. If instType is OPTION, instFamily is required.
+            InstType::Option => {
+                require_when(
+                    "instFamily",
+                    self.inst_family.as_deref(),
+                    "instType is OPTION",
+                )?;
+            }
+
+            InstType::Futures | InstType::Swap => {}
+
+            InstType::Spot | InstType::Margin => {
+                // InstFamily is not applicable to SPOT/MARGIN。
+                reject_when_present(
+                    "instFamily",
+                    self.inst_family.as_ref(),
+                    "instType is SPOT or MARGIN",
+                )?;
+            }
+
+            InstType::Unknown(_) => {
+                return Err(RequestValidationError::InvalidFormat {
+                    field: "instType",
+                    expected: "SPOT, MARGIN, SWAP, FUTURES, OPTION, or EVENTS",
+                });
+            }
+        }
+
+        Ok(())
     }
 }
 

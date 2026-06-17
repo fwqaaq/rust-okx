@@ -1,3 +1,4 @@
+use crate::model::InstType;
 use crate::test_util::MockTransport;
 use crate::{Credentials, OkxClient};
 
@@ -369,9 +370,7 @@ async fn get_account_instruments_uses_builder_query() {
          "baseCcy":"BTC","quoteCcy":"USDT","settleCcy":"USDT"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = super::AccountInstrumentsRequest::new()
-        .inst_type(crate::model::InstType::Swap)
-        .inst_id("BTC-USDT-SWAP");
+    let request = super::AccountInstrumentsRequest::new(InstType::Swap).inst_id("BTC-USDT-SWAP");
 
     let result = client
         .account()

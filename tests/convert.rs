@@ -5,11 +5,11 @@ mod common;
 use std::env;
 
 use common::live_client;
+use rust_okx::OkxClient;
 use rust_okx::api::convert::{
     ConvertCurrencyPairRequest, ConvertHistoryRequest, ConvertQuoteRequest, ConvertTradeRequest,
 };
 use rust_okx::model::OrderSide;
-use rust_okx::OkxClient;
 
 fn client_or_skip(test: &str) -> Option<OkxClient> {
     let client = live_client();
@@ -39,12 +39,16 @@ async fn convert_read_only_live() {
         return;
     };
 
+    // API: Currency
+    // * /api/v5/asset/convert/currencies
     let _ = client
         .convert()
         .get_currencies()
         .await
         .expect("convert/currencies");
 
+    // API: Currency
+    // * /api/v5/asset/convert/currency-pair
     let pair = ConvertCurrencyPairRequest::new("BTC", "USDT");
     let _ = client
         .convert()
@@ -52,6 +56,8 @@ async fn convert_read_only_live() {
         .await
         .expect("convert/currency-pair");
 
+    // API: Currency
+    // * /api/v5/asset/convert/history
     let _ = client
         .convert()
         .get_convert_history(&ConvertHistoryRequest::new().limit(10))
@@ -88,6 +94,9 @@ async fn convert_quote_and_trade_live_when_enabled() {
         amount.clone(),
         size_ccy.clone(),
     );
+
+    // API: Currency
+    // * /api/v5/asset/convert/estimate-quote
     let quotes = client
         .convert()
         .estimate_quote(&quote)
@@ -98,14 +107,9 @@ async fn convert_quote_and_trade_live_when_enabled() {
         .or_else(|| quotes.first().map(|row| row.quote_id.clone()))
         .expect("quote id");
 
-    let trade = ConvertTradeRequest::new(
-        quote_id,
-        base_ccy,
-        quote_ccy,
-        side,
-        amount,
-        size_ccy,
-    );
+    // API: Currency
+    // * /api/v5/asset/convert/trade
+    let trade = ConvertTradeRequest::new(quote_id, base_ccy, quote_ccy, side, amount, size_ccy);
     let _ = client
         .convert()
         .convert_trade(&trade)
