@@ -1,7 +1,10 @@
 use serde::Serialize;
 
-use crate::model::{InstType, RequestParams};
+use crate::model::InstType;
 
+mod edge;
+
+pub use edge::*;
 /// Query parameters for public endpoints filtered by instrument family.
 #[derive(Debug, Clone, Serialize)]
 pub struct InstrumentFamilyRequest {
@@ -334,21 +337,3 @@ impl ConvertContractCoinRequest {
         self
     }
 }
-
-/// Query parameters for option summary.
-pub type OptionSummaryRequest = RequestParams;
-
-/// Query parameters for interest-rate loan quota.
-pub type InterestRateLoanQuotaRequest = RequestParams;
-
-/// Query parameters for VIP interest-rate loan quota.
-pub type VipInterestRateLoanQuotaRequest = RequestParams;
-
-/// Query parameters for instrument tick bands.
-pub type InstrumentTickBandsRequest = RequestParams;
-
-/// Query parameters for public option trades.
-pub type PublicOptionTradesRequest = RequestParams;
-
-/// Query parameters for market-data history.
-pub type MarketDataHistoryRequest = RequestParams;

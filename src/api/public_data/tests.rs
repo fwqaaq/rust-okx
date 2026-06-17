@@ -1,6 +1,6 @@
-use crate::OkxClient;
 use crate::model::InstType;
 use crate::test_util::MockTransport;
+use crate::{Error, OkxClient};
 
 #[tokio::test]
 async fn get_instruments_builds_request_and_parses() {
@@ -247,12 +247,12 @@ async fn get_convert_contract_coin_uses_builder_query() {
 }
 
 #[tokio::test]
-async fn get_option_summary_uses_flexible_query() {
+async fn get_option_summary_uses_typed_query() {
     let body = r#"{"code":"0","msg":"","data":[
             {"instType":"OPTION","instFamily":"BTC-USD","instId":"BTC-USD-240628-50000-C","delta":"0.5","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
-    let request = super::OptionSummaryRequest::new().param("instFamily", "BTC-USD");
+    let request = super::OptionSummaryRequest::new("BTC-USD");
 
     let rows = client
         .public_data()
@@ -260,15 +260,13 @@ async fn get_option_summary_uses_flexible_query() {
         .await
         .unwrap();
     assert_eq!(rows[0].inst_family, "BTC-USD");
-
-    let req = mock.captured();
-    assert_eq!(req.query(), Some("instFamily=BTC-USD"));
+    assert_eq!(mock.captured().query(), Some("instFamily=BTC-USD"));
 }
 
 #[tokio::test]
 async fn get_estimated_price_queries_inst_id() {
     let body = r#"{"code":"0","msg":"","data":[
-            {"instId":"BTC-USD-240628","px":"42000","ts":"1597026383085"}]}"#;
+            {"instType":"FUTURES","instId":"BTC-USD-240628","settlePx":"42000","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -277,10 +275,8 @@ async fn get_estimated_price_queries_inst_id() {
         .get_estimated_price("BTC-USD-240628")
         .await
         .unwrap();
-    assert_eq!(rows[0].px.as_str(), "42000");
-
-    let req = mock.captured();
-    assert_eq!(req.query(), Some("instId=BTC-USD-240628"));
+    assert_eq!(rows[0].settle_px.as_str(), "42000");
+    assert_eq!(mock.captured().query(), Some("instId=BTC-USD-240628"));
 }
 
 #[tokio::test]
@@ -301,24 +297,25 @@ async fn get_discount_rate_interest_free_quota_omits_currency() {
 }
 
 #[tokio::test]
-async fn public_edge_requests_use_flexible_query() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"OPTION","instFamily":"BTC-USD","instId":"BTC-USD-240628-50000-C","px":"10","ts":"1597026383085"}]}"#;
-
-    let mock = MockTransport::new(body);
+async fn public_edge_requests_use_typed_queries() {
+    let tick_body = r#"{"code":"0","msg":"","data":[
+        {"instType":"OPTION","instFamily":"BTC-USD","tickBand":[{"minPx":"0","maxPx":"10","tickSz":"0.1"}],"ts":"1"}]}"#;
+    let mock = MockTransport::new(tick_body);
     let client = OkxClient::with_transport(mock.clone()).build();
-    let request = super::InstrumentTickBandsRequest::new().param("instFamily", "BTC-USD");
+    let request = super::InstrumentTickBandsRequest::new("OPTION");
     let rows = client
         .public_data()
         .get_instrument_tick_bands(&request)
         .await
         .unwrap();
-    assert_eq!(rows[0].inst_id, "BTC-USD-240628-50000-C");
-    assert_eq!(mock.captured().query(), Some("instFamily=BTC-USD"));
+    assert_eq!(rows[0].inst_family, "BTC-USD");
+    assert_eq!(mock.captured().query(), Some("instType=OPTION"));
 
-    let mock = MockTransport::new(body);
+    let trade_body = r#"{"code":"0","msg":"","data":[
+        {"instId":"BTC-USD-240628-50000-C","tradeId":"1","px":"10","sz":"1","side":"buy","ts":"1"}]}"#;
+    let mock = MockTransport::new(trade_body);
     let client = OkxClient::with_transport(mock.clone()).build();
-    let request = super::PublicOptionTradesRequest::new().param("instFamily", "BTC-USD");
+    let request = super::PublicOptionTradesRequest::new().inst_family("BTC-USD");
     client
         .public_data()
         .get_option_trades(&request)
@@ -326,38 +323,50 @@ async fn public_edge_requests_use_flexible_query() {
         .unwrap();
     assert_eq!(mock.captured().query(), Some("instFamily=BTC-USD"));
 
-    let mock = MockTransport::new(body);
+    let history_body = r#"{"code":"0","msg":"","data":[
+        {"module":"1","instType":"SPOT","instId":"BTC-USDT","dateAggrType":"1D","value":"1","ts":"1"}]}"#;
+    let mock = MockTransport::new(history_body);
     let client = OkxClient::with_transport(mock.clone()).build();
     let request = super::MarketDataHistoryRequest::new()
-        .param("instId", "BTC-USDT")
-        .param("period", "5m");
+        .module("1")
+        .inst_type("SPOT")
+        .inst_id_list("BTC-USDT")
+        .date_aggregation("1D");
     client
         .public_data()
         .get_market_data_history(&request)
         .await
         .unwrap();
-    assert_eq!(mock.captured().query(), Some("instId=BTC-USDT&period=5m"));
+    assert_eq!(
+        mock.captured().query(),
+        Some("module=1&instType=SPOT&instIdList=BTC-USDT&dateAggrType=1D")
+    );
 }
 
 #[tokio::test]
-async fn loan_quota_requests_are_public_and_flexible() {
-    let body =
-        r#"{"code":"0","msg":"","data":[{"ccy":"USDT","rate":"0.01","ts":"1597026383085"}]}"#;
+async fn loan_quota_requests_are_public_and_typed() {
+    let body = r#"{"code":"0","msg":"","data":[{
+        "basic":[{"ccy":"USDT","rate":"0.01","quota":"100"}],
+        "vip":[],"regular":[],"configCcyList":[],"config":[]
+    }]}"#;
 
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
-    let request = super::InterestRateLoanQuotaRequest::new().param("ccy", "USDT");
+    let request = super::InterestRateLoanQuotaRequest::new();
     let rows = client
         .public_data()
         .get_interest_rate_loan_quota(&request)
         .await
         .unwrap();
-    assert_eq!(rows[0].rate.as_str(), "0.01");
+    assert_eq!(rows[0].basic[0].rate.as_str(), "0.01");
+    assert_eq!(mock.captured().query(), None);
     assert!(!mock.captured().is_signed());
 
-    let mock = MockTransport::new(body);
+    let vip_body = r#"{"code":"0","msg":"","data":[
+        {"ccy":"USDT","level":"1","rate":"0.01","quota":"100"}]}"#;
+    let mock = MockTransport::new(vip_body);
     let client = OkxClient::with_transport(mock.clone()).build();
-    let request = super::VipInterestRateLoanQuotaRequest::new().param("ccy", "USDT");
+    let request = super::VipInterestRateLoanQuotaRequest::new().currency("USDT");
     client
         .public_data()
         .get_vip_interest_rate_loan_quota(&request)
@@ -365,4 +374,63 @@ async fn loan_quota_requests_are_public_and_flexible() {
         .unwrap();
     assert_eq!(mock.captured().query(), Some("ccy=USDT"));
     assert!(!mock.captured().is_signed());
+}
+
+#[tokio::test]
+async fn invalid_public_request_fails_before_transport() {
+    let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = super::InstrumentTickBandsRequest::new("SPOT");
+
+    let error = client
+        .public_data()
+        .get_instrument_tick_bands(&request)
+        .await
+        .unwrap_err();
+    assert!(matches!(error, Error::InvalidRequest(_)));
+    assert!(!mock.was_called());
+}
+
+#[test]
+fn public_quota_array_fields_accept_empty_string_or_null() {
+    let discount: super::DiscountRateInterestFreeQuota =
+        serde_json::from_str(r#"{"ccy":"USDT","amt":"0","discountLv":""}"#)
+            .expect("discountLv should accept the empty-string wire representation");
+    assert!(discount.discount_lv.is_empty());
+
+    let quota: super::InterestRateLoanQuota = serde_json::from_str(
+        r#"{
+            "basic":"",
+            "vip":null,
+            "regular":[],
+            "configCcyList":"",
+            "config":[]
+        }"#,
+    )
+    .expect("quota arrays should accept OKX empty wire representations");
+    assert!(quota.basic.is_empty());
+    assert!(quota.vip.is_empty());
+    assert!(quota.regular.is_empty());
+    assert!(quota.config_ccy_list.is_empty());
+    assert!(quota.config.is_empty());
+
+    let tick_band: super::InstrumentTickBand = serde_json::from_str(
+        r#"{"instType":"OPTION","instFamily":"BTC-USD","tickBand":"","ts":"1"}"#,
+    )
+    .expect("tickBand should accept the empty-string wire representation");
+    assert!(tick_band.tick_band.is_empty());
+}
+
+#[test]
+fn array_or_empty_string_rejects_non_empty_strings() {
+    let error = serde_json::from_str::<super::DiscountRateInterestFreeQuota>(
+        r#"{"ccy":"USDT","amt":"0","discountLv":"not-an-array"}"#,
+    )
+    .expect_err("a non-empty string must not silently decode as an empty array");
+
+    assert!(
+        error
+            .to_string()
+            .contains("expected an array or empty string")
+    );
 }

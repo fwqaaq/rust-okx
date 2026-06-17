@@ -1,10 +1,10 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::RequestParams;
+use crate::model::ValidateRequest;
 use crate::transport::Transport;
 
 use super::endpoints::*;
-use super::internal::optional_ccy;
+use super::internal::{AmountBody, DaysQuery, NoParams, SetLendingRateBody, optional_ccy};
 use super::requests::*;
 use super::responses::*;
 /// Accessor for OKX finance endpoint groups.
@@ -80,6 +80,7 @@ impl<T: Transport> Savings<'_, T> {
         &self,
         request: &SavingsPurchaseRedemptionRequest,
     ) -> Result<Vec<SavingsPurchaseRedemptionResult>, Error> {
+        request.validate()?;
         self.client
             .post(SAVINGS_PURCHASE_REDEMPT, request, true)
             .await
@@ -95,7 +96,7 @@ impl<T: Transport> Savings<'_, T> {
         ccy: &str,
         rate: &str,
     ) -> Result<Vec<SetLendingRateResult>, Error> {
-        let body = RequestParams::new().param("ccy", ccy).param("rate", rate);
+        let body = SetLendingRateBody { ccy, rate };
         self.client
             .post(SAVINGS_SET_LENDING_RATE, &body, true)
             .await
@@ -110,6 +111,7 @@ impl<T: Transport> Savings<'_, T> {
         &self,
         request: &FinanceHistoryRequest,
     ) -> Result<Vec<LendingHistory>, Error> {
+        request.validate()?;
         self.client
             .get(SAVINGS_LENDING_HISTORY, request, true)
             .await
@@ -124,6 +126,7 @@ impl<T: Transport> Savings<'_, T> {
         &self,
         request: &FinanceHistoryRequest,
     ) -> Result<Vec<PublicBorrowHistory>, Error> {
+        request.validate()?;
         self.client
             .get(SAVINGS_PUBLIC_BORROW_HISTORY, request, false)
             .await
@@ -160,7 +163,8 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiOffersRequest,
     ) -> Result<Vec<StakingDefiOffer>, Error> {
-        self.client.get(STAKING_DEFI_OFFERS, request, false).await
+        request.validate()?;
+        self.client.get(STAKING_DEFI_OFFERS, request, true).await
     }
 
     /// Purchase a Staking/DeFi product.
@@ -172,6 +176,7 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiPurchaseRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
+        request.validate()?;
         self.client.post(STAKING_DEFI_PURCHASE, request, true).await
     }
 
@@ -184,6 +189,7 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiRedeemRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
+        request.validate()?;
         self.client.post(STAKING_DEFI_REDEEM, request, true).await
     }
 
@@ -196,6 +202,7 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiCancelRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
+        request.validate()?;
         self.client.post(STAKING_DEFI_CANCEL, request, true).await
     }
 
@@ -206,8 +213,9 @@ impl<T: Transport> StakingDefi<'_, T> {
     /// Returns authentication, API, transport, or decode errors.
     pub async fn get_active_orders(
         &self,
-        request: &StakingDefiOrdersRequest,
+        request: &StakingDefiActiveOrdersRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
+        request.validate()?;
         self.client
             .get(STAKING_DEFI_ACTIVE_ORDERS, request, true)
             .await
@@ -220,8 +228,9 @@ impl<T: Transport> StakingDefi<'_, T> {
     /// Returns authentication, API, transport, or decode errors.
     pub async fn get_orders_history(
         &self,
-        request: &StakingDefiOrdersRequest,
+        request: &StakingDefiOrderHistoryRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
+        request.validate()?;
         self.client
             .get(STAKING_DEFI_ORDERS_HISTORY, request, true)
             .await
@@ -240,9 +249,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// Returns API, transport, or decode errors.
     pub async fn product_info(&self) -> Result<Vec<StakingProductInfo>, Error> {
-        self.client
-            .get(ETH_PRODUCT_INFO, &RequestParams::new(), false)
-            .await
+        self.client.get(ETH_PRODUCT_INFO, &NoParams {}, true).await
     }
 
     /// Purchase ETH staking.
@@ -251,7 +258,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// Returns authentication, API, transport, or decode errors.
     pub async fn purchase(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
-        let body = RequestParams::new().param("amt", amt);
+        let body = AmountBody { amt };
         self.client.post(ETH_PURCHASE, &body, true).await
     }
 
@@ -261,7 +268,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// Returns authentication, API, transport, or decode errors.
     pub async fn redeem(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
-        let body = RequestParams::new().param("amt", amt);
+        let body = AmountBody { amt };
         self.client.post(ETH_REDEEM, &body, true).await
     }
 
@@ -271,9 +278,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// Returns authentication, API, transport, or decode errors.
     pub async fn balance(&self) -> Result<Vec<StakingBalance>, Error> {
-        self.client
-            .get(ETH_BALANCE, &RequestParams::new(), true)
-            .await
+        self.client.get(ETH_BALANCE, &NoParams {}, true).await
     }
 
     /// Retrieve ETH staking purchase/redeem history.
@@ -285,6 +290,7 @@ impl<T: Transport> EthStaking<'_, T> {
         &self,
         request: &FinanceHistoryRequest,
     ) -> Result<Vec<StakingHistory>, Error> {
+        request.validate()?;
         self.client.get(ETH_HISTORY, request, true).await
     }
 
@@ -294,7 +300,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// Returns API, transport, or decode errors.
     pub async fn apy_history(&self, days: &str) -> Result<Vec<StakingApyHistory>, Error> {
-        let query = RequestParams::new().param("days", days);
+        let query = DaysQuery { days };
         self.client.get(ETH_APY_HISTORY, &query, false).await
     }
 }
@@ -310,10 +316,8 @@ impl<T: Transport> SolStaking<'_, T> {
     /// # Errors
     ///
     /// Returns API, transport, or decode errors.
-    pub async fn product_info(&self) -> Result<Vec<StakingProductInfo>, Error> {
-        self.client
-            .get(SOL_PRODUCT_INFO, &RequestParams::new(), false)
-            .await
+    pub async fn product_info(&self) -> Result<StakingProductInfo, Error> {
+        self.client.get(SOL_PRODUCT_INFO, &NoParams {}, true).await
     }
 
     /// Purchase SOL staking.
@@ -322,7 +326,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// Returns authentication, API, transport, or decode errors.
     pub async fn purchase(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
-        let body = RequestParams::new().param("amt", amt);
+        let body = AmountBody { amt };
         self.client.post(SOL_PURCHASE, &body, true).await
     }
 
@@ -332,7 +336,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// Returns authentication, API, transport, or decode errors.
     pub async fn redeem(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
-        let body = RequestParams::new().param("amt", amt);
+        let body = AmountBody { amt };
         self.client.post(SOL_REDEEM, &body, true).await
     }
 
@@ -342,9 +346,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// Returns authentication, API, transport, or decode errors.
     pub async fn balance(&self) -> Result<Vec<StakingBalance>, Error> {
-        self.client
-            .get(SOL_BALANCE, &RequestParams::new(), true)
-            .await
+        self.client.get(SOL_BALANCE, &NoParams {}, true).await
     }
 
     /// Retrieve SOL staking purchase/redeem history.
@@ -356,6 +358,7 @@ impl<T: Transport> SolStaking<'_, T> {
         &self,
         request: &FinanceHistoryRequest,
     ) -> Result<Vec<StakingHistory>, Error> {
+        request.validate()?;
         self.client.get(SOL_HISTORY, request, true).await
     }
 
@@ -365,7 +368,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// Returns API, transport, or decode errors.
     pub async fn apy_history(&self, days: &str) -> Result<Vec<StakingApyHistory>, Error> {
-        let query = RequestParams::new().param("days", days);
+        let query = DaysQuery { days };
         self.client.get(SOL_APY_HISTORY, &query, false).await
     }
 }
@@ -383,7 +386,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     /// Returns API, transport, or decode errors.
     pub async fn borrow_currencies(&self) -> Result<Vec<FlexibleLoanCurrency>, Error> {
         self.client
-            .get(FLEX_BORROW_CURRENCIES, &RequestParams::new(), false)
+            .get(FLEX_BORROW_CURRENCIES, &NoParams {}, true)
             .await
     }
 
@@ -394,10 +397,12 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     /// Returns API, transport, or decode errors.
     pub async fn collateral_assets(
         &self,
-        ccy: Option<&str>,
+        request: &FlexibleLoanCollateralAssetsRequest,
     ) -> Result<Vec<FlexibleLoanCollateralAsset>, Error> {
-        let query = optional_ccy(ccy);
-        self.client.get(FLEX_COLLATERAL_ASSETS, &query, false).await
+        request.validate()?;
+        self.client
+            .get(FLEX_COLLATERAL_ASSETS, request, false)
+            .await
     }
 
     /// Estimate maximum flexible-loan amount.
@@ -409,6 +414,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanMaxLoanRequest,
     ) -> Result<Vec<FlexibleLoanMaxLoan>, Error> {
+        request.validate()?;
         self.client.post(FLEX_MAX_LOAN, request, true).await
     }
 
@@ -419,10 +425,10 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     /// Returns authentication, API, transport, or decode errors.
     pub async fn max_collateral_redeem_amount(
         &self,
-        ccy: Option<&str>,
+        request: &FlexibleLoanMaxRedeemRequest,
     ) -> Result<Vec<FlexibleLoanMaxRedeem>, Error> {
-        let query = optional_ccy(ccy);
-        self.client.get(FLEX_MAX_REDEEM, &query, true).await
+        request.validate()?;
+        self.client.get(FLEX_MAX_REDEEM, request, true).await
     }
 
     /// Adjust flexible-loan collateral.
@@ -434,6 +440,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanAdjustCollateralRequest,
     ) -> Result<Vec<FlexibleLoanOrder>, Error> {
+        request.validate()?;
         self.client
             .post(FLEX_ADJUST_COLLATERAL, request, true)
             .await
@@ -444,10 +451,12 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     /// # Errors
     ///
     /// Returns authentication, API, transport, or decode errors.
-    pub async fn loan_info(&self) -> Result<Vec<FlexibleLoanInfo>, Error> {
-        self.client
-            .get(FLEX_LOAN_INFO, &RequestParams::new(), true)
-            .await
+    pub async fn loan_info(
+        &self,
+        request: &FlexibleLoanInfoRequest,
+    ) -> Result<Vec<FlexibleLoanInfo>, Error> {
+        request.validate()?;
+        self.client.get(FLEX_LOAN_INFO, request, true).await
     }
 
     /// Retrieve flexible-loan history.
@@ -457,8 +466,9 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     /// Returns authentication, API, transport, or decode errors.
     pub async fn loan_history(
         &self,
-        request: &FinanceHistoryRequest,
+        request: &FlexibleLoanHistoryRequest,
     ) -> Result<Vec<FlexibleLoanHistory>, Error> {
+        request.validate()?;
         self.client.get(FLEX_LOAN_HISTORY, request, true).await
     }
 
@@ -469,8 +479,9 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     /// Returns authentication, API, transport, or decode errors.
     pub async fn interest_accrued(
         &self,
-        request: &FinanceHistoryRequest,
+        request: &FlexibleLoanInterestAccruedRequest,
     ) -> Result<Vec<FlexibleLoanInterest>, Error> {
+        request.validate()?;
         self.client.get(FLEX_INTEREST_ACCRUED, request, true).await
     }
 }

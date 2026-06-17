@@ -1,10 +1,18 @@
+use serde::Serialize;
+
+use crate::Error;
 use crate::api::trade::{CancelOrderRequest, PlaceOrderRequest};
 use crate::model::{OrderSide, OrderType, TradeMode};
 use crate::signing;
 use crate::ws::channels;
 use crate::ws::client::login_payload;
 use crate::ws::event::parse_text_event;
-use crate::ws::ops::operation_payload;
+use crate::ws::model::EventType;
+use crate::ws::ops::operation_payload_with_expiry;
+use crate::ws::request::{
+    AmendSpreadOrderRequest, CancelSpreadOrderRequest, MassCancelRequest,
+    MassCancelSpreadOrdersRequest, PlaceSpreadOrderRequest,
+};
 use crate::{Arg, Credentials, WsEvent};
 
 #[test]
@@ -53,6 +61,21 @@ fn channel_helpers_build_expected_args() {
     let funding = channels::public_data::funding_rate("BTC-USDT-SWAP");
     assert_eq!(funding.channel, "funding-rate");
     assert_eq!(funding.inst_id.as_deref(), Some("BTC-USDT-SWAP"));
+
+    let event_markets = channels::public_data::event_contract_markets();
+    assert_eq!(event_markets.inst_type.as_deref(), Some("EVENTS"));
+
+    let estimated = channels::public_data::estimated_price("OPTION", "BTC-USD-260626-100000-C");
+    assert_eq!(estimated.inst_type.as_deref(), Some("OPTION"));
+    assert_eq!(
+        estimated.inst_id.as_deref(),
+        Some("BTC-USD-260626-100000-C")
+    );
+
+    let spot_grid = channels::grid::spot_grid_orders();
+    assert_eq!(spot_grid.inst_type.as_deref(), Some("SPOT"));
+    let recurring = channels::grid::recurring_buy_orders();
+    assert_eq!(recurring.channel, "algo-recurring-buy");
 
     let account = channels::account::account_by_currency("USDT");
     assert_eq!(account.channel, "account");
@@ -126,7 +149,7 @@ fn parse_balance_and_position_push() {
     let rows: Vec<crate::ws::model::BalanceAndPositionUpdate> = push.parse().unwrap();
     assert_eq!(rows.len(), 1);
     assert_eq!(rows[0].p_time.as_str(), "1597026383085");
-    assert_eq!(rows[0].event_type, "snapshot");
+    assert_eq!(rows[0].event_type, Some(EventType::Snapshot));
     assert_eq!(rows[0].bal_data[0].ccy, "BTC");
     assert_eq!(rows[0].bal_data[0].cash_bal.as_str(), "1");
     assert_eq!(rows[0].pos_data[0].inst_id, "BTC-USD-191018");
@@ -176,4 +199,55 @@ fn operation_payload_serializes_trade_requests() {
     let value: serde_json::Value = serde_json::from_str(&payload).unwrap();
     assert_eq!(value["op"], "cancel-order");
     assert_eq!(value["args"][0]["ordId"], "ord-1");
+}
+
+#[test]
+fn operation_payload_serializes_expiry_and_typed_ws_requests() {
+    let mmp = MassCancelRequest::option("BTC-USD").lock_interval("1000");
+    let payload = operation_payload_with_expiry(
+        "mmp-1",
+        "mass-cancel",
+        Some("1900000000000".to_owned()),
+        std::slice::from_ref(&mmp),
+    )
+    .unwrap();
+    let value: serde_json::Value = serde_json::from_str(&payload).unwrap();
+    assert_eq!(value["expTime"], "1900000000000");
+    assert_eq!(value["args"][0]["instType"], "OPTION");
+    assert_eq!(value["args"][0]["instFamily"], "BTC-USD");
+
+    let place = PlaceSpreadOrderRequest::new("BTC-USDT_BTC-USDT-SWAP", "buy", "limit", "1")
+        .client_order_id("spread-1")
+        .price("10");
+    let payload =
+        operation_payload("spread-place", "sprd-order", std::slice::from_ref(&place)).unwrap();
+    let value: serde_json::Value = serde_json::from_str(&payload).unwrap();
+    assert_eq!(value["args"][0]["sprdId"], "BTC-USDT_BTC-USDT-SWAP");
+    assert_eq!(value["args"][0]["clOrdId"], "spread-1");
+    assert_eq!(value["args"][0]["px"], "10");
+
+    let amend = AmendSpreadOrderRequest::by_order_id("ord-1")
+        .request_id("req-1")
+        .new_price("11");
+    let value = serde_json::to_value(amend).unwrap();
+    assert_eq!(value["ordId"], "ord-1");
+    assert_eq!(value["reqId"], "req-1");
+    assert_eq!(value["newPx"], "11");
+
+    let cancel = CancelSpreadOrderRequest::by_client_order_id("spread-1");
+    let value = serde_json::to_value(cancel).unwrap();
+    assert_eq!(value["clOrdId"], "spread-1");
+    assert!(value.get("ordId").is_none());
+
+    let cancel_all = MassCancelSpreadOrdersRequest::all();
+    let value = serde_json::to_value(cancel_all).unwrap();
+    assert_eq!(value, serde_json::json!({}));
+}
+
+fn operation_payload<A: Serialize>(
+    id: impl Into<String>,
+    op: impl Into<String>,
+    args: &[A],
+) -> Result<String, Error> {
+    operation_payload_with_expiry(id, op, None, args)
 }

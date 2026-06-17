@@ -25,6 +25,8 @@ async fn demo_place_get_cancel_order() {
         return;
     };
 
+    // API: GET /api/v5/market/ticker
+    // STATUS: DEMO — public price lookup used by the simulated lifecycle.
     let ticker = client
         .market()
         .get_ticker("BTC-USDT")
@@ -42,6 +44,8 @@ async fn demo_place_get_cancel_order() {
         "0.0001",
     )
     .price(price);
+    // API: POST /api/v5/trade/order
+    // STATUS: DEMO — simulated trading only; the order is deliberately non-marketable.
     let placed = client
         .trade()
         .place_order(&request)
@@ -55,6 +59,8 @@ async fn demo_place_get_cancel_order() {
     let ord_id = placed[0].ord_id.clone();
     assert!(!ord_id.is_empty(), "expected an order id");
 
+    // API: GET /api/v5/trade/order
+    // STATUS: DEMO — reads the simulated order created above.
     let live = client
         .trade()
         .get_order("BTC-USDT", &ord_id)
@@ -62,6 +68,8 @@ async fn demo_place_get_cancel_order() {
         .expect("get_order");
     assert_eq!(live[0].state, OrderState::Live);
 
+    // API: POST /api/v5/trade/cancel-order
+    // STATUS: DEMO — cancels only the simulated order created above.
     let cancelled = client
         .trade()
         .cancel_order("BTC-USDT", &ord_id)
@@ -91,6 +99,8 @@ async fn demo_set_and_get_leverage() {
         return;
     };
 
+    // API: POST /api/v5/account/set-leverage
+    // STATUS: DEMO — changes leverage only in simulated trading.
     let set = SetLeverageRequest::new("5", TradeMode::Cross).inst_id("BTC-USDT-SWAP");
     let result = client
         .account()

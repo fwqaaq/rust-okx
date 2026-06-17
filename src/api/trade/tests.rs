@@ -1,6 +1,6 @@
 use crate::model::{OrderSide, OrderType, TradeMode};
 use crate::test_util::MockTransport;
-use crate::{Credentials, OkxClient};
+use crate::{Credentials, Error, OkxClient};
 
 use super::PlaceOrderRequest;
 
@@ -342,16 +342,13 @@ async fn get_fills_history_uses_builder_query() {
 }
 
 #[tokio::test]
-async fn algo_order_endpoints_are_signed_and_flexible() {
+async fn algo_order_endpoints_are_signed_and_typed() {
     let body = r#"{"code":"0","msg":"","data":[
             {"algoId":"a1","algoClOrdId":"c1","sCode":"0","sMsg":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = super::AlgoOrderRequest::new()
-        .param("instId", "BTC-USDT")
-        .param("tdMode", "cash")
-        .param("side", "buy")
-        .param("ordType", "conditional");
+    let request = super::AlgoOrderRequest::new("BTC-USDT", "cash", "buy", "conditional", "1")
+        .take_profit("15", "18");
 
     let rows = client.trade().place_algo_order(&request).await.unwrap();
     assert_eq!(rows[0].algo_id, "a1");
@@ -362,18 +359,15 @@ async fn algo_order_endpoints_are_signed_and_flexible() {
 
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let cancel = super::CancelAlgoOrderRequest::new()
-        .param("instId", "BTC-USDT")
-        .param("algoId", "a1");
+    let cancel = super::CancelAlgoOrderRequest::new("a1", "BTC-USDT");
     client.trade().cancel_algo_orders(&[cancel]).await.unwrap();
     assert!(mock.captured().uri.ends_with("/api/v5/trade/cancel-algos"));
 
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let amend = super::AmendAlgoOrderRequest::new()
-        .param("instId", "BTC-USDT")
-        .param("algoId", "a1")
-        .param("newSz", "0.2");
+    let amend = super::AmendAlgoOrderRequest::new("BTC-USDT")
+        .algo_id("a1")
+        .new_size("0.2");
     client.trade().amend_algo_order(&amend).await.unwrap();
     assert!(mock.captured().uri.ends_with("/api/v5/trade/amend-algos"));
 }
@@ -385,7 +379,7 @@ async fn algo_order_query_endpoints_are_signed() {
 
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = super::AlgoOrderListRequest::new().param("ordType", "conditional");
+    let request = super::AlgoOrderListRequest::new("conditional");
     let rows = client.trade().get_algo_order_list(&request).await.unwrap();
     assert_eq!(rows[0].state, "live");
     assert_eq!(mock.captured().query(), Some("ordType=conditional"));
@@ -393,9 +387,7 @@ async fn algo_order_query_endpoints_are_signed() {
 
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = super::AlgoOrderHistoryRequest::new()
-        .param("ordType", "conditional")
-        .param("state", "canceled");
+    let request = super::AlgoOrderHistoryRequest::new("conditional").state("canceled");
     client
         .trade()
         .get_algo_orders_history(&request)
@@ -408,7 +400,7 @@ async fn algo_order_query_endpoints_are_signed() {
 
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = super::AlgoOrderDetailsRequest::new().param("algoId", "a1");
+    let request = super::AlgoOrderDetailsRequest::by_algo_id("a1");
     client
         .trade()
         .get_algo_order_details(&request)
@@ -419,34 +411,34 @@ async fn algo_order_query_endpoints_are_signed() {
 
 #[tokio::test]
 async fn easy_convert_endpoints_are_signed() {
-    let body = r#"{"code":"0","msg":"","data":[{"ccy":"USDT","amt":"1","ts":"1597026383085"}]}"#;
+    let list_body = r#"{"code":"0","msg":"","data":[{
+        "fromData":[{"fromCcy":"BTC","fromAmt":"1"}],"toCcy":["USDT"]
+    }]}"#;
 
-    let mock = MockTransport::new(body);
+    let mock = MockTransport::new(list_body);
     let client = signed_client(mock.clone());
     let rows = client
         .trade()
         .get_easy_convert_currency_list()
         .await
         .unwrap();
-    assert_eq!(rows[0].ccy, "USDT");
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/trade/easy-convert-currency-list")
-    );
+    assert_eq!(rows[0].to_ccy[0], "USDT");
     assert!(mock.captured().is_signed());
 
-    let mock = MockTransport::new(body);
+    let result_body = r#"{"code":"0","msg":"","data":[{
+        "fromCcy":"BTC","toCcy":"USDT","fillFromSz":"1","fillToSz":"100","status":"filled","uTime":"1"
+    }]}"#;
+    let mock = MockTransport::new(result_body);
     let client = signed_client(mock.clone());
-    let request = super::EasyConvertRequest::new()
-        .param("fromCcy", "BTC")
-        .param("toCcy", "USDT");
+    let request = super::EasyConvertRequest::new(["BTC"], "USDT");
     client.trade().easy_convert(&request).await.unwrap();
-    assert!(mock.captured().body_str().contains(r#""fromCcy":"BTC""#));
+    let sent: serde_json::Value = serde_json::from_str(mock.captured().body_str()).unwrap();
+    assert_eq!(sent["fromCcy"][0], "BTC");
+    assert_eq!(sent["toCcy"], "USDT");
 
-    let mock = MockTransport::new(body);
+    let mock = MockTransport::new(result_body);
     let client = signed_client(mock.clone());
-    let request = super::EasyConvertHistoryRequest::new().param("after", "1");
+    let request = super::EasyConvertHistoryRequest::new().after("1");
     client
         .trade()
         .get_easy_convert_history(&request)
@@ -457,49 +449,53 @@ async fn easy_convert_endpoints_are_signed() {
 
 #[tokio::test]
 async fn one_click_repay_v1_and_v2_endpoints_are_signed() {
-    let body = r#"{"code":"0","msg":"","data":[{"ccy":"USDT","ordId":"r1","state":"filled"}]}"#;
-    let request = super::OneClickRepayCurrencyListRequest::new().param("debtCcy", "USDT");
+    let list_body = r#"{"code":"0","msg":"","data":[{
+        "debtCcy":"USDT","debtAmt":"1","repayCcyList":["BTC"]
+    }]}"#;
+    let list_request = super::OneClickRepayCurrencyListRequest::new().debt_type("cross");
 
-    let mock = MockTransport::new(body);
+    let mock = MockTransport::new(list_body);
     let client = signed_client(mock.clone());
     client
         .trade()
-        .get_one_click_repay_currency_list(&request)
+        .get_one_click_repay_currency_list(&list_request)
         .await
         .unwrap();
-    assert_eq!(mock.captured().query(), Some("debtCcy=USDT"));
+    assert_eq!(mock.captured().query(), Some("debtType=cross"));
     assert!(mock.captured().is_signed());
 
-    let mock = MockTransport::new(body);
+    let mock = MockTransport::new(list_body);
     let client = signed_client(mock.clone());
     client
         .trade()
-        .get_one_click_repay_currency_list_v2(&request)
+        .get_one_click_repay_currency_list_v2(&list_request)
         .await
         .unwrap();
     assert!(
         mock.captured()
             .uri
-            .ends_with("/api/v5/trade/one-click-repay-currency-list-v2?debtCcy=USDT")
+            .contains("one-click-repay-currency-list-v2")
     );
 
-    let body_request = super::OneClickRepayRequest::new()
-        .param("debtCcy", "USDT")
-        .param("repayCcy", "BTC");
-    let mock = MockTransport::new(body);
+    let result_body = r#"{"code":"0","msg":"","data":[{
+        "debtCcy":"USDT","repayCcy":"BTC","fillDebtSz":"1","fillRepaySz":"0.1","status":"filled","uTime":"1"
+    }]}"#;
+    let v1_request = super::OneClickRepayRequest::new(["USDT"], "BTC");
+    let mock = MockTransport::new(result_body);
     let client = signed_client(mock.clone());
-    client.trade().one_click_repay(&body_request).await.unwrap();
+    client.trade().one_click_repay(&v1_request).await.unwrap();
     assert!(
         mock.captured()
             .uri
             .ends_with("/api/v5/trade/one-click-repay")
     );
 
-    let mock = MockTransport::new(body);
+    let v2_request = super::OneClickRepayRequest::v2("USDT", ["BTC"]);
+    let mock = MockTransport::new(result_body);
     let client = signed_client(mock.clone());
     client
         .trade()
-        .one_click_repay_v2(&body_request)
+        .one_click_repay_v2(&v2_request)
         .await
         .unwrap();
     assert!(
@@ -508,8 +504,8 @@ async fn one_click_repay_v1_and_v2_endpoints_are_signed() {
             .ends_with("/api/v5/trade/one-click-repay-v2")
     );
 
-    let history_request = super::OneClickRepayHistoryRequest::new().param("after", "1");
-    let mock = MockTransport::new(body);
+    let history_request = super::OneClickRepayHistoryRequest::new().after("1");
+    let mock = MockTransport::new(result_body);
     let client = signed_client(mock.clone());
     client
         .trade()
@@ -518,16 +514,44 @@ async fn one_click_repay_v1_and_v2_endpoints_are_signed() {
         .unwrap();
     assert_eq!(mock.captured().query(), Some("after=1"));
 
-    let mock = MockTransport::new(body);
+    let mock = MockTransport::new(result_body);
     let client = signed_client(mock.clone());
     client
         .trade()
         .get_one_click_repay_history_v2(&history_request)
         .await
         .unwrap();
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/trade/one-click-repay-history-v2?after=1")
-    );
+    assert!(mock.captured().uri.contains("one-click-repay-history-v2"));
+}
+
+#[tokio::test]
+async fn invalid_advanced_trade_request_fails_before_transport() {
+    let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
+    let client = signed_client(mock.clone());
+    let request = super::AlgoOrderRequest::new("BTC-USDT-SWAP", "cross", "buy", "trigger", "1");
+
+    let error = client.trade().place_algo_order(&request).await.unwrap_err();
+    assert!(matches!(error, Error::InvalidRequest(_)));
+    assert!(!mock.was_called());
+}
+
+#[tokio::test]
+async fn cancel_algo_orders_enforces_documented_batch_size_before_transport() {
+    let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
+    let client = signed_client(mock.clone());
+
+    let error = client.trade().cancel_algo_orders(&[]).await.unwrap_err();
+    assert!(matches!(error, Error::InvalidRequest(_)));
+    assert!(!mock.was_called());
+
+    let requests = (0..11)
+        .map(|index| super::CancelAlgoOrderRequest::new(index.to_string(), "BTC-USDT"))
+        .collect::<Vec<_>>();
+    let error = client
+        .trade()
+        .cancel_algo_orders(&requests)
+        .await
+        .unwrap_err();
+    assert!(matches!(error, Error::InvalidRequest(_)));
+    assert!(!mock.was_called());
 }

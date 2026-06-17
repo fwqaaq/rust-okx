@@ -1,39 +1,12 @@
 use serde::Serialize;
 
-use crate::model::{OrderSide, OrderState, OrderType, PositionSide, RequestParams, TradeMode};
+use crate::model::{OrderSide, OrderState, OrderType, PositionSide, TradeMode};
 
-/// Request body for placing an algo order.
-pub type AlgoOrderRequest = RequestParams;
+mod advanced;
+mod algo;
 
-/// Request body for canceling an algo order.
-pub type CancelAlgoOrderRequest = RequestParams;
-
-/// Request body for amending an algo order.
-pub type AmendAlgoOrderRequest = RequestParams;
-
-/// Query parameters for pending algo orders.
-pub type AlgoOrderListRequest = RequestParams;
-
-/// Query parameters for historical algo orders.
-pub type AlgoOrderHistoryRequest = RequestParams;
-
-/// Query parameters for a single algo order.
-pub type AlgoOrderDetailsRequest = RequestParams;
-
-/// Request body for easy convert.
-pub type EasyConvertRequest = RequestParams;
-
-/// Query parameters for easy-convert history.
-pub type EasyConvertHistoryRequest = RequestParams;
-
-/// Query parameters for one-click-repay currency lists.
-pub type OneClickRepayCurrencyListRequest = RequestParams;
-
-/// Request body for one-click repay.
-pub type OneClickRepayRequest = RequestParams;
-
-/// Query parameters for one-click-repay history.
-pub type OneClickRepayHistoryRequest = RequestParams;
+pub use advanced::*;
+pub use algo::*;
 
 /// A request to place an order.
 ///

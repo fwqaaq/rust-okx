@@ -4,10 +4,13 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-/// A WebSocket channel argument.
+/// A WebSocket channel argument used in subscribe/unsubscribe requests and
+/// returned in channel acknowledgements/data pushes.
 ///
 /// Use [`Arg::new`] for a channel-only subscription, then add standard
 /// instrument filters or custom channel parameters with consuming setters.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-subscribe>
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]

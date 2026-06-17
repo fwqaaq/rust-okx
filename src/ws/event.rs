@@ -9,6 +9,8 @@ use crate::{Error, NumberString};
 use super::arg::Arg;
 
 /// A WebSocket event surfaced by [`OkxWs::next_event`](crate::ws::OkxWs::next_event).
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket>
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum WsEvent {
@@ -42,6 +44,8 @@ pub enum WsEvent {
 }
 
 /// A service notice pushed by OKX.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-notice>
 #[derive(Debug, Clone, Default)]
 #[non_exhaustive]
 pub struct WsNotice {
@@ -52,6 +56,8 @@ pub struct WsNotice {
 }
 
 /// A channel connection-count notification.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-connection-count-limit>
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub struct WsChannelConnectionCount {
@@ -64,6 +70,8 @@ pub struct WsChannelConnectionCount {
 }
 
 /// A WebSocket operation response.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket>
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub struct WsOperation {
@@ -95,6 +103,11 @@ impl WsOperation {
 }
 
 /// A channel data push.
+///
+/// The concrete rows are available in [`crate::ws::model`] and can be decoded
+/// with [`Push::parse`].
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-subscribe>
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub struct Push {

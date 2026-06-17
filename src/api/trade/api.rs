@@ -1,6 +1,6 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-
+use crate::model::{ValidateRequest, collection_length};
 use crate::transport::Transport;
 
 use super::endpoints::*;
@@ -209,6 +209,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &AlgoOrderRequest,
     ) -> Result<Vec<AlgoOrderResult>, Error> {
+        request.validate()?;
         self.client.post(ORDER_ALGO, request, true).await
     }
 
@@ -223,6 +224,10 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         requests: &[CancelAlgoOrderRequest],
     ) -> Result<Vec<AlgoOrderResult>, Error> {
+        collection_length("requests", requests.len(), 1, 10)?;
+        for request in requests {
+            request.validate()?;
+        }
         self.client.post(CANCEL_ALGOS, &requests, true).await
     }
 
@@ -237,6 +242,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &AmendAlgoOrderRequest,
     ) -> Result<Vec<AlgoOrderResult>, Error> {
+        request.validate()?;
         self.client.post(AMEND_ALGOS, request, true).await
     }
 
@@ -251,6 +257,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &AlgoOrderListRequest,
     ) -> Result<Vec<AlgoOrder>, Error> {
+        request.validate()?;
         self.client.get(ORDERS_ALGO_PENDING, request, true).await
     }
 
@@ -265,6 +272,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &AlgoOrderHistoryRequest,
     ) -> Result<Vec<AlgoOrder>, Error> {
+        request.validate()?;
         self.client.get(ORDERS_ALGO_HISTORY, request, true).await
     }
 
@@ -279,6 +287,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &AlgoOrderDetailsRequest,
     ) -> Result<Vec<AlgoOrder>, Error> {
+        request.validate()?;
         self.client.get(ORDER_ALGO_DETAILS, request, true).await
     }
 
@@ -306,6 +315,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &EasyConvertRequest,
     ) -> Result<Vec<EasyConvertResult>, Error> {
+        request.validate()?;
         self.client.post(EASY_CONVERT, request, true).await
     }
 
@@ -320,6 +330,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &EasyConvertHistoryRequest,
     ) -> Result<Vec<EasyConvertHistory>, Error> {
+        request.validate()?;
         self.client.get(EASY_CONVERT_HISTORY, request, true).await
     }
 
@@ -334,6 +345,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &OneClickRepayCurrencyListRequest,
     ) -> Result<Vec<OneClickRepayCurrency>, Error> {
+        request.validate()?;
         self.client
             .get(ONE_CLICK_REPAY_CURRENCY_LIST, request, true)
             .await
@@ -350,6 +362,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &OneClickRepayRequest,
     ) -> Result<Vec<OneClickRepayResult>, Error> {
+        request.validate()?;
         self.client.post(ONE_CLICK_REPAY, request, true).await
     }
 
@@ -364,6 +377,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &OneClickRepayHistoryRequest,
     ) -> Result<Vec<OneClickRepayHistory>, Error> {
+        request.validate()?;
         self.client
             .get(ONE_CLICK_REPAY_HISTORY, request, true)
             .await
@@ -380,6 +394,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &OneClickRepayCurrencyListRequest,
     ) -> Result<Vec<OneClickRepayCurrency>, Error> {
+        request.validate()?;
         self.client
             .get(ONE_CLICK_REPAY_CURRENCY_LIST_V2, request, true)
             .await
@@ -396,6 +411,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &OneClickRepayRequest,
     ) -> Result<Vec<OneClickRepayResult>, Error> {
+        request.validate()?;
         self.client.post(ONE_CLICK_REPAY_V2, request, true).await
     }
 
@@ -410,6 +426,7 @@ impl<'a, T: Transport> Trade<'a, T> {
         &self,
         request: &OneClickRepayHistoryRequest,
     ) -> Result<Vec<OneClickRepayHistory>, Error> {
+        request.validate()?;
         self.client
             .get(ONE_CLICK_REPAY_HISTORY_V2, request, true)
             .await

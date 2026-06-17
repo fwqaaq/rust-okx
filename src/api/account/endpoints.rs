@@ -31,20 +31,6 @@ pub(super) const SET_AUTO_LOAN: &str = "/api/v5/account/set-auto-loan";
 pub(super) const SET_ACCOUNT_LEVEL: &str = "/api/v5/account/set-account-level";
 pub(super) const ACTIVATE_OPTION: &str = "/api/v5/account/activate-option";
 pub(super) const POSITION_BUILDER: &str = "/api/v5/account/position-builder";
-pub(super) const VIP_INTEREST_ACCRUED: &str = "/api/v5/account/vip-interest-accrued";
-pub(super) const VIP_INTEREST_DEDUCTED: &str = "/api/v5/account/vip-interest-deducted";
-pub(super) const VIP_LOAN_ORDER_LIST: &str = "/api/v5/account/vip-loan-order-list";
-pub(super) const VIP_LOAN_ORDER_DETAIL: &str = "/api/v5/account/vip-loan-order-detail";
-pub(super) const FIXED_LOAN_BORROWING_LIMIT: &str = "/api/v5/account/fixed-loan/borrowing-limit";
-pub(super) const FIXED_LOAN_BORROWING_QUOTE: &str = "/api/v5/account/fixed-loan/borrowing-quote";
-pub(super) const FIXED_LOAN_BORROWING_ORDER: &str = "/api/v5/account/fixed-loan/borrowing-order";
-pub(super) const FIXED_LOAN_AMEND_BORROWING_ORDER: &str =
-    "/api/v5/account/fixed-loan/amend-borrowing-order";
-pub(super) const FIXED_LOAN_MANUAL_REBORROW: &str = "/api/v5/account/fixed-loan/manual-reborrow";
-pub(super) const FIXED_LOAN_REPAY_BORROWING_ORDER: &str =
-    "/api/v5/account/fixed-loan/repay-borrowing-order";
-pub(super) const FIXED_LOAN_BORROWING_ORDERS_LIST: &str =
-    "/api/v5/account/fixed-loan/borrowing-orders-list";
 pub(super) const SPOT_MANUAL_BORROW_REPAY: &str = "/api/v5/account/spot-manual-borrow-repay";
 pub(super) const SET_AUTO_REPAY: &str = "/api/v5/account/set-auto-repay";
 pub(super) const SPOT_BORROW_REPAY_HISTORY: &str = "/api/v5/account/spot-borrow-repay-history";

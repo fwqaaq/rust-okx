@@ -7,13 +7,46 @@ use std::str::FromStr;
 use serde::ser::{SerializeMap, SerializeSeq};
 use serde::{Deserialize, Serialize};
 
+/// Deserialize an OKX array field that may be encoded as an empty string when
+/// no entries are available.
+///
+/// A few OKX REST endpoints document these fields as arrays but return `""`
+/// for accounts/currencies without data. Treat only the empty string and
+/// `null` as an empty vector; non-empty strings remain decode errors.
+pub(crate) fn deserialize_vec_or_empty_string<'de, D, T>(
+    deserializer: D,
+) -> Result<Vec<T>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+    T: Deserialize<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum WireValue<T> {
+        Sequence(Vec<T>),
+        String(String),
+        Null(()),
+    }
+
+    match WireValue::<T>::deserialize(deserializer)? {
+        WireValue::Sequence(values) => Ok(values),
+        WireValue::String(value) if value.is_empty() => Ok(Vec::new()),
+        WireValue::String(value) => Err(serde::de::Error::custom(format!(
+            "expected an array or empty string, got {value:?}"
+        ))),
+        WireValue::Null(()) => Ok(Vec::new()),
+    }
+}
+
 mod validation;
 
 pub use validation::{RequestValidationError, ValidateRequest};
 pub(crate) use validation::{
-    at_least_one, at_most_one, exactly_one, length_range, max_length, non_empty,
-    optional_non_empty, range_u64, reject_when_present, require_when, validate_client_request_id,
-    validate_side,
+    at_least_one, collection_length, decimal_string_range, exactly_one, length_range, max_length,
+    non_empty, non_empty_items, non_negative_decimal_string, one_of, optional_non_empty,
+    optional_one_of, optional_positive_decimal_string, optional_unsigned_integer_string,
+    positive_decimal_string, positive_unsigned_integer_string, range_u64, reject_when_present,
+    require_when, validate_client_request_id, validate_side,
 };
 
 /// The OKX response envelope: `{ "code": "...", "msg": "...", "data": [...] }`.
@@ -394,6 +427,8 @@ string_enum! {
         Cross = "cross",
         /// Isolated margin.
         Isolated = "isolated",
+        /// Spot isolated margin mode.
+        SpotIsolated = "spot_isolated",
     }
 }
 

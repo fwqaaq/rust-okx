@@ -91,10 +91,7 @@ mod tungstenite_impl {
             }
         }
 
-        fn send_pong(
-            &mut self,
-            payload: Bytes,
-        ) -> impl Future<Output = Result<(), Error>> + Send {
+        fn send_pong(&mut self, payload: Bytes) -> impl Future<Output = Result<(), Error>> + Send {
             async move {
                 self.inner
                     .send(Message::Pong(payload.to_vec()))

@@ -64,6 +64,19 @@ pub enum RequestValidationError {
         max: u64,
     },
 
+    /// A decimal-string request value was outside the documented range.
+    #[error("request field `{field}` must be between {min} and {max}")]
+    DecimalOutOfRange {
+        /// OKX wire-field name.
+        field: &'static str,
+
+        /// Inclusive lower bound as documented by OKX.
+        min: &'static str,
+
+        /// Inclusive upper bound as documented by OKX.
+        max: &'static str,
+    },
+
     /// A field is required under a particular condition.
     #[error("request field `{field}` is required when {condition}")]
     RequiredWhen {
@@ -215,6 +228,207 @@ pub(crate) fn range_u64(
         return Err(RequestValidationError::OutOfRange { field, min, max });
     }
 
+    Ok(())
+}
+
+/// Validate a string against a documented set of wire values.
+pub(crate) fn one_of(
+    field: &'static str,
+    value: &str,
+    allowed: &[&str],
+    expected: &'static str,
+) -> Result<(), RequestValidationError> {
+    non_empty(field, value)?;
+    if !allowed.contains(&value) {
+        return Err(RequestValidationError::InvalidFormat { field, expected });
+    }
+    Ok(())
+}
+
+/// Validate an optional string against a documented set of wire values.
+pub(crate) fn optional_one_of(
+    field: &'static str,
+    value: Option<&str>,
+    allowed: &[&str],
+    expected: &'static str,
+) -> Result<(), RequestValidationError> {
+    if let Some(value) = value {
+        one_of(field, value, allowed, expected)?;
+    }
+    Ok(())
+}
+
+/// Validate an unsigned integer encoded as an ASCII decimal string.
+pub(crate) fn unsigned_integer_string(
+    field: &'static str,
+    value: &str,
+) -> Result<(), RequestValidationError> {
+    non_empty(field, value)?;
+    if !value.bytes().all(|byte| byte.is_ascii_digit()) {
+        return Err(RequestValidationError::InvalidFormat {
+            field,
+            expected: "an unsigned integer encoded with ASCII digits",
+        });
+    }
+    Ok(())
+}
+
+/// Validate an optional unsigned integer encoded as an ASCII decimal string.
+pub(crate) fn optional_unsigned_integer_string(
+    field: &'static str,
+    value: Option<&str>,
+) -> Result<(), RequestValidationError> {
+    if let Some(value) = value {
+        unsigned_integer_string(field, value)?;
+    }
+    Ok(())
+}
+
+/// Validate a positive finite decimal encoded as a string.
+///
+/// Scientific notation, signs, `NaN`, and infinity are rejected because OKX
+/// documents request amounts and prices as ordinary decimal strings.
+pub(crate) fn positive_decimal_string(
+    field: &'static str,
+    value: &str,
+) -> Result<(), RequestValidationError> {
+    non_empty(field, value)?;
+    let mut dot_seen = false;
+    let mut digit_seen = false;
+    let mut non_zero_seen = false;
+
+    for byte in value.bytes() {
+        match byte {
+            b'0'..=b'9' => {
+                digit_seen = true;
+                non_zero_seen |= byte != b'0';
+            }
+            b'.' if !dot_seen => dot_seen = true,
+            _ => {
+                return Err(RequestValidationError::InvalidFormat {
+                    field,
+                    expected: "a positive decimal string",
+                });
+            }
+        }
+    }
+
+    if !digit_seen || !non_zero_seen || value.starts_with('.') || value.ends_with('.') {
+        return Err(RequestValidationError::InvalidFormat {
+            field,
+            expected: "a positive decimal string",
+        });
+    }
+    Ok(())
+}
+
+/// Validate a finite, non-negative decimal encoded as a string.
+///
+/// Scientific notation, signs, `NaN`, and infinity are rejected. Unlike
+/// [`positive_decimal_string`], zero is accepted.
+pub(crate) fn non_negative_decimal_string(
+    field: &'static str,
+    value: &str,
+) -> Result<(), RequestValidationError> {
+    non_empty(field, value)?;
+    let mut dot_seen = false;
+    let mut digit_seen = false;
+
+    for byte in value.bytes() {
+        match byte {
+            b'0'..=b'9' => digit_seen = true,
+            b'.' if !dot_seen => dot_seen = true,
+            _ => {
+                return Err(RequestValidationError::InvalidFormat {
+                    field,
+                    expected: "a non-negative decimal string",
+                });
+            }
+        }
+    }
+
+    if !digit_seen || value.starts_with('.') || value.ends_with('.') {
+        return Err(RequestValidationError::InvalidFormat {
+            field,
+            expected: "a non-negative decimal string",
+        });
+    }
+    Ok(())
+}
+
+/// Validate a positive integer encoded as an ASCII decimal string.
+pub(crate) fn positive_unsigned_integer_string(
+    field: &'static str,
+    value: &str,
+) -> Result<(), RequestValidationError> {
+    unsigned_integer_string(field, value)?;
+    if value.bytes().all(|byte| byte == b'0') {
+        return Err(RequestValidationError::InvalidFormat {
+            field,
+            expected: "a positive integer encoded with ASCII digits",
+        });
+    }
+    Ok(())
+}
+
+/// Validate an optional positive decimal encoded as a string.
+pub(crate) fn optional_positive_decimal_string(
+    field: &'static str,
+    value: Option<&str>,
+) -> Result<(), RequestValidationError> {
+    if let Some(value) = value {
+        positive_decimal_string(field, value)?;
+    }
+    Ok(())
+}
+
+/// Validate a positive decimal string against inclusive numeric bounds.
+pub(crate) fn decimal_string_range(
+    field: &'static str,
+    value: &str,
+    min: f64,
+    max: f64,
+    min_display: &'static str,
+    max_display: &'static str,
+) -> Result<(), RequestValidationError> {
+    positive_decimal_string(field, value)?;
+    let parsed = value
+        .parse::<f64>()
+        .map_err(|_| RequestValidationError::InvalidFormat {
+            field,
+            expected: "a finite positive decimal string",
+        })?;
+    if !parsed.is_finite() || !(min..=max).contains(&parsed) {
+        return Err(RequestValidationError::DecimalOutOfRange {
+            field,
+            min: min_display,
+            max: max_display,
+        });
+    }
+    Ok(())
+}
+
+/// Validate a collection length against inclusive documented bounds.
+pub(crate) fn collection_length(
+    field: &'static str,
+    length: usize,
+    min: usize,
+    max: usize,
+) -> Result<(), RequestValidationError> {
+    if !(min..=max).contains(&length) {
+        return Err(RequestValidationError::LengthOutOfRange { field, min, max });
+    }
+    Ok(())
+}
+
+/// Validate that every string in a collection is non-empty.
+pub(crate) fn non_empty_items<'a>(
+    field: &'static str,
+    values: impl IntoIterator<Item = &'a str>,
+) -> Result<(), RequestValidationError> {
+    for value in values {
+        non_empty(field, value)?;
+    }
     Ok(())
 }
 

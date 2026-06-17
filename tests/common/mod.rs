@@ -18,7 +18,7 @@
 use std::env;
 use std::sync::Once;
 
-use rust_okx::{Credentials, OkxClient};
+use rust_okx::{Credentials, Error, OkxClient};
 
 /// Load variables from a `.env` file in the crate root into the process
 /// environment, once per test binary. Missing `.env` is not an error.
@@ -68,4 +68,32 @@ fn credentials(key: &str, secret: &str, passphrase: &str) -> Option<Credentials>
 
 fn non_empty(var: &str) -> Option<String> {
     env::var(var).ok().filter(|v| !v.is_empty())
+}
+
+/// Return a live client or print a consistent skip message for the current test.
+pub fn live_client_or_skip(test: &str) -> Option<OkxClient> {
+    let client = live_client();
+    if client.is_none() {
+        eprintln!("skipping {test}: OKX_API_* env vars not set");
+    }
+    client
+}
+
+/// Read a non-empty environment variable after loading `.env`.
+pub fn env_non_empty(var: &str) -> Option<String> {
+    load_dotenv();
+    non_empty(var)
+}
+
+/// Accept an API-level eligibility/account-mode rejection while still failing
+/// transport and decode errors. This is useful for read-only endpoints whose
+/// availability depends on account tier, product enrollment, or region.
+pub fn expect_ok_or_api_unavailable<T>(result: Result<T, Error>, endpoint: &str) {
+    match result {
+        Ok(_) => {}
+        Err(Error::Api { code, message }) => {
+            eprintln!("skipping {endpoint}: OKX returned {code} {message}");
+        }
+        Err(error) => panic!("{endpoint} failed: {error}"),
+    }
 }

@@ -1,16 +1,20 @@
 #![cfg(feature = "websocket")]
 
 //! Integration tests against OKX public WebSocket channels.
+//!
+//! These tests intentionally parse channel payloads with the WebSocket models
+//! from [`rust_okx::ws::model`] instead of reusing REST response types. This
+//! keeps the examples aligned with OKX's WebSocket payload schemas.
 
 use std::time::Duration;
 
-use rust_okx::api::market::Candle;
-use rust_okx::api::market::Ticker;
 use rust_okx::ws::channels;
-use rust_okx::{Arg, OkxWs, WsEvent};
+use rust_okx::ws::model::{CandleUpdate, StatusUpdate, TickerUpdate};
+use rust_okx::{OkxWs, WsEvent};
 
 /// `WS / public tickers` — subscribe to `tickers` for `BTC-USDT`, wait for an
-/// acknowledgement and at least one ticker push, then unsubscribe and close.
+/// acknowledgement and at least one typed ticker push, then unsubscribe and
+/// close.
 #[tokio::test]
 async fn public_tickers_channel_pushes_typed_rows() {
     let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::public().connect()).await;
@@ -26,7 +30,7 @@ async fn public_tickers_channel_pushes_typed_rows() {
         }
     };
 
-    let arg = Arg::new("tickers").inst_id("BTC-USDT");
+    let arg = channels::market::tickers("BTC-USDT");
     if let Err(err) = ws.subscribe(std::slice::from_ref(&arg)).await {
         eprintln!("skipping public_tickers_channel_pushes_typed_rows: subscribe failed: {err}");
         return;
@@ -45,20 +49,25 @@ async fn public_tickers_channel_pushes_typed_rows() {
             }
             event = ws.next_event() => {
                 match event {
-                    Ok(Some(WsEvent::Subscribed(ack))) => {
-                        if ack.channel == "tickers" && ack.inst_id.as_deref() == Some("BTC-USDT") {
-                            subscribed = true;
-                        }
+                    Ok(Some(WsEvent::Subscribed(ack)))
+                        if ack.channel == "tickers"
+                            && ack.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        subscribed = true;
                     }
-                    Ok(Some(WsEvent::Push(push))) => {
-                        if push.arg.channel == "tickers" {
-                            let rows: Vec<Ticker> = push.parse().expect("ticker push should parse");
-                            if rows.iter().any(|row| row.inst_id == "BTC-USDT") {
-                                pushed = true;
-                            }
-                        }
+                    Ok(Some(WsEvent::Push(push)))
+                        if push.arg.channel == "tickers"
+                            && push.arg.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        let rows: Vec<TickerUpdate> = push
+                            .parse()
+                            .expect("tickers push should parse as Vec<TickerUpdate>");
+
+                        pushed = rows.iter().any(|row| row.inst_id == "BTC-USDT");
                     }
-                    Ok(Some(WsEvent::Error { code, msg })) => panic!("OKX WS error {code}: {msg}"),
+                    Ok(Some(WsEvent::Error { code, msg })) => {
+                        panic!("OKX WS error {code}: {msg}")
+                    }
                     Ok(Some(_)) => {}
                     Ok(None) => {
                         eprintln!("skipping public_tickers_channel_pushes_typed_rows: connection closed");
@@ -69,6 +78,7 @@ async fn public_tickers_channel_pushes_typed_rows() {
                         return;
                     }
                 }
+
                 if subscribed && pushed {
                     break;
                 }
@@ -83,7 +93,11 @@ async fn public_tickers_channel_pushes_typed_rows() {
 }
 
 /// `WS / status` — subscribe to the public status channel and wait for an
-/// acknowledgement. Status pushes are sparse, so this only requires the ack.
+/// acknowledgement.
+///
+/// Status pushes are sparse, so the test does not require one. When a status
+/// push arrives before the acknowledgement, it is still parsed with
+/// [`StatusUpdate`] to exercise the channel model.
 #[tokio::test]
 async fn public_status_channel_subscribes() {
     let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::public().connect()).await;
@@ -117,6 +131,11 @@ async fn public_status_channel_subscribes() {
             event = ws.next_event() => {
                 match event {
                     Ok(Some(WsEvent::Subscribed(ack))) if ack.channel == "status" => break,
+                    Ok(Some(WsEvent::Push(push))) if push.arg.channel == "status" => {
+                        let _: Vec<StatusUpdate> = push
+                            .parse()
+                            .expect("status push should parse as Vec<StatusUpdate>");
+                    }
                     Ok(Some(WsEvent::Error { code, msg })) => {
                         eprintln!("skipping public_status_channel_subscribes: OKX WS error {code}: {msg}");
                         return;
@@ -142,7 +161,8 @@ async fn public_status_channel_subscribes() {
 }
 
 /// `WS / business candle1m` — subscribe to the business candlestick channel,
-/// wait for an acknowledgement and one candle push, then unsubscribe and close.
+/// wait for an acknowledgement and one typed candle push, then unsubscribe and
+/// close.
 #[tokio::test]
 async fn business_candle_channel_pushes_typed_rows() {
     let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::business().connect()).await;
@@ -158,7 +178,7 @@ async fn business_candle_channel_pushes_typed_rows() {
         }
     };
 
-    let arg = Arg::new("candle1m").inst_id("BTC-USDT");
+    let arg = channels::market::candlesticks("candle1m", "BTC-USDT");
     if let Err(err) = ws.subscribe(std::slice::from_ref(&arg)).await {
         eprintln!("skipping business_candle_channel_pushes_typed_rows: subscribe failed: {err}");
         return;
@@ -177,20 +197,25 @@ async fn business_candle_channel_pushes_typed_rows() {
             }
             event = ws.next_event() => {
                 match event {
-                    Ok(Some(WsEvent::Subscribed(ack))) => {
-                        if ack.channel == "candle1m" && ack.inst_id.as_deref() == Some("BTC-USDT") {
-                            subscribed = true;
-                        }
+                    Ok(Some(WsEvent::Subscribed(ack)))
+                        if ack.channel == "candle1m"
+                            && ack.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        subscribed = true;
                     }
-                    Ok(Some(WsEvent::Push(push))) => {
-                        if push.arg.channel == "candle1m" {
-                            let rows: Vec<Candle> = push.parse().expect("candle push should parse");
-                            if !rows.is_empty() {
-                                pushed = true;
-                            }
-                        }
+                    Ok(Some(WsEvent::Push(push)))
+                        if push.arg.channel == "candle1m"
+                            && push.arg.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        let rows: Vec<CandleUpdate> = push
+                            .parse()
+                            .expect("candle push should parse as Vec<CandleUpdate>");
+
+                        pushed = !rows.is_empty();
                     }
-                    Ok(Some(WsEvent::Error { code, msg })) => panic!("OKX WS error {code}: {msg}"),
+                    Ok(Some(WsEvent::Error { code, msg })) => {
+                        panic!("OKX WS error {code}: {msg}")
+                    }
                     Ok(Some(_)) => {}
                     Ok(None) => {
                         eprintln!("skipping business_candle_channel_pushes_typed_rows: connection closed");
@@ -201,6 +226,7 @@ async fn business_candle_channel_pushes_typed_rows() {
                         return;
                     }
                 }
+
                 if subscribed && pushed {
                     break;
                 }

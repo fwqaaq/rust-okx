@@ -1,6 +1,6 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::InstType;
+use crate::model::{InstType, ValidateRequest};
 use crate::transport::Transport;
 
 use super::endpoints::*;
@@ -204,6 +204,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
         &self,
         request: &OptionSummaryRequest,
     ) -> Result<Vec<OptionSummary>, Error> {
+        request.validate()?;
         self.client.get(OPTION_SUMMARY, request, false).await
     }
 
@@ -247,6 +248,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
         &self,
         request: &InterestRateLoanQuotaRequest,
     ) -> Result<Vec<InterestRateLoanQuota>, Error> {
+        request.validate()?;
         self.client
             .get(INTEREST_RATE_LOAN_QUOTA, request, false)
             .await
@@ -263,6 +265,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
         &self,
         request: &VipInterestRateLoanQuotaRequest,
     ) -> Result<Vec<VipInterestRateLoanQuota>, Error> {
+        request.validate()?;
         self.client
             .get(VIP_INTEREST_RATE_LOAN_QUOTA, request, false)
             .await
@@ -279,6 +282,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
         &self,
         request: &InstrumentTickBandsRequest,
     ) -> Result<Vec<InstrumentTickBand>, Error> {
+        request.validate()?;
         self.client.get(INSTRUMENT_TICK_BANDS, request, false).await
     }
 
@@ -293,6 +297,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
         &self,
         request: &PublicOptionTradesRequest,
     ) -> Result<Vec<PublicOptionTrade>, Error> {
+        request.validate()?;
         self.client.get(OPTION_TRADES, request, false).await
     }
 
@@ -307,6 +312,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
         &self,
         request: &MarketDataHistoryRequest,
     ) -> Result<Vec<MarketDataHistory>, Error> {
+        request.validate()?;
         self.client.get(MARKET_DATA_HISTORY, request, false).await
     }
 }

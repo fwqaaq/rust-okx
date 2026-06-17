@@ -2,14 +2,13 @@
 
 use std::collections::VecDeque;
 
-use serde::Serialize;
-
 use crate::credentials::Credentials;
 use crate::{Error, signing};
 
 use super::arg::Arg;
 use super::conn::{TungsteniteConnector, WsConn, WsConnector, WsFrame};
 use super::event::{WsEvent, parse_text_event};
+use super::request::{ChannelRequest, LoginArg, LoginRequest};
 
 /// OKX WebSocket channel group.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -135,6 +134,8 @@ impl OkxWs<TungsteniteConnector> {
 
 impl<C: WsConnector> OkxWs<C> {
     /// Subscribe to one or more channel arguments.
+    ///
+    /// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-subscribe>
     pub async fn subscribe(&mut self, args: &[Arg]) -> Result<(), Error> {
         self.track_subscriptions(args);
         if self.needs_login()? && !self.logged_in {
@@ -148,6 +149,8 @@ impl<C: WsConnector> OkxWs<C> {
     }
 
     /// Unsubscribe from one or more channel arguments.
+    ///
+    /// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-unsubscribe>
     pub async fn unsubscribe(&mut self, args: &[Arg]) -> Result<(), Error> {
         self.subscriptions.retain(|arg| !args.contains(arg));
         self.send_op("unsubscribe", args).await
@@ -252,7 +255,16 @@ impl<C: WsConnector> OkxWs<C> {
     }
 
     async fn send_op(&mut self, op: &str, args: &[Arg]) -> Result<(), Error> {
-        let payload = serde_json::to_string(&WsRequest { op, args }).map_err(Error::encode)?;
+        let request = match op {
+            "subscribe" => ChannelRequest::subscribe(args),
+            "unsubscribe" => ChannelRequest::unsubscribe(args),
+            _ => ChannelRequest {
+                id: None,
+                op,
+                args,
+            },
+        };
+        let payload = serde_json::to_string(&request).map_err(Error::encode)?;
         self.conn.send_text(payload).await
     }
 
@@ -280,37 +292,16 @@ impl<C: WsConnector> OkxWs<C> {
     }
 }
 
-#[derive(Serialize)]
-struct WsRequest<'a> {
-    op: &'a str,
-    args: &'a [Arg],
-}
-
-#[derive(Serialize)]
-struct LoginRequest<'a> {
-    op: &'static str,
-    args: [LoginArg<'a>; 1],
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct LoginArg<'a> {
-    api_key: &'a str,
-    passphrase: &'a str,
-    timestamp: &'a str,
-    sign: String,
-}
-
+/// Build the authenticated WebSocket login body.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-login>
 pub(crate) fn login_payload(credentials: &Credentials, timestamp: &str) -> Result<String, Error> {
-    let payload = LoginRequest {
-        op: "login",
-        args: [LoginArg {
-            api_key: credentials.api_key(),
-            passphrase: credentials.passphrase(),
-            timestamp,
-            sign: signing::ws_login_sign(timestamp, credentials.secret_key()),
-        }],
-    };
+    let payload = LoginRequest::new(LoginArg::new(
+        credentials.api_key(),
+        credentials.passphrase(),
+        timestamp,
+        signing::ws_login_sign(timestamp, credentials.secret_key()),
+    ));
     serde_json::to_string(&payload).map_err(Error::encode)
 }
 

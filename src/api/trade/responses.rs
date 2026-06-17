@@ -2,32 +2,14 @@ use serde::Deserialize;
 
 use crate::{
     NumberString,
-    model::{OrderSide, OrderState, OrderType, PositionSide, RestRow, TradeMode},
+    model::{OrderSide, OrderState, OrderType, PositionSide, TradeMode},
 };
 
-/// Result row returned by algo-order mutation endpoints.
-pub type AlgoOrderResult = RestRow;
+mod advanced;
+mod algo;
 
-/// Algo-order row returned by list, history, and details endpoints.
-pub type AlgoOrder = RestRow;
-
-/// Easy-convert currency row.
-pub type EasyConvertCurrency = RestRow;
-
-/// Easy-convert execution result row.
-pub type EasyConvertResult = RestRow;
-
-/// Easy-convert history row.
-pub type EasyConvertHistory = RestRow;
-
-/// One-click-repay currency row.
-pub type OneClickRepayCurrency = RestRow;
-
-/// One-click-repay execution result row.
-pub type OneClickRepayResult = RestRow;
-
-/// One-click-repay history row.
-pub type OneClickRepayHistory = RestRow;
+pub use advanced::*;
+pub use algo::*;
 
 /// The result of placing an order.
 #[derive(Debug, Clone, Deserialize)]

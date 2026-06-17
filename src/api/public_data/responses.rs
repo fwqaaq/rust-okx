@@ -1,33 +1,10 @@
 use serde::Deserialize;
 
-use crate::{
-    NumberString,
-    model::{InstType, RestRow},
-};
+use crate::{NumberString, model::InstType};
 
-/// Option summary row.
-pub type OptionSummary = RestRow;
+mod edge;
 
-/// Estimated delivery or exercise price row.
-pub type EstimatedPrice = RestRow;
-
-/// Discount-rate and interest-free quota row.
-pub type DiscountRateInterestFreeQuota = RestRow;
-
-/// Interest-rate loan quota row.
-pub type InterestRateLoanQuota = RestRow;
-
-/// VIP interest-rate loan quota row.
-pub type VipInterestRateLoanQuota = RestRow;
-
-/// Instrument tick-band row.
-pub type InstrumentTickBand = RestRow;
-
-/// Public option-trade row.
-pub type PublicOptionTrade = RestRow;
-
-/// Market-data history row.
-pub type MarketDataHistory = RestRow;
+pub use edge::*;
 
 /// A tradable instrument.
 ///

@@ -1,6 +1,6 @@
 use crate::model::InstType;
 use crate::test_util::MockTransport;
-use crate::{Credentials, OkxClient};
+use crate::{Credentials, Error, OkxClient};
 
 fn signed_client(mock: MockTransport) -> OkxClient<MockTransport> {
     OkxClient::with_transport(mock)
@@ -725,195 +725,33 @@ async fn position_builder_posts_body_and_omits_unset_fields() {
 }
 
 #[tokio::test]
-async fn vip_loan_queries_are_signed_and_flexible() {
-    let body = r#"{"code":"0","msg":"","data":[
-        {"ordId":"vip1","ccy":"USDT","amt":"100","ts":"1597026383085"}]}"#;
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::VipInterestAccruedRequest::new().param("ccy", "USDT");
-    let rows = client
-        .account()
-        .get_vip_interest_accrued(&request)
-        .await
-        .unwrap();
-    assert_eq!(rows[0].ccy, "USDT");
-    assert_eq!(mock.captured().query(), Some("ccy=USDT"));
-    assert!(mock.captured().is_signed());
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::VipInterestDeductedRequest::new().param("ordId", "vip1");
-    client
-        .account()
-        .get_vip_interest_deducted(&request)
-        .await
-        .unwrap();
-    assert_eq!(mock.captured().query(), Some("ordId=vip1"));
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::VipLoanOrderListRequest::new().param("ccy", "USDT");
-    client
-        .account()
-        .get_vip_loan_order_list(&request)
-        .await
-        .unwrap();
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/account/vip-loan-order-list?ccy=USDT")
-    );
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::VipLoanOrderDetailRequest::new().param("ordId", "vip1");
-    client
-        .account()
-        .get_vip_loan_order_detail(&request)
-        .await
-        .unwrap();
-    assert_eq!(mock.captured().query(), Some("ordId=vip1"));
-}
-
-#[tokio::test]
-async fn fixed_loan_endpoints_are_signed_and_flexible() {
-    let body = r#"{"code":"0","msg":"","data":[
-        {"ordId":"loan1","ccy":"USDT","amt":"100","rate":"0.01","state":"live"}]}"#;
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::FixedLoanBorrowingLimitRequest::new().param("ccy", "USDT");
-    let rows = client
-        .account()
-        .get_fixed_loan_borrowing_limit(&request)
-        .await
-        .unwrap();
-    assert_eq!(rows[0].amt.as_str(), "100");
-    assert_eq!(mock.captured().query(), Some("ccy=USDT"));
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::FixedLoanBorrowingQuoteRequest::new()
-        .param("ccy", "USDT")
-        .param("amt", "100");
-    client
-        .account()
-        .fixed_loan_borrowing_quote(&request)
-        .await
-        .unwrap();
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/account/fixed-loan/borrowing-quote")
-    );
-    assert!(mock.captured().body_str().contains(r#""amt":"100""#));
-    assert!(mock.captured().is_signed());
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::FixedLoanBorrowingOrderRequest::new().param("quoteId", "q1");
-    client
-        .account()
-        .fixed_loan_borrowing_order(&request)
-        .await
-        .unwrap();
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/account/fixed-loan/borrowing-order")
-    );
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::FixedLoanAmendBorrowingOrderRequest::new()
-        .param("ordId", "loan1")
-        .param("reborrow", "true");
-    client
-        .account()
-        .amend_fixed_loan_borrowing_order(&request)
-        .await
-        .unwrap();
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/account/fixed-loan/amend-borrowing-order")
-    );
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::FixedLoanManualReborrowRequest::new().param("ordId", "loan1");
-    client
-        .account()
-        .fixed_loan_manual_reborrow(&request)
-        .await
-        .unwrap();
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/account/fixed-loan/manual-reborrow")
-    );
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::FixedLoanRepayBorrowingOrderRequest::new()
-        .param("ordId", "loan1")
-        .param("amt", "10");
-    client
-        .account()
-        .repay_fixed_loan_borrowing_order(&request)
-        .await
-        .unwrap();
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/account/fixed-loan/repay-borrowing-order")
-    );
-
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::FixedLoanBorrowingOrdersListRequest::new().param("state", "live");
-    client
-        .account()
-        .get_fixed_loan_borrowing_orders_list(&request)
-        .await
-        .unwrap();
-    assert_eq!(mock.captured().query(), Some("state=live"));
-}
-
-#[tokio::test]
 async fn spot_borrow_repay_and_auto_settings_are_signed() {
-    let body = r#"{"code":"0","msg":"","data":[
-        {"ccy":"USDT","ordId":"spot1","sCode":"0","sMsg":"","state":"success"}]}"#;
+    let mutation_body = r#"{"code":"0","msg":"","data":[
+        {"ccy":"USDT","side":"borrow","amt":"10"}]}"#;
 
-    let mock = MockTransport::new(body);
+    let mock = MockTransport::new(mutation_body);
     let client = signed_client(mock.clone());
-    let request = super::SpotManualBorrowRepayRequest::new()
-        .param("ccy", "USDT")
-        .param("side", "borrow")
-        .param("amt", "10");
+    let request = super::SpotManualBorrowRepayRequest::new("USDT", "borrow", "10");
     let rows = client
         .account()
         .spot_manual_borrow_repay(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].ccy, "USDT");
-    assert!(
-        mock.captured()
-            .uri
-            .ends_with("/api/v5/account/spot-manual-borrow-repay")
-    );
     assert!(mock.captured().is_signed());
 
-    let mock = MockTransport::new(body);
+    let auto_repay_body = r#"{"code":"0","msg":"","data":[{"autoRepay":true}]}"#;
+    let mock = MockTransport::new(auto_repay_body);
     let client = signed_client(mock.clone());
-    let request = super::SetAutoRepayRequest::new().bool_param("autoRepay", true);
+    let request = super::SetAutoRepayRequest::new(true);
     client.account().set_auto_repay(&request).await.unwrap();
     assert!(mock.captured().body_str().contains(r#""autoRepay":true"#));
 
-    let mock = MockTransport::new(body);
+    let history_body = r#"{"code":"0","msg":"","data":[
+        {"ccy":"USDT","type":"manual_borrow","amt":"10","ts":"1"}]}"#;
+    let mock = MockTransport::new(history_body);
     let client = signed_client(mock.clone());
-    let request = super::SpotBorrowRepayHistoryRequest::new().param("ccy", "USDT");
+    let request = super::SpotBorrowRepayHistoryRequest::new().currency("USDT");
     client
         .account()
         .get_spot_borrow_repay_history(&request)
@@ -921,9 +759,24 @@ async fn spot_borrow_repay_and_auto_settings_are_signed() {
         .unwrap();
     assert_eq!(mock.captured().query(), Some("ccy=USDT"));
 
-    let mock = MockTransport::new(body);
+    let auto_earn_body = r#"{"code":"0","msg":"","data":[{}]}"#;
+    let mock = MockTransport::new(auto_earn_body);
     let client = signed_client(mock.clone());
-    let request = super::SetAutoEarnRequest::new().bool_param("autoEarn", true);
+    let request = super::SetAutoEarnRequest::new("0", "USDT", "turn_on");
     client.account().set_auto_earn(&request).await.unwrap();
-    assert!(mock.captured().body_str().contains(r#""autoEarn":true"#));
+    let sent: serde_json::Value = serde_json::from_str(mock.captured().body_str()).unwrap();
+    assert_eq!(sent["earnType"], "0");
+    assert_eq!(sent["ccy"], "USDT");
+    assert_eq!(sent["action"], "turn_on");
+}
+
+#[tokio::test]
+async fn invalid_account_request_fails_before_transport() {
+    let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
+    let client = signed_client(mock.clone());
+    let request = super::MaxLoanRequest::new("", crate::model::TradeMode::Cross);
+
+    let error = client.account().get_max_loan(&request).await.unwrap_err();
+    assert!(matches!(error, Error::InvalidRequest(_)));
+    assert!(!mock.was_called());
 }

@@ -1,4 +1,11 @@
 {
-  "rust-analyzer.cargo.features": ["websocket"],
-  "rust-analyzer.check.features": ["websocket"]
+  "rust-analyzer.cargo.features": [
+    "websocket"
+  ],
+  "rust-analyzer.check.features": [
+    "websocket"
+  ],
+  "rust-analyzer.diagnostics.disabled": [
+    "unlinked-file"
+  ]
 }

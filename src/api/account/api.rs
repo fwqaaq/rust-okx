@@ -1,6 +1,6 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::InstType;
+use crate::model::{InstType, ValidateRequest};
 use crate::transport::Transport;
 
 use super::endpoints::*;
@@ -96,6 +96,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &BillsRequest,
     ) -> Result<Vec<AccountBill>, Error> {
+        request.validate()?;
         self.client.get(BILLS, request, true).await
     }
 
@@ -110,6 +111,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &BillsArchiveRequest,
     ) -> Result<Vec<AccountBill>, Error> {
+        request.validate()?;
         self.client.get(BILLS_ARCHIVE, request, true).await
     }
 
@@ -139,6 +141,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SetLeverageRequest,
     ) -> Result<Vec<LeverageInfo>, Error> {
+        request.validate()?;
         self.client.post(SET_LEVERAGE, request, true).await
     }
 
@@ -153,6 +156,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &LeverageRequest,
     ) -> Result<Vec<LeverageInfo>, Error> {
+        request.validate()?;
         self.client.get(GET_LEVERAGE, request, true).await
     }
 
@@ -167,6 +171,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &MaxOrderSizeRequest,
     ) -> Result<Vec<MaxOrderSize>, Error> {
+        request.validate()?;
         self.client.get(MAX_ORDER_SIZE, request, true).await
     }
 
@@ -181,6 +186,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &MaxAvailableSizeRequest,
     ) -> Result<Vec<MaxAvailableSize>, Error> {
+        request.validate()?;
         self.client.get(MAX_AVAILABLE_SIZE, request, true).await
     }
 
@@ -195,6 +201,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &AdjustMarginRequest,
     ) -> Result<Vec<AdjustMarginResult>, Error> {
+        request.validate()?;
         self.client.post(ADJUST_MARGIN, request, true).await
     }
 
@@ -206,6 +213,7 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// See [`get_balance`](Self::get_balance).
     pub async fn get_fee_rates(&self, request: &FeeRatesRequest) -> Result<Vec<FeeRate>, Error> {
+        request.validate()?;
         self.client.get(FEE_RATES, request, true).await
     }
 
@@ -220,6 +228,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &AccountInstrumentsRequest,
     ) -> Result<Vec<AccountInstrument>, Error> {
+        request.validate()?;
         self.client.get(ACCOUNT_INSTRUMENTS, request, true).await
     }
 
@@ -231,6 +240,7 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// See [`get_balance`](Self::get_balance).
     pub async fn get_max_loan(&self, request: &MaxLoanRequest) -> Result<Vec<MaxLoan>, Error> {
+        request.validate()?;
         self.client.get(MAX_LOAN, request, true).await
     }
 
@@ -245,6 +255,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &InterestAccruedRequest,
     ) -> Result<Vec<InterestAccrued>, Error> {
+        request.validate()?;
         self.client.get(INTEREST_ACCRUED, request, true).await
     }
 
@@ -314,6 +325,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &BorrowRepayRequest,
     ) -> Result<Vec<BorrowRepayResult>, Error> {
+        request.validate()?;
         self.client.post(BORROW_REPAY, request, true).await
     }
 
@@ -328,6 +340,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &BorrowRepayHistoryRequest,
     ) -> Result<Vec<BorrowRepayHistory>, Error> {
+        request.validate()?;
         self.client.get(BORROW_REPAY_HISTORY, request, true).await
     }
 
@@ -342,6 +355,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &InterestLimitsRequest,
     ) -> Result<Vec<InterestLimit>, Error> {
+        request.validate()?;
         self.client.get(INTEREST_LIMITS, request, true).await
     }
 
@@ -358,6 +372,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SimulatedMarginRequest,
     ) -> Result<Vec<SimulatedMargin>, Error> {
+        request.validate()?;
         self.client.post(SIMULATED_MARGIN, request, true).await
     }
 
@@ -384,6 +399,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &PositionsHistoryRequest,
     ) -> Result<Vec<PositionHistory>, Error> {
+        request.validate()?;
         self.client.get(POSITIONS_HISTORY, request, true).await
     }
 
@@ -398,6 +414,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &AccountPositionTiersRequest,
     ) -> Result<Vec<AccountPositionTier>, Error> {
+        request.validate()?;
         self.client.get(ACCOUNT_POSITION_TIERS, request, true).await
     }
 
@@ -478,175 +495,8 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &PositionBuilderRequest,
     ) -> Result<Vec<PositionBuilderResult>, Error> {
+        request.validate()?;
         self.client.post(POSITION_BUILDER, request, true).await
-    }
-
-    /// Retrieve VIP-loan interest accrued records.
-    ///
-    /// `GET /api/v5/account/vip-interest-accrued`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn get_vip_interest_accrued(
-        &self,
-        request: &VipInterestAccruedRequest,
-    ) -> Result<Vec<VipInterestAccrued>, Error> {
-        self.client.get(VIP_INTEREST_ACCRUED, request, true).await
-    }
-
-    /// Retrieve VIP-loan interest deducted records.
-    ///
-    /// `GET /api/v5/account/vip-interest-deducted`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn get_vip_interest_deducted(
-        &self,
-        request: &VipInterestDeductedRequest,
-    ) -> Result<Vec<VipInterestDeducted>, Error> {
-        self.client.get(VIP_INTEREST_DEDUCTED, request, true).await
-    }
-
-    /// Retrieve VIP-loan orders.
-    ///
-    /// `GET /api/v5/account/vip-loan-order-list`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn get_vip_loan_order_list(
-        &self,
-        request: &VipLoanOrderListRequest,
-    ) -> Result<Vec<VipLoanOrder>, Error> {
-        self.client.get(VIP_LOAN_ORDER_LIST, request, true).await
-    }
-
-    /// Retrieve a VIP-loan order detail.
-    ///
-    /// `GET /api/v5/account/vip-loan-order-detail`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn get_vip_loan_order_detail(
-        &self,
-        request: &VipLoanOrderDetailRequest,
-    ) -> Result<Vec<VipLoanOrder>, Error> {
-        self.client.get(VIP_LOAN_ORDER_DETAIL, request, true).await
-    }
-
-    /// Retrieve fixed-loan borrowing limits.
-    ///
-    /// `GET /api/v5/account/fixed-loan/borrowing-limit`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn get_fixed_loan_borrowing_limit(
-        &self,
-        request: &FixedLoanBorrowingLimitRequest,
-    ) -> Result<Vec<FixedLoanBorrowingLimit>, Error> {
-        self.client
-            .get(FIXED_LOAN_BORROWING_LIMIT, request, true)
-            .await
-    }
-
-    /// Request a fixed-loan borrowing quote.
-    ///
-    /// `POST /api/v5/account/fixed-loan/borrowing-quote`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn fixed_loan_borrowing_quote(
-        &self,
-        request: &FixedLoanBorrowingQuoteRequest,
-    ) -> Result<Vec<FixedLoanBorrowingQuote>, Error> {
-        self.client
-            .post(FIXED_LOAN_BORROWING_QUOTE, request, true)
-            .await
-    }
-
-    /// Place a fixed-loan borrowing order.
-    ///
-    /// `POST /api/v5/account/fixed-loan/borrowing-order`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn fixed_loan_borrowing_order(
-        &self,
-        request: &FixedLoanBorrowingOrderRequest,
-    ) -> Result<Vec<FixedLoanBorrowingOrder>, Error> {
-        self.client
-            .post(FIXED_LOAN_BORROWING_ORDER, request, true)
-            .await
-    }
-
-    /// Amend a fixed-loan borrowing order.
-    ///
-    /// `POST /api/v5/account/fixed-loan/amend-borrowing-order`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn amend_fixed_loan_borrowing_order(
-        &self,
-        request: &FixedLoanAmendBorrowingOrderRequest,
-    ) -> Result<Vec<FixedLoanBorrowingOrder>, Error> {
-        self.client
-            .post(FIXED_LOAN_AMEND_BORROWING_ORDER, request, true)
-            .await
-    }
-
-    /// Manually reborrow a fixed-loan order.
-    ///
-    /// `POST /api/v5/account/fixed-loan/manual-reborrow`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn fixed_loan_manual_reborrow(
-        &self,
-        request: &FixedLoanManualReborrowRequest,
-    ) -> Result<Vec<FixedLoanBorrowingOrder>, Error> {
-        self.client
-            .post(FIXED_LOAN_MANUAL_REBORROW, request, true)
-            .await
-    }
-
-    /// Repay a fixed-loan borrowing order.
-    ///
-    /// `POST /api/v5/account/fixed-loan/repay-borrowing-order`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn repay_fixed_loan_borrowing_order(
-        &self,
-        request: &FixedLoanRepayBorrowingOrderRequest,
-    ) -> Result<Vec<FixedLoanBorrowingOrder>, Error> {
-        self.client
-            .post(FIXED_LOAN_REPAY_BORROWING_ORDER, request, true)
-            .await
-    }
-
-    /// Retrieve fixed-loan borrowing orders.
-    ///
-    /// `GET /api/v5/account/fixed-loan/borrowing-orders-list`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn get_fixed_loan_borrowing_orders_list(
-        &self,
-        request: &FixedLoanBorrowingOrdersListRequest,
-    ) -> Result<Vec<FixedLoanBorrowingOrder>, Error> {
-        self.client
-            .get(FIXED_LOAN_BORROWING_ORDERS_LIST, request, true)
-            .await
     }
 
     /// Manually borrow or repay spot liabilities.
@@ -660,6 +510,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SpotManualBorrowRepayRequest,
     ) -> Result<Vec<SpotBorrowRepayResult>, Error> {
+        request.validate()?;
         self.client
             .post(SPOT_MANUAL_BORROW_REPAY, request, true)
             .await
@@ -676,6 +527,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SetAutoRepayRequest,
     ) -> Result<Vec<SetAutoRepayResult>, Error> {
+        request.validate()?;
         self.client.post(SET_AUTO_REPAY, request, true).await
     }
 
@@ -690,6 +542,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SpotBorrowRepayHistoryRequest,
     ) -> Result<Vec<SpotBorrowRepayHistory>, Error> {
+        request.validate()?;
         self.client
             .get(SPOT_BORROW_REPAY_HISTORY, request, true)
             .await
@@ -706,6 +559,7 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SetAutoEarnRequest,
     ) -> Result<Vec<SetAutoEarnResult>, Error> {
+        request.validate()?;
         self.client.post(SET_AUTO_EARN, request, true).await
     }
 }
