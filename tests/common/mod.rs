@@ -18,7 +18,7 @@
 use std::env;
 use std::sync::Once;
 
-use rust_okx::{Credentials, Error, OkxClient};
+use rust_okx::{Credentials, Error, OkxClient, RestError};
 
 /// Load variables from a `.env` file in the crate root into the process
 /// environment, once per test binary. Missing `.env` is not an error.
@@ -91,7 +91,7 @@ pub fn env_non_empty(var: &str) -> Option<String> {
 pub fn expect_ok_or_api_unavailable<T>(result: Result<T, Error>, endpoint: &str) {
     match result {
         Ok(_) => {}
-        Err(Error::Api { code, message }) => {
+        Err(Error::Rest(RestError::Okx { code, message, .. })) => {
             eprintln!("skipping {endpoint}: OKX returned {code} {message}");
         }
         Err(error) => panic!("{endpoint} failed: {error}"),
@@ -106,7 +106,7 @@ pub fn expect_ok_or_api_unavailable<T>(result: Result<T, Error>, endpoint: &str)
 pub fn ok_or_skip<T>(result: Result<T, Error>, label: &str) -> Option<T> {
     match result {
         Ok(v) => Some(v),
-        Err(Error::HttpStatus { status, .. }) if status.is_server_error() => {
+        Err(Error::Rest(RestError::HttpStatus { status, .. })) if status.is_server_error() => {
             eprintln!("skipping {label}: OKX returned HTTP {status}");
             None
         }

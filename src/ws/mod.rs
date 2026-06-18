@@ -9,6 +9,7 @@ pub mod arg;
 pub mod channels;
 pub mod client;
 mod conn;
+pub mod error;
 pub mod event;
 pub mod model;
 pub mod ops;
@@ -17,6 +18,7 @@ pub mod response;
 
 pub use arg::Arg;
 pub use client::{OkxWs, OkxWsBuilder, WsChannelGroup};
+pub use error::WsError;
 #[cfg(feature = "websocket")]
 pub use conn::{TungsteniteConn, TungsteniteConnector};
 pub use conn::{WsConn, WsConnector, WsFrame};

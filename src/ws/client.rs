@@ -4,6 +4,7 @@ use std::collections::VecDeque;
 
 use crate::credentials::Credentials;
 use crate::{Error, signing};
+use crate::ws::WsError;
 
 use super::arg::Arg;
 use super::conn::{TungsteniteConnector, WsConn, WsConnector, WsFrame};
@@ -139,18 +140,20 @@ impl<C: WsConnector> OkxWs<C> {
         operation: &str,
     ) -> Result<(), Error> {
         if self.group != required {
-            return Err(Error::Configuration(format!(
+            return Err(WsError::Configuration(format!(
                 "WebSocket operation `{operation}` requires the {required:?} channel group"
-            )));
+            ))
+            .into());
         }
         Ok(())
     }
 
     pub(crate) fn require_credentials(&self, operation: &str) -> Result<(), Error> {
         if self.credentials.is_none() {
-            return Err(Error::Configuration(format!(
+            return Err(WsError::Configuration(format!(
                 "WebSocket operation `{operation}` requires API credentials"
-            )));
+            ))
+            .into());
         }
         Ok(())
     }
@@ -242,9 +245,9 @@ impl<C: WsConnector> OkxWs<C> {
 
     fn needs_login(&self) -> Result<bool, Error> {
         if self.group == WsChannelGroup::Private && self.credentials.is_none() {
-            return Err(Error::Configuration(
-                "private WebSocket requires credentials".to_owned(),
-            ));
+            return Err(
+                WsError::Configuration("private WebSocket requires credentials".to_owned()).into(),
+            );
         }
         Ok(self.group == WsChannelGroup::Private
             || (self.group == WsChannelGroup::Business && self.credentials.is_some()))
@@ -268,7 +271,7 @@ impl<C: WsConnector> OkxWs<C> {
 
     async fn send_login(&mut self) -> Result<(), Error> {
         let credentials = self.credentials.as_ref().ok_or_else(|| {
-            Error::Configuration("WebSocket login requires credentials".to_owned())
+            WsError::Configuration("WebSocket login requires credentials".to_owned())
         })?;
         let payload = login_payload(credentials, &signing::ws_timestamp())?;
         self.conn.send_text(payload).await?;
@@ -286,7 +289,8 @@ impl<C: WsConnector> OkxWs<C> {
                 args,
             },
         };
-        let payload = serde_json::to_string(&request).map_err(Error::encode)?;
+        let payload = serde_json::to_string(&request)
+            .map_err(|e| WsError::Encode { source: e })?;
         self.conn.send_text(payload).await
     }
 
@@ -324,7 +328,9 @@ pub(crate) fn login_payload(credentials: &Credentials, timestamp: &str) -> Resul
         timestamp,
         signing::ws_login_sign(timestamp, credentials.secret_key()),
     ));
-    serde_json::to_string(&payload).map_err(Error::encode)
+    serde_json::to_string(&payload)
+        .map_err(|e| WsError::Encode { source: e })
+        .map_err(Error::from)
 }
 
 pub(crate) fn ws_url(group: WsChannelGroup, demo: bool) -> String {

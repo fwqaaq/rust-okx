@@ -47,7 +47,7 @@ pub mod ws;
 
 pub use client::{OkxClient, OkxClientBuilder};
 pub use credentials::Credentials;
-pub use error::Error;
+pub use error::{Error, RestError, Result};
 pub use model::NumberString;
 #[cfg(feature = "reqwest")]
 pub use transport::ReqwestTransport;
@@ -55,7 +55,7 @@ pub use transport::{Transport, TransportError};
 #[cfg(feature = "websocket")]
 pub use ws::{
     Arg, OkxWs, OkxWsBuilder, Push, WsChannelConnectionCount, WsChannelGroup, WsConn, WsConnector,
-    WsEvent, WsFrame, WsNotice, WsOperation,
+    WsError, WsEvent, WsFrame, WsNotice, WsOperation,
 };
 
 /// Global OKX REST API base URL.

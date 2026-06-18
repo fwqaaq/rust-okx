@@ -40,7 +40,7 @@ async fn standard_trade_read_only_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     client
         .trade()
-        .get_fills_history(&FillsRequest::new().limit(10))
+        .get_fills_history(&FillsRequest::new().inst_type(InstType::Spot).limit(10))
         .await
         .expect("trade/fills-history");
 }

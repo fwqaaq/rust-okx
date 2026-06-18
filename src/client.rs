@@ -15,7 +15,7 @@ use crate::api::market::Market;
 use crate::api::public_data::PublicData;
 use crate::api::trade::Trade;
 use crate::credentials::Credentials;
-use crate::error::Error;
+use crate::error::{Error, RestError};
 use crate::model::OkxResponse;
 use crate::signing;
 use crate::transport::{DefaultTransport, Transport};
@@ -94,7 +94,7 @@ impl<T: Transport> OkxClient<T> {
     /// returning the deserialized `data` array.
     pub(crate) async fn get<Q, D>(
         &self,
-        path: &str,
+        endpoint: &'static str,
         query: &Q,
         authenticated: bool,
     ) -> Result<D, Error>
@@ -102,13 +102,14 @@ impl<T: Transport> OkxClient<T> {
         Q: Serialize,
         D: DeserializeOwned,
     {
-        let qs = serde_urlencoded::to_string(query).map_err(Error::encode)?;
+        let qs = serde_urlencoded::to_string(query)
+            .map_err(|e| RestError::Encode { source: e.into() })?;
         let request_path = if qs.is_empty() {
-            path.to_owned()
+            endpoint.to_owned()
         } else {
-            format!("{path}?{qs}")
+            format!("{endpoint}?{qs}")
         };
-        self.send(Method::GET, &request_path, Bytes::new(), authenticated)
+        self.send(endpoint, Method::GET, &request_path, Bytes::new(), authenticated)
             .await
     }
 
@@ -116,7 +117,7 @@ impl<T: Transport> OkxClient<T> {
     /// deserialized `data` array.
     pub(crate) async fn post<B, D>(
         &self,
-        path: &str,
+        endpoint: &'static str,
         body: &B,
         authenticated: bool,
     ) -> Result<D, Error>
@@ -124,13 +125,15 @@ impl<T: Transport> OkxClient<T> {
         B: Serialize,
         D: DeserializeOwned,
     {
-        let body = serde_json::to_vec(body).map_err(Error::encode)?;
-        self.send(Method::POST, path, Bytes::from(body), authenticated)
+        let body = serde_json::to_vec(body)
+            .map_err(|e| RestError::Encode { source: e.into() })?;
+        self.send(endpoint, Method::POST, endpoint, Bytes::from(body), authenticated)
             .await
     }
 
     async fn send<D>(
         &self,
+        endpoint: &'static str,
         method: Method,
         request_path: &str,
         body: Bytes,
@@ -154,7 +157,9 @@ impl<T: Transport> OkxClient<T> {
         }
         if authenticated {
             let credentials = self.credentials.as_ref().ok_or_else(|| {
-                Error::Configuration("authenticated endpoint requires credentials".to_owned())
+                RestError::Configuration(
+                    "authenticated endpoint requires credentials".to_owned(),
+                )
             })?;
             let timestamp = signing::timestamp();
             let body_str = std::str::from_utf8(&body).unwrap_or_default();
@@ -166,30 +171,38 @@ impl<T: Transport> OkxClient<T> {
             insert_header(headers, "ok-access-passphrase", credentials.passphrase())?;
         }
 
-        let request = builder.body(body).map_err(Error::encode)?;
-        let response = self.transport.send(request).await?;
+        let request = builder
+            .body(body)
+            .map_err(|e| RestError::Encode { source: e.into() })?;
+        let response = self.transport.send(request).await.map_err(RestError::from)?;
         let status = response.status();
         let bytes = response.into_body();
         if !status.is_success() {
-            return Err(Error::HttpStatus {
+            return Err(RestError::HttpStatus {
+                endpoint,
                 status,
                 body: String::from_utf8_lossy(&bytes).into_owned(),
-            });
+            }
+            .into());
         }
-        let envelope: OkxResponse<D> = serde_json::from_slice(&bytes).map_err(Error::decode)?;
+        let envelope: OkxResponse<D> = serde_json::from_slice(&bytes)
+            .map_err(|e| RestError::Decode { endpoint, source: e })?;
         if envelope.code != "0" {
-            return Err(Error::Api {
+            return Err(RestError::Okx {
+                endpoint,
                 code: envelope.code,
                 message: envelope.msg,
-            });
+            }
+            .into());
         }
         Ok(envelope.data)
     }
 }
 
 fn insert_header(headers: &mut HeaderMap, name: &'static str, value: &str) -> Result<(), Error> {
-    let value = HeaderValue::from_str(value)
-        .map_err(|e| Error::Configuration(format!("invalid header value for {name}: {e}")))?;
+    let value = HeaderValue::from_str(value).map_err(|e| {
+        RestError::Configuration(format!("invalid header value for {name}: {e}"))
+    })?;
     headers.insert(HeaderName::from_static(name), value);
     Ok(())
 }
@@ -268,24 +281,24 @@ impl<T> OkxClientBuilder<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::error::Error;
+    use crate::error::{Error, RestError};
     use crate::test_util::MockTransport;
     use crate::{OkxClient, OkxRegion};
 
-    /// A non-zero OKX response code is surfaced as [`Error::Api`] with the code
-    /// and message preserved (offline unit test; the network path is covered by
-    /// the integration tests).
+    /// A non-zero OKX response code is surfaced as [`RestError::Okx`] with the
+    /// code and message preserved (offline unit test; network path covered by
+    /// integration tests).
     #[tokio::test]
     async fn non_zero_code_is_api_error() {
         let mock = MockTransport::new(r#"{"code":"51000","msg":"Parameter error","data":[]}"#);
         let client = OkxClient::with_transport(mock).build();
         let err = client.market().get_ticker("BAD").await.unwrap_err();
         match err {
-            Error::Api { code, message } => {
+            Error::Rest(RestError::Okx { code, message, .. }) => {
                 assert_eq!(code, "51000");
                 assert_eq!(message, "Parameter error");
             }
-            other => panic!("expected Error::Api, got {other:?}"),
+            other => panic!("expected Error::Rest(RestError::Okx), got {other:?}"),
         }
     }
 

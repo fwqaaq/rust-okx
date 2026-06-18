@@ -399,7 +399,7 @@ impl OrderHistoryRequest {
 /// Query parameters for fills.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct FillsRequest {
-    #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "instType")]
     inst_type: Option<crate::model::InstType>,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
     underlying: Option<String>,

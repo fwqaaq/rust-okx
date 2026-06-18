@@ -56,6 +56,7 @@ mod tungstenite_impl {
 
     use super::*;
     use crate::TransportError;
+    use crate::ws::WsError;
 
     /// Default WebSocket connector backed by `tokio-tungstenite`.
     #[derive(Debug, Clone, Copy, Default)]
@@ -74,7 +75,7 @@ mod tungstenite_impl {
             async move {
                 let (inner, _) = connect_async(url)
                     .await
-                    .map_err(|e| Error::Transport(TransportError::new(e)))?;
+                    .map_err(|e| Error::from(WsError::from(TransportError::new(e))))?;
                 Ok(TungsteniteConn { inner })
             }
         }
@@ -87,7 +88,7 @@ mod tungstenite_impl {
                 self.inner
                     .send(Message::Text(text))
                     .await
-                    .map_err(|e| Error::Transport(TransportError::new(e)))
+                    .map_err(|e| Error::from(WsError::from(TransportError::new(e))))
             }
         }
 
@@ -96,7 +97,7 @@ mod tungstenite_impl {
                 self.inner
                     .send(Message::Pong(payload.to_vec()))
                     .await
-                    .map_err(|e| Error::Transport(TransportError::new(e)))
+                    .map_err(|e| Error::from(WsError::from(TransportError::new(e))))
             }
         }
 
@@ -106,7 +107,8 @@ mod tungstenite_impl {
                     let Some(message) = self.inner.next().await else {
                         return Ok(None);
                     };
-                    let message = message.map_err(|e| Error::Transport(TransportError::new(e)))?;
+                    let message = message
+                        .map_err(|e| Error::from(WsError::from(TransportError::new(e))))?;
                     match message {
                         Message::Text(text) => return Ok(Some(WsFrame::Text(text))),
                         Message::Ping(bytes) => return Ok(Some(WsFrame::Ping(Bytes::from(bytes)))),
@@ -123,7 +125,7 @@ mod tungstenite_impl {
                 self.inner
                     .close(None)
                     .await
-                    .map_err(|e| Error::Transport(TransportError::new(e)))
+                    .map_err(|e| Error::from(WsError::from(TransportError::new(e))))
             }
         }
     }

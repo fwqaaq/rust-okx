@@ -4,6 +4,7 @@ use serde::Serialize;
 
 use crate::model::ValidateRequest;
 use crate::Error;
+use crate::ws::WsError;
 use crate::ws::client::OkxWs;
 use crate::ws::conn::WsConnector;
 use crate::ws::request::OperationRequest;
@@ -65,5 +66,7 @@ pub(crate) fn operation_payload_with_expiry<A: Serialize>(
     if let Some(exp_time) = exp_time {
         payload = payload.exp_time(exp_time);
     }
-    serde_json::to_string(&payload).map_err(Error::encode)
+    serde_json::to_string(&payload)
+        .map_err(|e| WsError::Encode { source: e })
+        .map_err(Error::from)
 }
