@@ -24,8 +24,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     ///
     /// `GET /api/v5/public/instruments`
     ///
-    /// `inst_family` is required for `FUTURES`, `SWAP`, and `OPTION` and ignored
-    /// for `SPOT`/`MARGIN`. This endpoint is public (unauthenticated).
+    /// `inst_family` is required for `FUTURES`, `SWAP`, and `OPTION` and ignored for `SPOT`/`MARGIN`.
     ///
     /// # Errors
     ///

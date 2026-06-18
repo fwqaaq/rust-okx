@@ -64,9 +64,12 @@ pub struct Savings<'a, T> {
 impl<T: Transport> Savings<'_, T> {
     /// Retrieve savings balances.
     ///
+    /// `GET /api/v5/finance/savings/balance`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
+    /// OKX code, or transport/decode errors.
     pub async fn get_saving_balance(&self, ccy: Option<&str>) -> Result<Vec<SavingBalance>, Error> {
         let query = optional_ccy(ccy);
         self.client.get(SAVINGS_BALANCE, &query, true).await
@@ -74,9 +77,12 @@ impl<T: Transport> Savings<'_, T> {
 
     /// Purchase or redeem savings.
     ///
+    /// `POST /api/v5/finance/savings/purchase-redempt`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
+    /// OKX code, or transport/decode errors.
     pub async fn purchase_redemption(
         &self,
         request: &SavingsPurchaseRedemptionRequest,
@@ -89,9 +95,12 @@ impl<T: Transport> Savings<'_, T> {
 
     /// Set the savings lending rate.
     ///
+    /// `POST /api/v5/finance/savings/set-lending-rate`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
+    /// OKX code, or transport/decode errors.
     pub async fn set_lending_rate(
         &self,
         ccy: &str,
@@ -105,9 +114,12 @@ impl<T: Transport> Savings<'_, T> {
 
     /// Retrieve lending history.
     ///
+    /// `GET /api/v5/finance/savings/lending-history`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
+    /// OKX code, or transport/decode errors.
     pub async fn get_lending_history(
         &self,
         request: &FinanceHistoryRequest,
@@ -120,9 +132,11 @@ impl<T: Transport> Savings<'_, T> {
 
     /// Retrieve public borrow history.
     ///
+    /// `GET /api/v5/finance/savings/lending-rate-history`. Public.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_public_borrow_history(
         &self,
         request: &FinanceHistoryRequest,
@@ -135,9 +149,11 @@ impl<T: Transport> Savings<'_, T> {
 
     /// Retrieve public borrow info.
     ///
+    /// `GET /api/v5/finance/savings/lending-rate-summary`. Public.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_public_borrow_info(
         &self,
         ccy: Option<&str>,
@@ -157,9 +173,11 @@ pub struct StakingDefi<'a, T> {
 impl<T: Transport> StakingDefi<'_, T> {
     /// Retrieve Staking/DeFi offers.
     ///
+    /// `GET /api/v5/finance/staking-defi/offers`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_offers(
         &self,
         request: &StakingDefiOffersRequest,
@@ -170,9 +188,11 @@ impl<T: Transport> StakingDefi<'_, T> {
 
     /// Purchase a Staking/DeFi product.
     ///
+    /// `POST /api/v5/finance/staking-defi/purchase`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase(
         &self,
         request: &StakingDefiPurchaseRequest,
@@ -183,9 +203,11 @@ impl<T: Transport> StakingDefi<'_, T> {
 
     /// Redeem a Staking/DeFi order.
     ///
+    /// `POST /api/v5/finance/staking-defi/redeem`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn redeem(
         &self,
         request: &StakingDefiRedeemRequest,
@@ -196,9 +218,11 @@ impl<T: Transport> StakingDefi<'_, T> {
 
     /// Cancel a Staking/DeFi order.
     ///
+    /// `POST /api/v5/finance/staking-defi/cancel`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn cancel(
         &self,
         request: &StakingDefiCancelRequest,
@@ -209,9 +233,11 @@ impl<T: Transport> StakingDefi<'_, T> {
 
     /// Retrieve active Staking/DeFi orders.
     ///
+    /// `GET /api/v5/finance/staking-defi/orders-active`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_active_orders(
         &self,
         request: &StakingDefiActiveOrdersRequest,
@@ -224,9 +250,11 @@ impl<T: Transport> StakingDefi<'_, T> {
 
     /// Retrieve Staking/DeFi order history.
     ///
+    /// `GET /api/v5/finance/staking-defi/orders-history`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_orders_history(
         &self,
         request: &StakingDefiOrderHistoryRequest,
@@ -246,18 +274,22 @@ pub struct EthStaking<'a, T> {
 impl<T: Transport> EthStaking<'_, T> {
     /// Retrieve ETH staking product info.
     ///
+    /// `GET /api/v5/finance/staking-defi/eth/product-info`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn product_info(&self) -> Result<Vec<StakingProductInfo>, Error> {
         self.client.get(ETH_PRODUCT_INFO, &NoParams {}, true).await
     }
 
     /// Purchase ETH staking.
     ///
+    /// `POST /api/v5/finance/staking-defi/eth/purchase`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
         let body = AmountBody { amt };
         self.client.post(ETH_PURCHASE, &body, true).await
@@ -265,9 +297,11 @@ impl<T: Transport> EthStaking<'_, T> {
 
     /// Redeem ETH staking.
     ///
+    /// `POST /api/v5/finance/staking-defi/eth/redeem`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn redeem(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
         let body = AmountBody { amt };
         self.client.post(ETH_REDEEM, &body, true).await
@@ -275,9 +309,11 @@ impl<T: Transport> EthStaking<'_, T> {
 
     /// Cancel redeem ETH staking.
     ///
+    /// `POST /api/v5/finance/staking-defi/eth/cancel-redeem`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn cancel_redeem(&self, ord_id: &str) -> Result<Vec<CancelRedeem>, Error> {
         let body = CancelRedeemBody { ord_id };
         self.client.post(ETH_CANCEL_REDEEM, &body, true).await
@@ -285,18 +321,22 @@ impl<T: Transport> EthStaking<'_, T> {
 
     /// Retrieve ETH staking balance.
     ///
+    /// `GET /api/v5/finance/staking-defi/eth/balance`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn balance(&self) -> Result<Vec<StakingBalance>, Error> {
         self.client.get(ETH_BALANCE, &NoParams {}, true).await
     }
 
     /// Retrieve ETH staking purchase/redeem history.
     ///
+    /// `GET /api/v5/finance/staking-defi/eth/purchase-redeem-history`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase_redeem_history(
         &self,
         request: &FinanceHistoryRequest,
@@ -307,9 +347,11 @@ impl<T: Transport> EthStaking<'_, T> {
 
     /// Retrieve ETH staking APY history.
     ///
+    /// `GET /api/v5/finance/staking-defi/eth/apy-history`. Public.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn apy_history(&self, days: &str) -> Result<Vec<StakingApyHistory>, Error> {
         let query = DaysQuery { days };
         self.client.get(ETH_APY_HISTORY, &query, false).await
@@ -324,18 +366,22 @@ pub struct SolStaking<'a, T> {
 impl<T: Transport> SolStaking<'_, T> {
     /// Retrieve SOL staking product info.
     ///
+    /// `GET /api/v5/finance/staking-defi/sol/product-info`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn product_info(&self) -> Result<StakingProductInfo, Error> {
         self.client.get(SOL_PRODUCT_INFO, &NoParams {}, true).await
     }
 
     /// Purchase SOL staking.
     ///
+    /// `POST /api/v5/finance/staking-defi/sol/purchase`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
         let body = AmountBody { amt };
         self.client.post(SOL_PURCHASE, &body, true).await
@@ -343,9 +389,11 @@ impl<T: Transport> SolStaking<'_, T> {
 
     /// Redeem SOL staking.
     ///
+    /// `POST /api/v5/finance/staking-defi/sol/redeem`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn redeem(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
         let body = AmountBody { amt };
         self.client.post(SOL_REDEEM, &body, true).await
@@ -353,18 +401,22 @@ impl<T: Transport> SolStaking<'_, T> {
 
     /// Retrieve SOL staking balance.
     ///
+    /// `GET /api/v5/finance/staking-defi/sol/balance`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn balance(&self) -> Result<Vec<StakingBalance>, Error> {
         self.client.get(SOL_BALANCE, &NoParams {}, true).await
     }
 
     /// Retrieve SOL staking purchase/redeem history.
     ///
+    /// `GET /api/v5/finance/staking-defi/sol/purchase-redeem-history`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase_redeem_history(
         &self,
         request: &FinanceHistoryRequest,
@@ -375,9 +427,11 @@ impl<T: Transport> SolStaking<'_, T> {
 
     /// Retrieve SOL staking APY history.
     ///
+    /// `GET /api/v5/finance/staking-defi/sol/apy-history`. Public.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn apy_history(&self, days: &str) -> Result<Vec<StakingApyHistory>, Error> {
         let query = DaysQuery { days };
         self.client.get(SOL_APY_HISTORY, &query, false).await
@@ -392,9 +446,11 @@ pub struct FlexibleLoan<'a, T> {
 impl<T: Transport> FlexibleLoan<'_, T> {
     /// Retrieve borrowable currencies.
     ///
+    /// `GET /api/v5/finance/flexible-loan/borrow-currencies`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn borrow_currencies(&self) -> Result<Vec<FlexibleLoanCurrency>, Error> {
         self.client
             .get(FLEX_BORROW_CURRENCIES, &NoParams {}, true)
@@ -403,9 +459,11 @@ impl<T: Transport> FlexibleLoan<'_, T> {
 
     /// Retrieve collateral assets.
     ///
+    /// `GET /api/v5/finance/flexible-loan/collateral-assets`. Public.
+    ///
     /// # Errors
     ///
-    /// Returns API, transport, or decode errors.
+    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn collateral_assets(
         &self,
         request: &FlexibleLoanCollateralAssetsRequest,
@@ -418,9 +476,11 @@ impl<T: Transport> FlexibleLoan<'_, T> {
 
     /// Estimate maximum flexible-loan amount.
     ///
+    /// `POST /api/v5/finance/flexible-loan/max-loan`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn max_loan(
         &self,
         request: &FlexibleLoanMaxLoanRequest,
@@ -431,9 +491,11 @@ impl<T: Transport> FlexibleLoan<'_, T> {
 
     /// Retrieve maximum collateral redeem amount.
     ///
+    /// `GET /api/v5/finance/flexible-loan/max-collateral-redeem-amount`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn max_collateral_redeem_amount(
         &self,
         request: &FlexibleLoanMaxRedeemRequest,
@@ -444,9 +506,11 @@ impl<T: Transport> FlexibleLoan<'_, T> {
 
     /// Adjust flexible-loan collateral.
     ///
+    /// `POST /api/v5/finance/flexible-loan/adjust-collateral`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn adjust_collateral(
         &self,
         request: &FlexibleLoanAdjustCollateralRequest,
@@ -459,9 +523,11 @@ impl<T: Transport> FlexibleLoan<'_, T> {
 
     /// Retrieve flexible-loan info.
     ///
+    /// `GET /api/v5/finance/flexible-loan/loan-info`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn loan_info(
         &self,
         request: &FlexibleLoanInfoRequest,
@@ -472,9 +538,11 @@ impl<T: Transport> FlexibleLoan<'_, T> {
 
     /// Retrieve flexible-loan history.
     ///
+    /// `GET /api/v5/finance/flexible-loan/loan-history`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn loan_history(
         &self,
         request: &FlexibleLoanHistoryRequest,
@@ -485,9 +553,11 @@ impl<T: Transport> FlexibleLoan<'_, T> {
 
     /// Retrieve flexible-loan accrued interest.
     ///
+    /// `GET /api/v5/finance/flexible-loan/interest-accrued`. Authenticated.
+    ///
     /// # Errors
     ///
-    /// Returns authentication, API, transport, or decode errors.
+    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn interest_accrued(
         &self,
         request: &FlexibleLoanInterestAccruedRequest,
