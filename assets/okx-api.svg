@@ -1,0 +1,20 @@
+<svg width="132" height="132" viewBox="0 0 132 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">rust-okx OKX API icon</title>
+  <desc id="desc">Minimal OKX API SDK icon with readable OKX lettering and an API v5 endpoint badge.</desc>
+  <rect width="132" height="132" rx="28" fill="#090B0E"/>
+
+  <!-- Readable OKX mark, drawn with vector strokes instead of a font. -->
+  <rect x="20" y="25" width="26" height="34" rx="8" stroke="#FFFFFF" stroke-width="8"/>
+  <path d="M57 24V60" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M78 26L60 42L78 60" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M88 27L111 59" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M111 27L88 59" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Minimal API badge. -->
+  <rect x="18" y="77" width="96" height="30" rx="11" fill="#11161C" stroke="#2B333C" stroke-width="2"/>
+  <path d="M30 92H24" stroke="#00D084" stroke-width="3" stroke-linecap="round"/>
+  <path d="M27 88L23 92L27 96" stroke="#00D084" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="39" y="98" fill="#FFFFFF" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="800" letter-spacing="0.4">API</text>
+  <text x="77" y="98" fill="#00D084" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="800">v5</text>
+  <circle cx="104" cy="92" r="4" fill="#00D084"/>
+</svg>

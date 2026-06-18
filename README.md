@@ -1,35 +1,52 @@
-<h1 align="center">
- rust-okx
-</h1>
-
 <p align="center">
-  <img src="assets/rust-okx.svg" alt="rust-okx project icon" width="128" height="128">
+  <img src="assets/okx-api.svg" alt="rust-okx OKX API icon" width="132" height="132">
 </p>
 
-Async Rust client for the [OKX v5 REST API](https://www.okx.com/docs-v5/en/).
+<h1 align="center">rust-okx</h1>
 
-![MSRV](https://img.shields.io/badge/MSRV-1.85-blue)
-![Edition](https://img.shields.io/badge/edition-2024-blue)
-![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
-![Default HTTP client](https://img.shields.io/badge/default%20HTTP-reqwest-green)
+<p align="center">
+  Typed async Rust SDK for the <a href="https://www.okx.com/docs-v5/en/">OKX v5 API</a>.
+</p>
 
-> **Status:** early `0.1.x` crate. The core REST client is usable, but API
-> coverage is still expanding and breaking changes may happen before `1.0`.
+<p align="center">
+  <img alt="MSRV" src="https://img.shields.io/badge/MSRV-1.85-blue">
+  <img alt="Edition" src="https://img.shields.io/badge/edition-2024-blue">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
+  <img alt="HTTP" src="https://img.shields.io/badge/default%20HTTP-reqwest-green">
+  <img alt="Status" src="https://img.shields.io/badge/status-early%200.4.x-orange">
+</p>
+
+`rust-okx` is an unofficial OKX client focused on typed request/response models,
+clear error handling, demo trading support, regional API hosts, and optional
+WebSocket streams.
+
+> Status: early `0.4.x`. The REST surface is usable and still expanding. Public
+> API details may change before `1.0`.
 
 ## Installation
 
-Add `rust-okx` and an async runtime:
-
 ```toml
 [dependencies]
-rust-okx = "0.1"
+rust-okx = "0.4"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 ```
 
-The default feature enables the built-in `reqwest` HTTP client. Disable default
-features only when you provide your own transport.
+The default feature enables the built-in `reqwest` transport. Disable default
+features only when you provide your own `Transport` implementation.
 
-## Quick Start
+```toml
+[dependencies]
+rust-okx = { version = "0.4", default-features = false }
+```
+
+Enable optional WebSocket support when you need streaming market, business, or
+private account channels.
+
+```toml
+rust-okx = { version = "0.4", features = ["websocket"] }
+```
+
+## Quick start
 
 Public market data does not require credentials.
 
@@ -47,9 +64,9 @@ async fn main() -> Result<(), rust_okx::Error> {
 }
 ```
 
-## Authenticated Client
+## Authenticated REST
 
-Authenticated endpoints require an API key, secret, and passphrase.
+Authenticated endpoints require an OKX API key, secret, and passphrase.
 
 ```rust
 use rust_okx::{Credentials, OkxClient};
@@ -66,10 +83,10 @@ async fn main() -> Result<(), rust_okx::Error> {
 }
 ```
 
-## Demo Trading
+## Demo trading
 
-OKX uses separate credentials for live and demo trading. Enable demo trading to
-send the `x-simulated-trading: 1` header.
+OKX demo trading uses separate credentials. The builder sends
+`x-simulated-trading: 1` for demo requests.
 
 ```rust
 use rust_okx::{Credentials, OkxClient};
@@ -81,10 +98,10 @@ let client = OkxClient::builder()
     .build();
 ```
 
-## Regional Accounts
+## Regional API hosts
 
-The default client uses the global OKX API domain. Regional accounts should use
-the matching domain.
+The default host is the global OKX API domain. Regional accounts can select the
+matching domain through `OkxRegion`.
 
 ```rust
 use rust_okx::{OkxClient, OkxRegion};
@@ -94,19 +111,26 @@ let client = OkxClient::builder()
     .build();
 ```
 
-## Feature Overview
+## What is included
 
-- Typed REST accessors: `market`, `public_data`, `account`, `funding`,
+- Typed REST accessors for `market`, `public_data`, `account`, `funding`,
   `convert`, `finance`, and `trade`.
-- Demo trading support through `OkxClientBuilder::demo_trading(true)`.
-- Regional API domains through `OkxRegion`.
-- Lossless numeric strings through `NumberString`.
-- Matchable error enum for transport, encoding, decoding, HTTP status, API, and
-  configuration failures.
-- Default `reqwest` transport, with custom transport support for tests, proxies,
-  retries, request recording, or replacing the HTTP stack.
-- Optional `rust-decimal` feature for `NumberString::to_decimal()`.
-- Optional `websocket` feature for typed WebSocket clients and events.
+- Optional typed WebSocket client behind the `websocket` feature.
+- Demo trading mode and regional API domain selection.
+- Matchable two-level errors: `RestError`, `WsError`, and shared request
+  validation errors.
+- Lossless numeric strings through `NumberString`, with optional
+  `rust-decimal` conversion.
+- Swappable `Transport` for tests, proxies, retry layers, request recording, or
+  custom HTTP stacks.
+
+## Feature flags
+
+| Feature | Default | Purpose |
+| --- | --- | --- |
+| `reqwest` | yes | Built-in HTTPS transport. |
+| `websocket` | no | Typed OKX WebSocket clients and events. |
+| `rust-decimal` | no | Convert `NumberString` values to `rust_decimal::Decimal`. |
 
 ## Examples
 
@@ -136,20 +160,19 @@ unless the matching `OKX_ENABLE_*_MUTATION=1` switch is set.
 
 ## Roadmap
 
-Current REST coverage includes market data, public data, account, funding,
-convert, finance, and trade endpoints. WebSocket support is available behind
-the `websocket` feature.
+Current coverage includes market data, public data, account, funding, convert,
+finance, trade, and optional WebSocket support. The next major areas are
+SubAccount, RFQ/block trading, grid/copy trading, spread trading,
+trading-data analytics, and status endpoints.
 
-The next major areas are SubAccount, RFQ/block trading, grid/copy trading,
-spread trading, trading-data analytics, and status endpoints. See
-[TODO.md](TODO.md) for the detailed backlog.
+See [TODO.md](TODO.md) for the detailed backlog.
 
 ## Disclaimer
 
-This is an unofficial OKX client and is not affiliated with OKX. Trading
-involves financial risk. Test your flows against the demo environment before
-using live credentials.
+This is an unofficial SDK and is not affiliated with OKX. Trading involves
+financial risk. Test your flows against the demo environment before using live
+credentials.
 
 ## License
 
-Licensed under `MIT OR Apache-2.0`.
+Licensed under [`MIT`](./LICENSE).
