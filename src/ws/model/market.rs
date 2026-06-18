@@ -12,28 +12,64 @@ pub(super) fn array_value(values: &[NumberString], index: usize) -> NumberString
     values.get(index).cloned().unwrap_or_default()
 }
 
-ws_object! {
-    /// `tickers` channel row.
-    ///
-    /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-tickers-channel>
-    TickerUpdate {
-        inst_type: String,
-        inst_id: String,
-        last: NumberString,
-        last_sz: NumberString,
-        ask_px: NumberString,
-        ask_sz: NumberString,
-        bid_px: NumberString,
-        bid_sz: NumberString,
-        open24h: NumberString,
-        high24h: NumberString,
-        low24h: NumberString,
-        vol_ccy24h: NumberString,
-        vol24h: NumberString,
-        sod_utc0: NumberString,
-        sod_utc8: NumberString,
-        ts: NumberString
-    }
+/// `tickers` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-tickers-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct TickerUpdate {
+    /// Instrument type, e.g., `SPOT`, `SWAP`, `FUTURES`, `OPTION`.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Instrument ID, e.g., `BTC-USDT`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Last traded price.
+    #[serde(default)]
+    pub last: NumberString,
+    /// Last traded size.
+    #[serde(default)]
+    pub last_sz: NumberString,
+    /// Best ask price.
+    #[serde(default)]
+    pub ask_px: NumberString,
+    /// Best ask size.
+    #[serde(default)]
+    pub ask_sz: NumberString,
+    /// Best bid price.
+    #[serde(default)]
+    pub bid_px: NumberString,
+    /// Best bid size.
+    #[serde(default)]
+    pub bid_sz: NumberString,
+    /// Open price over the last 24 hours.
+    #[serde(default)]
+    pub open24h: NumberString,
+    /// Highest price over the last 24 hours.
+    #[serde(default)]
+    pub high24h: NumberString,
+    /// Lowest price over the last 24 hours.
+    #[serde(default)]
+    pub low24h: NumberString,
+    /// Trading volume in quote currency over the last 24 hours.
+    #[serde(default)]
+    pub vol_ccy24h: NumberString,
+    /// Trading volume in base currency (or contracts for derivatives) over the last 24 hours.
+    #[serde(default)]
+    pub vol24h: NumberString,
+    /// Open price at the start of day (00:00 UTC).
+    #[serde(default)]
+    pub sod_utc0: NumberString,
+    /// Open price at the start of day (08:00 UTC+8).
+    #[serde(default)]
+    pub sod_utc8: NumberString,
+    /// Ticker push time (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
 /// `candle*` channel row represented by OKX's nine-element array.
@@ -43,32 +79,24 @@ ws_object! {
 #[serde(from = "Vec<NumberString>")]
 #[non_exhaustive]
 pub struct CandleUpdate {
-    /// Opening time of the candlestick,
-    /// Unix timestamp format in milliseconds
+    /// Opening time of the candlestick (Unix milliseconds).
     pub ts: NumberString,
-    /// Open price
+    /// Open price.
     pub o: NumberString,
-    /// highest price
+    /// Highest price.
     pub h: NumberString,
-    /// Lowest price
+    /// Lowest price.
     pub l: NumberString,
-    /// Cloest price
+    /// Close price.
     pub c: NumberString,
-    /// Trading volume, with a unit of `contract`.
-    /// If it is a `derivatives` contract, the value is the number of contracts.
-    /// If it is `SPOT`/`MARGIN`, the value is the quantity in base currency.
+    /// Trading volume in contracts (derivatives) or base currency (SPOT/MARGIN).
     pub volume: NumberString,
-    /// Trading volume, with a unit of `currency`.
-    /// If it is a `derivatives` contract, the value is the number of base currency.
-    /// If it is `SPOT`/`MARGIN`, the value is the quantity in quote currency.
+    /// Trading volume in base currency (derivatives) or quote currency (SPOT/MARGIN).
     pub volume_ccy: NumberString,
-    /// Trading volume, the value is the quantity in quote currency
-    /// e.g. The unit is `USDT` for `BTC-USDT` and `BTC-USDT-SWAP`
-    /// The unit is `USD` for `BTC-USD-SWAP`
+    /// Trading volume in quote currency, e.g., `USDT` for `BTC-USDT` and `BTC-USDT-SWAP`,
+    /// `USD` for `BTC-USD-SWAP`.
     pub volume_quote: NumberString,
-    /// The state of candlesticks
-    /// 0: K line is uncompleted
-    /// 1: K line is completed
+    /// Candlestick state: `0` incomplete (still forming), `1` completed.
     pub confirm: NumberString,
 }
 
@@ -88,56 +116,129 @@ impl From<Vec<NumberString>> for CandleUpdate {
     }
 }
 
-ws_object! {
-    /// `trades` and `trades-all` channel row.
+/// `trades` and `trades-all` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-trades-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct TradeUpdate {
+    /// Instrument ID, e.g., `BTC-USDT`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Trade ID assigned by OKX.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Trade price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Trade size.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Trade side: `buy` or `sell`.
+    #[serde(default)]
+    pub side: String,
+    /// Trade source.
     ///
-    /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-trades-channel>
-    TradeUpdate {
-        inst_id: String,
-        trade_id: String,
-        px: NumberString,
-        sz: NumberString,
-        side: String,
-        source: String,
-        count: NumberString,
-        seq_id: NumberString,
-        ts: NumberString
-    }
+    /// Empty string for regular trades. `"1"` indicates a block trade.
+    #[serde(default)]
+    pub source: String,
+    /// Number of trades aggregated into this push (only applicable to the `trades` channel).
+    #[serde(default)]
+    pub count: NumberString,
+    /// Sequence ID of this message; monotonically increasing within a session.
+    #[serde(default)]
+    pub seq_id: NumberString,
+    /// Trade timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
-ws_object! {
-    /// `option-trades` channel row.
-    ///
-    /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-option-trades-channel>
-    OptionTradeUpdate {
-        inst_id: String,
-        inst_family: String,
-        trade_id: String,
-        px: NumberString,
-        sz: NumberString,
-        side: String,
-        opt_type: String,
-        fill_vol: NumberString,
-        fwd_px: NumberString,
-        idx_px: NumberString,
-        mark_px: NumberString,
-        ts: NumberString
-    }
+/// `option-trades` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-option-trades-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct OptionTradeUpdate {
+    /// Instrument ID, e.g., `BTC-USD-240329-40000-C`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Instrument family, e.g., `BTC-USD`.
+    #[serde(default)]
+    pub inst_family: String,
+    /// Trade ID assigned by OKX.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Trade price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Trade size (number of contracts).
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Trade side: `buy` or `sell`.
+    #[serde(default)]
+    pub side: String,
+    /// Option type: `C` (call) or `P` (put).
+    #[serde(default)]
+    pub opt_type: String,
+    /// Implied volatility at the fill price.
+    #[serde(default)]
+    pub fill_vol: NumberString,
+    /// Forward price at the time of the trade.
+    #[serde(default)]
+    pub fwd_px: NumberString,
+    /// Index price at the time of the trade.
+    #[serde(default)]
+    pub idx_px: NumberString,
+    /// Mark price at the time of the trade.
+    #[serde(default)]
+    pub mark_px: NumberString,
+    /// Trade timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
-ws_object! {
-    /// `call-auction-details` channel row.
+/// `call-auction-details` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-call-auction-details-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct CallAuctionDetailsUpdate {
+    /// Instrument ID, e.g., `BTC-USDT`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Equilibrium price — the price at which the maximum volume can be matched.
+    #[serde(default)]
+    pub eq_px: NumberString,
+    /// Total matched volume at the equilibrium price.
+    #[serde(default)]
+    pub matched_sz: NumberString,
+    /// Unmatched volume remaining at the equilibrium price.
+    #[serde(default)]
+    pub unmatched_sz: NumberString,
+    /// Auction end time (Unix milliseconds).
+    #[serde(default)]
+    pub auction_end_time: NumberString,
+    /// Auction state.
     ///
-    /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-call-auction-details-channel>
-    CallAuctionDetailsUpdate {
-        inst_id: String,
-        eq_px: NumberString,
-        matched_sz: NumberString,
-        unmatched_sz: NumberString,
-        auction_end_time: NumberString,
-        state: String,
-        ts: NumberString
-    }
+    /// Documented values: `prepareStart`, `parallelTrading`, `callAuction`,
+    /// `cancelOrder`, `matchWaiting`, `matched`, `normal`.
+    #[serde(default)]
+    pub state: String,
+    /// Push time (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
 /// An order book push from `books`, `books5`, or tick-by-tick book channels.
@@ -147,27 +248,27 @@ ws_object! {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct OrderBookUpdate {
-    /// Order book on sell side
+    /// Ask levels sorted from best (lowest) price to worst.
     #[serde(default)]
     pub asks: Vec<BookLevel>,
+    /// Bid levels sorted from best (highest) price to worst.
     #[serde(default)]
-    /// Order book on buy side
     pub bids: Vec<BookLevel>,
-    /// Checksum, implementation details below
+    /// CRC32 checksum of the top-25 bid/ask levels for integrity verification.
     #[serde(default)]
     pub checksum: i64,
-    /// Sequence ID of the last sent message.
-    /// Only applicable to books, books-l2-tbt, books50-l2-tbt
+    /// Sequence ID of the previous message; used to detect gaps.
+    ///
+    /// Only applicable to `books`, `books-l2-tbt`, and `books50-l2-tbt`.
     #[serde(default)]
     pub prev_seq_id: i64,
-    /// Sequence ID of the current message,
-    /// implementation details below
+    /// Sequence ID of the current message; monotonically increasing.
     #[serde(default)]
     pub seq_id: i64,
-    /// Order book generation time
+    /// Order book generation time (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
-    /// Unrecognized field
+    /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,
 }

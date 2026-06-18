@@ -7,64 +7,172 @@ use serde::Deserialize;
 use super::ExtraFields;
 use crate::model::NumberString;
 
-ws_object! {
-    /// Private `positions` channel row.
-    ///
-    /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-positions-channel>
-    PositionUpdate {
-        inst_type: String,
-        mgn_mode: String,
-        pos_id: String,
-        pos_side: String,
-        pos: NumberString,
-        pos_ccy: String,
-        avail_pos: NumberString,
-        avg_px: NumberString,
-        non_settle_avg_px: NumberString,
-        upl: NumberString,
-        upl_ratio: NumberString,
-        upl_last_px: NumberString,
-        upl_ratio_last_px: NumberString,
-        lever: NumberString,
-        liq_px: NumberString,
-        mark_px: NumberString,
-        imr: NumberString,
-        margin: NumberString,
-        mgn_ratio: NumberString,
-        mmr: NumberString,
-        liab: NumberString,
-        liab_ccy: String,
-        interest: NumberString,
-        usd_px: NumberString,
-        hedged_pos: NumberString,
-        trade_id: String,
-        opt_val: NumberString,
-        pending_close_ord_liab_val: NumberString,
-        notional_usd: NumberString,
-        adl: String,
-        ccy: String,
-        last: NumberString,
-        idx_px: NumberString,
-        be_px: NumberString,
-        delta_bs: NumberString,
-        delta_pa: NumberString,
-        gamma_bs: NumberString,
-        gamma_pa: NumberString,
-        theta_bs: NumberString,
-        theta_pa: NumberString,
-        vega_bs: NumberString,
-        vega_pa: NumberString,
-        spot_in_use_amt: NumberString,
-        spot_in_use_ccy: String,
-        cl_spot_in_use_amt: NumberString,
-        max_spot_in_use_amt: NumberString,
-        biz_ref_id: String,
-        biz_ref_type: String,
-        inst_id: String,
-        c_time: NumberString,
-        u_time: NumberString,
-        p_time: NumberString
-    }
+/// Private `positions` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-positions-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct PositionUpdate {
+    /// Instrument type, e.g., `MARGIN`, `SWAP`, `FUTURES`, `OPTION`.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Margin mode: `cross` or `isolated`.
+    #[serde(default)]
+    pub mgn_mode: String,
+    /// OKX-assigned position ID.
+    #[serde(default)]
+    pub pos_id: String,
+    /// Position side: `long`, `short`, or `net`.
+    #[serde(default)]
+    pub pos_side: String,
+    /// Position quantity (contracts for derivatives; base currency for margin).
+    #[serde(default)]
+    pub pos: NumberString,
+    /// Position currency (base currency for MARGIN positions only).
+    #[serde(default)]
+    pub pos_ccy: String,
+    /// Available position (not frozen by closing orders).
+    #[serde(default)]
+    pub avail_pos: NumberString,
+    /// Average entry price of the position.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Non-settlement average entry price (cross FUTURES only).
+    #[serde(default)]
+    pub non_settle_avg_px: NumberString,
+    /// Unrealized profit and loss.
+    #[serde(default)]
+    pub upl: NumberString,
+    /// Unrealized profit and loss ratio.
+    #[serde(default)]
+    pub upl_ratio: NumberString,
+    /// Unrealized PnL calculated using the last traded price.
+    #[serde(default)]
+    pub upl_last_px: NumberString,
+    /// Unrealized PnL ratio calculated using the last traded price.
+    #[serde(default)]
+    pub upl_ratio_last_px: NumberString,
+    /// Leverage.
+    #[serde(default)]
+    pub lever: NumberString,
+    /// Estimated liquidation price.
+    #[serde(default)]
+    pub liq_px: NumberString,
+    /// Mark price.
+    #[serde(default)]
+    pub mark_px: NumberString,
+    /// Initial margin requirement in USD.
+    #[serde(default)]
+    pub imr: NumberString,
+    /// Margin balance (isolated mode only).
+    #[serde(default)]
+    pub margin: NumberString,
+    /// Margin ratio.
+    #[serde(default)]
+    pub mgn_ratio: NumberString,
+    /// Maintenance margin requirement in USD.
+    #[serde(default)]
+    pub mmr: NumberString,
+    /// Liabilities of the position (for cross-margin positions).
+    #[serde(default)]
+    pub liab: NumberString,
+    /// Liability currency.
+    #[serde(default)]
+    pub liab_ccy: String,
+    /// Accrued interest.
+    #[serde(default)]
+    pub interest: NumberString,
+    /// USD price of the instrument's settlement currency.
+    #[serde(default)]
+    pub usd_px: NumberString,
+    /// Quantity of base currency hedged via spot (Portfolio margin mode only).
+    #[serde(default)]
+    pub hedged_pos: NumberString,
+    /// Trade ID of the most recent fill for this position.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Options value in USD (options positions only).
+    #[serde(default)]
+    pub opt_val: NumberString,
+    /// Pending closing-order liability value.
+    #[serde(default)]
+    pub pending_close_ord_liab_val: NumberString,
+    /// Notional value of the position in USD.
+    #[serde(default)]
+    pub notional_usd: NumberString,
+    /// Auto-deleveraging (ADL) indicator level (1–5); higher means higher ADL risk.
+    #[serde(default)]
+    pub adl: String,
+    /// Settlement or margin currency of the position.
+    #[serde(default)]
+    pub ccy: String,
+    /// Last traded price.
+    #[serde(default)]
+    pub last: NumberString,
+    /// Index price.
+    #[serde(default)]
+    pub idx_px: NumberString,
+    /// Breakeven price.
+    #[serde(default)]
+    pub be_px: NumberString,
+    /// Black-Scholes delta (options only).
+    #[serde(default)]
+    pub delta_bs: NumberString,
+    /// PA delta (options only).
+    #[serde(default)]
+    pub delta_pa: NumberString,
+    /// Black-Scholes gamma (options only).
+    #[serde(default)]
+    pub gamma_bs: NumberString,
+    /// PA gamma (options only).
+    #[serde(default)]
+    pub gamma_pa: NumberString,
+    /// Black-Scholes theta (options only).
+    #[serde(default)]
+    pub theta_bs: NumberString,
+    /// PA theta (options only).
+    #[serde(default)]
+    pub theta_pa: NumberString,
+    /// Black-Scholes vega (options only).
+    #[serde(default)]
+    pub vega_bs: NumberString,
+    /// PA vega (options only).
+    #[serde(default)]
+    pub vega_pa: NumberString,
+    /// Spot quantity used for hedging (Portfolio margin mode only).
+    #[serde(default)]
+    pub spot_in_use_amt: NumberString,
+    /// Currency of the spot hedge quantity.
+    #[serde(default)]
+    pub spot_in_use_ccy: String,
+    /// User-defined spot hedge amount.
+    #[serde(default)]
+    pub cl_spot_in_use_amt: NumberString,
+    /// Maximum spot hedge amount calculated by OKX.
+    #[serde(default)]
+    pub max_spot_in_use_amt: NumberString,
+    /// External business reference ID (e.g., copy-trading).
+    #[serde(default)]
+    pub biz_ref_id: String,
+    /// External business reference type.
+    #[serde(default)]
+    pub biz_ref_type: String,
+    /// Instrument ID, e.g., `BTC-USDT-SWAP`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Position creation time (Unix milliseconds).
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Last update time (Unix milliseconds).
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Push time (Unix milliseconds).
+    #[serde(default)]
+    pub p_time: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
 /// A data row pushed by the private `balance_and_position` WebSocket channel.
@@ -286,77 +394,175 @@ pub struct Trade {
     pub extra: ExtraFields,
 }
 
-ws_object! {
-    /// Balance row in a `balance_and_position` push.
-    BalanceAndPositionBalance {
-        ccy: String,
-        cash_bal: NumberString,
-        u_time: NumberString
-    }
+/// Balance row in a `balance_and_position` push.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BalanceAndPositionBalance {
+    /// Currency code, e.g., `BTC` or `USDT`.
+    #[serde(default)]
+    pub ccy: String,
+    /// Cash balance of the currency.
+    #[serde(default)]
+    pub cash_bal: NumberString,
+    /// Time when this currency balance was last updated (Unix milliseconds).
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
-ws_object! {
-    /// Position row in a `balance_and_position` push.
-    BalanceAndPositionPosition {
-        pos_id: String,
-        trade_id: String,
-        inst_id: String,
-        inst_type: String,
-        mgn_mode: String,
-        pos_side: String,
-        pos: NumberString,
-        ccy: String,
-        pos_ccy: String,
-        avg_px: NumberString,
-        non_settle_avg_px: NumberString,
-        settled_pnl: NumberString,
-        u_time: NumberString
-    }
+/// Position row in a `balance_and_position` push.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BalanceAndPositionPosition {
+    /// OKX-assigned position ID.
+    #[serde(default)]
+    pub pos_id: String,
+    /// Trade ID of the most recent fill for this position.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Instrument ID, e.g., `BTC-USDT-SWAP`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Instrument type, e.g., `MARGIN`, `SWAP`, `FUTURES`, `OPTION`.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Margin mode: `cross` or `isolated`.
+    #[serde(default)]
+    pub mgn_mode: String,
+    /// Position side: `long`, `short`, or `net`.
+    #[serde(default)]
+    pub pos_side: String,
+    /// Position quantity (contracts for derivatives; base currency for margin).
+    #[serde(default)]
+    pub pos: NumberString,
+    /// Settlement or margin currency of the position.
+    #[serde(default)]
+    pub ccy: String,
+    /// Position currency (base currency for MARGIN positions only).
+    #[serde(default)]
+    pub pos_ccy: String,
+    /// Average entry price of the position.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Non-settlement average entry price (cross FUTURES only).
+    #[serde(default)]
+    pub non_settle_avg_px: NumberString,
+    /// Accumulated settled PnL using settlement prices (cross FUTURES only).
+    #[serde(default)]
+    pub settled_pnl: NumberString,
+    /// Time when this position was last updated (Unix milliseconds).
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
-ws_object! {
-    /// Trade row in a `balance_and_position` push.
-    BalanceAndPositionTrade {
-        inst_id: String,
-        trade_id: String
-    }
+/// Trade row in a `balance_and_position` push.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BalanceAndPositionTrade {
+    /// Instrument ID of the fill, e.g., `BTC-USDT` or `BTC-USDT-SWAP`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Trade ID assigned by OKX.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
-ws_object! {
-    /// Private `liquidation-warning` channel row.
-    ///
-    /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-liquidation-warning-channel>
-    LiquidationWarningUpdate {
-        inst_type: String,
-        inst_id: String,
-        pos_side: String,
-        pos: NumberString,
-        mgn_mode: String,
-        mgn_ratio: NumberString,
-        mark_px: NumberString,
-        liq_px: NumberString,
-        ccy: String,
-        u_time: NumberString,
-        p_time: NumberString
-    }
+/// Private `liquidation-warning` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-liquidation-warning-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct LiquidationWarningUpdate {
+    /// Instrument type, e.g., `MARGIN`, `SWAP`, `FUTURES`, `OPTION`.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Instrument ID, e.g., `BTC-USDT-SWAP`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Position side: `long`, `short`, or `net`.
+    #[serde(default)]
+    pub pos_side: String,
+    /// Position quantity (contracts for derivatives).
+    #[serde(default)]
+    pub pos: NumberString,
+    /// Margin mode: `cross` or `isolated`.
+    #[serde(default)]
+    pub mgn_mode: String,
+    /// Current margin ratio; liquidation is triggered when this reaches 1.
+    #[serde(default)]
+    pub mgn_ratio: NumberString,
+    /// Current mark price.
+    #[serde(default)]
+    pub mark_px: NumberString,
+    /// Estimated liquidation price.
+    #[serde(default)]
+    pub liq_px: NumberString,
+    /// Settlement or margin currency.
+    #[serde(default)]
+    pub ccy: String,
+    /// Last update time (Unix milliseconds).
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Push time (Unix milliseconds).
+    #[serde(default)]
+    pub p_time: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
-ws_object! {
-    /// Private `account-greeks` channel row.
-    ///
-    /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-account-greeks-channel>
-    AccountGreeksUpdate {
-        ccy: String,
-        delta_bs: NumberString,
-        delta_pa: NumberString,
-        gamma_bs: NumberString,
-        gamma_pa: NumberString,
-        theta_bs: NumberString,
-        theta_pa: NumberString,
-        vega_bs: NumberString,
-        vega_pa: NumberString,
-        ts: NumberString
-    }
+/// Private `account-greeks` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-account-greeks-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct AccountGreeksUpdate {
+    /// Currency denominating the greeks, e.g., `BTC`.
+    #[serde(default)]
+    pub ccy: String,
+    /// Account-level Black-Scholes delta in this currency.
+    #[serde(default)]
+    pub delta_bs: NumberString,
+    /// Account-level PA delta in this currency.
+    #[serde(default)]
+    pub delta_pa: NumberString,
+    /// Account-level Black-Scholes gamma in this currency.
+    #[serde(default)]
+    pub gamma_bs: NumberString,
+    /// Account-level PA gamma in this currency.
+    #[serde(default)]
+    pub gamma_pa: NumberString,
+    /// Account-level Black-Scholes theta in this currency.
+    #[serde(default)]
+    pub theta_bs: NumberString,
+    /// Account-level PA theta in this currency.
+    #[serde(default)]
+    pub theta_pa: NumberString,
+    /// Account-level Black-Scholes vega in this currency.
+    #[serde(default)]
+    pub vega_bs: NumberString,
+    /// Account-level PA vega in this currency.
+    #[serde(default)]
+    pub vega_pa: NumberString,
+    /// Push time (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
 }
 
 /// Account data row pushed by the private `account` WebSocket channel.

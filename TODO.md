@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **148/342 (43.3%)**
+> Progress: **151/342 (44.2%)**
 
 ## Account
 
@@ -273,7 +273,7 @@
 - [x] GET /api/v5/finance/savings/lending-rate-summary
 - [x] GET /api/v5/finance/savings/lending-rate-history
 
-<!-- Financial Product — Simple Earn Flexible: 4/6 implemented -->
+<!-- Financial Product — Simple Earn Flexible: 6/6 implemented -->
 
 ## Financial Product — ETH Staking
 
@@ -285,7 +285,7 @@
 - [x] GET /api/v5/finance/staking-defi/eth/purchase-redeem-history
 - [x] GET /api/v5/finance/staking-defi/eth/apy-history
 
-<!-- Financial Product — ETH Staking: 6/7 implemented -->
+<!-- Financial Product — ETH Staking: 7/7 implemented -->
 
 ## Financial Product — SOL Staking
 

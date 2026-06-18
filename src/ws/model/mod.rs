@@ -28,33 +28,6 @@ use serde_json::Value;
 /// Fields added by OKX after this crate was released.
 pub type ExtraFields = BTreeMap<String, Value>;
 
-macro_rules! ws_object {
-    (
-        $(#[$meta:meta])*
-        $name:ident {
-            $(
-                $(#[$field_meta:meta])*
-                $field:ident: $ty:ty
-            ),* $(,)?
-        }
-    ) => {
-        $(#[$meta])*
-        #[derive(Debug, Clone, Default, Deserialize)]
-        #[serde(rename_all = "camelCase")]
-        #[non_exhaustive]
-        pub struct $name {
-            $(
-                $(#[$field_meta])*
-                #[serde(default)]
-                pub $field: $ty,
-            )*
-            /// Unrecognized fields retained for forward compatibility.
-            #[serde(flatten, default)]
-            pub extra: ExtraFields,
-        }
-    };
-}
-
 /// Generic object row for custom/future channels.
 #[derive(Debug, Clone, Default, Deserialize)]
 #[non_exhaustive]
