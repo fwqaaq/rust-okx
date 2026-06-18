@@ -15,7 +15,6 @@ pub(super) const ESTIMATED_PRICE: &str = "/api/v5/public/estimated-price";
 pub(super) const DISCOUNT_RATE_INTEREST_FREE_QUOTA: &str =
     "/api/v5/public/discount-rate-interest-free-quota";
 pub(super) const INTEREST_RATE_LOAN_QUOTA: &str = "/api/v5/public/interest-rate-loan-quota";
-pub(super) const VIP_INTEREST_RATE_LOAN_QUOTA: &str = "/api/v5/public/vip-interest-rate-loan-quota";
 pub(super) const INSTRUMENT_TICK_BANDS: &str = "/api/v5/public/instrument-tick-bands";
 pub(super) const OPTION_TRADES: &str = "/api/v5/public/option-trades";
 pub(super) const MARKET_DATA_HISTORY: &str = "/api/v5/public/market-data-history";

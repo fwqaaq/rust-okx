@@ -20,7 +20,6 @@ fn account_configuration_mutations_todo() {
 #[ignore = "may borrow, repay, reserve, or move real collateral"]
 fn account_borrowing_and_margin_mutations_todo() {
     // API: POST /api/v5/account/position/margin-balance
-    // API: POST /api/v5/account/borrow-repay
     // API: POST /api/v5/account/spot-manual-borrow-repay
     // STATUS: TODO — requires eligible products and real balances.
     todo!("configure eligible currencies, order IDs, and a reversible safety plan");
@@ -35,7 +34,6 @@ fn account_calculation_and_uncovered_reads_todo() {
     // API: GET /api/v5/account/interest-accrued
     // API: GET /api/v5/account/interest-rate
     // API: GET /api/v5/account/max-withdrawal
-    // API: GET /api/v5/account/borrow-repay-history
     // API: GET /api/v5/account/interest-limits
     // API: POST /api/v5/account/simulated_margin
     // API: GET /api/v5/account/positions-history

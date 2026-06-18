@@ -158,11 +158,12 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// # Errors
     ///
     /// See [`get_system_time`](Self::get_system_time).
-    pub async fn get_underlying(&self, inst_type: InstType) -> Result<Vec<String>, Error> {
-        let query = UnderlyingQuery {
-            inst_type: &inst_type,
-        };
-        self.client.get(UNDERLYING, &query, false).await
+    pub async fn get_underlying(
+        &self,
+        request: &UnderlyingRequest,
+    ) -> Result<Vec<Vec<String>>, Error> {
+        request.validate()?;
+        self.client.get(UNDERLYING, request, false).await
     }
 
     /// Retrieve insurance-fund snapshots.
@@ -251,23 +252,6 @@ impl<'a, T: Transport> PublicData<'a, T> {
         request.validate()?;
         self.client
             .get(INTEREST_RATE_LOAN_QUOTA, request, false)
-            .await
-    }
-
-    /// Retrieve VIP interest-rate loan quota data.
-    ///
-    /// `GET /api/v5/public/vip-interest-rate-loan-quota`. Public.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_system_time`](Self::get_system_time).
-    pub async fn get_vip_interest_rate_loan_quota(
-        &self,
-        request: &VipInterestRateLoanQuotaRequest,
-    ) -> Result<Vec<VipInterestRateLoanQuota>, Error> {
-        request.validate()?;
-        self.client
-            .get(VIP_INTEREST_RATE_LOAN_QUOTA, request, false)
             .await
     }
 

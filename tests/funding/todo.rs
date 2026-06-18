@@ -18,8 +18,6 @@ fn funding_withdrawal_endpoints_todo() {
 #[test]
 #[ignore = "changes real assets or creates Lightning invoices"]
 fn funding_asset_conversion_and_lightning_todo() {
-    // API: POST /api/v5/asset/purchase_redempt
-    // API: POST /api/v5/asset/convert-dust-assets
     // API: GET /api/v5/asset/deposit-lightning
     // API: POST /api/v5/asset/withdrawal-lightning
     // STATUS: TODO — needs product-specific balances and expiring invoice fixtures.

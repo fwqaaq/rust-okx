@@ -271,8 +271,8 @@
 - [x] POST /api/v5/finance/savings/purchase-redempt
 - [x] POST /api/v5/finance/savings/set-lending-rate
 - [x] GET /api/v5/finance/savings/lending-history
-- [ ] GET /api/v5/finance/savings/lending-rate-summary-priv
-- [ ] GET /api/v5/finance/savings/lending-rate-history-priv
+- [x] GET /api/v5/finance/savings/lending-rate-summary
+- [x] GET /api/v5/finance/savings/lending-rate-history
 
 <!-- Financial Product — Simple Earn Flexible: 4/6 implemented -->
 
@@ -486,28 +486,3 @@
 - [ ] GET /api/v5/support/announcement-types
 
 <!-- Announcement: 0/2 implemented -->
-
-## Repository/API drift requiring review
-
-These repository endpoints are intentionally **not** counted in the live Global checklist because the current guide no longer exposes them or the official change log marks them offline/decommissioned:
-
-- `POST /api/v5/account/borrow-repay`
-- `GET /api/v5/account/borrow-repay-history`
-- `GET /api/v5/public/vip-interest-rate-loan-quota`
-- `GET /api/v5/market/books-lite`
-- `GET /api/v5/market/block-trades`
-- `POST /api/v5/asset/convert-dust-assets`
-- `GET /api/v5/finance/savings/lending-rate-summary`
-- `GET /api/v5/finance/savings/lending-rate-history`
-- Fixed Loan endpoints under `/api/v5/account/fixed-loan/*`
-- Simple Earn Fixed endpoints under `/api/v5/finance/fixed-loan/*`
-
-Current-path replacements that remain unchecked until the repository implements the exact method and path:
-
-- `GET /api/v5/public/block-trades`
-- `GET /api/v5/finance/savings/lending-rate-summary-priv`
-- `GET /api/v5/finance/savings/lending-rate-history-priv`
-
-`POST /api/v5/asset/purchase_redempt` also exists in the repository but is not counted. The current Simple Earn Flexible endpoint is `POST /api/v5/finance/savings/purchase-redempt`.
-
-Region-, account-tier-, broker-, affiliate-, institutional-, and product-eligibility restrictions do not change checkbox state. An endpoint is checked only when the repository exposes a callable Rust method for the exact current Global HTTP method and path.

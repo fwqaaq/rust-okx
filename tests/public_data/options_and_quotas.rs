@@ -51,12 +51,4 @@ async fn public_loan_quota_endpoints_accept_empty_array_wire_values() {
         .get_interest_rate_loan_quota(&Default::default())
         .await
         .expect("public/interest-rate-loan-quota");
-
-    // API: GET /api/v5/public/vip-interest-rate-loan-quota
-    // STATUS: LIVE — public, read-only.
-    client
-        .public_data()
-        .get_vip_interest_rate_loan_quota(&Default::default())
-        .await
-        .expect("public/vip-interest-rate-loan-quota");
 }

@@ -1,179 +1,43 @@
-//! Typed OKX WebSocket request bodies.
-//!
-//! These models cover login/subscription envelopes and the WebSocket-only
-//! trading operations which previously accepted an untyped `RequestParams`.
+//! Spread Trading WebSocket trade request models.
 
 use serde::Serialize;
 
-use super::Arg;
+use crate::model::{
+    RequestValidationError, ValidateRequest, at_least_one, non_empty, one_of,
+    optional_non_empty, positive_decimal_string, validate_client_request_id,
+};
 
-/// Subscribe or unsubscribe request body.
-///
-/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-subscribe>
-#[derive(Debug, Serialize)]
-#[non_exhaustive]
-pub struct ChannelRequest<'a> {
-    /// Optional client message ID (up to 32 case-sensitive alphanumeric characters).
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub id: Option<&'a str>,
-    /// `subscribe` or `unsubscribe`.
-    pub op: &'a str,
-    /// Channel arguments.
-    pub args: &'a [Arg],
-}
+fn optional_signed_decimal_string(
+    field: &'static str,
+    value: Option<&str>,
+) -> Result<(), RequestValidationError> {
+    let Some(value) = value else {
+        return Ok(());
+    };
+    non_empty(field, value)?;
 
-impl<'a> ChannelRequest<'a> {
-    /// Build a subscription request.
-    pub fn subscribe(args: &'a [Arg]) -> Self {
-        Self {
-            id: None,
-            op: "subscribe",
-            args,
+    let unsigned = value.strip_prefix('-').unwrap_or(value);
+    let mut dot_seen = false;
+    let mut digit_seen = false;
+    for byte in unsigned.bytes() {
+        match byte {
+            b'0'..=b'9' => digit_seen = true,
+            b'.' if !dot_seen => dot_seen = true,
+            _ => {
+                return Err(RequestValidationError::InvalidFormat {
+                    field,
+                    expected: "a signed decimal string without exponent notation",
+                });
+            }
         }
     }
-
-    /// Build an unsubscription request.
-    pub fn unsubscribe(args: &'a [Arg]) -> Self {
-        Self {
-            id: None,
-            op: "unsubscribe",
-            args,
-        }
+    if !digit_seen || unsigned.starts_with('.') || unsigned.ends_with('.') {
+        return Err(RequestValidationError::InvalidFormat {
+            field,
+            expected: "a signed decimal string without exponent notation",
+        });
     }
-
-    /// Attach a client message ID.
-    pub fn id(mut self, id: &'a str) -> Self {
-        self.id = Some(id);
-        self
-    }
-}
-
-/// Private WebSocket login request body.
-///
-/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-login>
-#[derive(Debug, Serialize)]
-#[non_exhaustive]
-pub struct LoginRequest<'a> {
-    /// Always `login`.
-    pub op: &'static str,
-    /// OKX requires exactly one login argument.
-    pub args: [LoginArg<'a>; 1],
-}
-
-impl<'a> LoginRequest<'a> {
-    /// Build a login request from one authentication argument.
-    pub fn new(arg: LoginArg<'a>) -> Self {
-        Self {
-            op: "login",
-            args: [arg],
-        }
-    }
-}
-
-/// Authentication argument inside [`LoginRequest`].
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct LoginArg<'a> {
-    /// API key.
-    pub api_key: &'a str,
-    /// API key passphrase.
-    pub passphrase: &'a str,
-    /// Unix timestamp in seconds used for signing.
-    pub timestamp: &'a str,
-    /// Base64-encoded HMAC-SHA256 signature.
-    pub sign: String,
-}
-
-impl<'a> LoginArg<'a> {
-    /// Build a login argument from already-computed authentication values.
-    pub fn new(
-        api_key: &'a str,
-        passphrase: &'a str,
-        timestamp: &'a str,
-        sign: impl Into<String>,
-    ) -> Self {
-        Self {
-            api_key,
-            passphrase,
-            timestamp,
-            sign: sign.into(),
-        }
-    }
-}
-
-/// Generic WebSocket trade-operation envelope.
-///
-/// `expTime` is supported by order placement/amendment operations and is omitted
-/// when `None`.
-///
-/// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket>
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct OperationRequest<'a, A> {
-    /// Client-provided request ID.
-    pub id: String,
-    /// OKX operation name.
-    pub op: String,
-    /// Optional request effective deadline in Unix milliseconds.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub exp_time: Option<String>,
-    /// Operation arguments.
-    pub args: &'a [A],
-}
-
-impl<'a, A> OperationRequest<'a, A> {
-    /// Build an operation request without an expiration deadline.
-    pub fn new(id: impl Into<String>, op: impl Into<String>, args: &'a [A]) -> Self {
-        Self {
-            id: id.into(),
-            op: op.into(),
-            exp_time: None,
-            args,
-        }
-    }
-
-    /// Set the request effective deadline in Unix milliseconds.
-    pub fn exp_time(mut self, exp_time: impl Into<String>) -> Self {
-        self.exp_time = Some(exp_time.into());
-        self
-    }
-}
-
-/// MMP mass-cancel request body (`mass-cancel`).
-///
-/// Only `OPTION` in Portfolio Margin mode is supported by OKX.
-///
-/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-mass-cancel-order>
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct MassCancelRequest {
-    /// Instrument type. OKX currently requires `OPTION`.
-    pub inst_type: String,
-    /// Instrument family, e.g. `BTC-USD`.
-    pub inst_family: String,
-    /// Lock interval in milliseconds, range `0..=10000`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub lock_interval: Option<String>,
-}
-
-impl MassCancelRequest {
-    /// Create an option MMP mass-cancel request.
-    pub fn option(inst_family: impl Into<String>) -> Self {
-        Self {
-            inst_type: "OPTION".to_owned(),
-            inst_family: inst_family.into(),
-            lock_interval: None,
-        }
-    }
-
-    /// Set the post-cancel lock interval in milliseconds.
-    pub fn lock_interval(mut self, lock_interval: impl Into<String>) -> Self {
-        self.lock_interval = Some(lock_interval.into());
-        self
-    }
+    Ok(())
 }
 
 /// Place-spread-order request body (`sprd-order`).
@@ -193,11 +57,11 @@ pub struct PlaceSpreadOrderRequest {
     pub tag: Option<String>,
     /// Order side: `buy` or `sell`.
     pub side: String,
-    /// Order type accepted by the spread API.
+    /// Spread order type: `limit`, `post_only`, or `ioc`.
     pub ord_type: String,
     /// Order quantity.
     pub sz: String,
-    /// Order price. Required for price-based order types.
+    /// Order price.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub px: Option<String>,
 }
@@ -237,6 +101,24 @@ impl PlaceSpreadOrderRequest {
     pub fn price(mut self, price: impl Into<String>) -> Self {
         self.px = Some(price.into());
         self
+    }
+}
+
+impl ValidateRequest for PlaceSpreadOrderRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("sprdId", &self.sprd_id)?;
+        validate_client_request_id("clOrdId", self.cl_ord_id.as_deref())?;
+        optional_non_empty("tag", self.tag.as_deref())?;
+        one_of("side", &self.side, &["buy", "sell"], "buy or sell")?;
+        one_of(
+            "ordType",
+            &self.ord_type,
+            &["limit", "post_only", "ioc"],
+            "limit, post_only, or ioc",
+        )?;
+        positive_decimal_string("sz", &self.sz)?;
+        optional_signed_decimal_string("px", self.px.as_deref())?;
+        Ok(())
     }
 }
 
@@ -303,6 +185,21 @@ impl AmendSpreadOrderRequest {
     }
 }
 
+impl ValidateRequest for AmendSpreadOrderRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        at_least_one("ordId, clOrdId", &[self.ord_id.is_some(), self.cl_ord_id.is_some()])?;
+        optional_non_empty("ordId", self.ord_id.as_deref())?;
+        validate_client_request_id("clOrdId", self.cl_ord_id.as_deref())?;
+        validate_client_request_id("reqId", self.req_id.as_deref())?;
+        at_least_one("newSz, newPx", &[self.new_sz.is_some(), self.new_px.is_some()])?;
+        if let Some(value) = self.new_sz.as_deref() {
+            positive_decimal_string("newSz", value)?;
+        }
+        optional_signed_decimal_string("newPx", self.new_px.as_deref())?;
+        Ok(())
+    }
+}
+
 /// Cancel-spread-order request body (`sprd-cancel-order`).
 ///
 /// Either `ordId` or `clOrdId` is required; when both are supplied OKX uses
@@ -339,6 +236,15 @@ impl CancelSpreadOrderRequest {
     }
 }
 
+impl ValidateRequest for CancelSpreadOrderRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        at_least_one("ordId, clOrdId", &[self.ord_id.is_some(), self.cl_ord_id.is_some()])?;
+        optional_non_empty("ordId", self.ord_id.as_deref())?;
+        validate_client_request_id("clOrdId", self.cl_ord_id.as_deref())?;
+        Ok(())
+    }
+}
+
 /// Cancel-all-spread-orders request body (`sprd-mass-cancel`).
 ///
 /// When `sprdId` is omitted, OKX cancels pending orders across all spreads.
@@ -367,33 +273,54 @@ impl MassCancelSpreadOrdersRequest {
     }
 }
 
+impl ValidateRequest for MassCancelSpreadOrdersRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        optional_non_empty("sprdId", self.sprd_id.as_deref())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn mass_cancel_serializes_documented_keys() {
-        let value = serde_json::to_value(
-            MassCancelRequest::option("BTC-USD").lock_interval("1000"),
-        )
-        .unwrap();
-        assert_eq!(value["instType"], "OPTION");
-        assert_eq!(value["instFamily"], "BTC-USD");
-        assert_eq!(value["lockInterval"], "1000");
-    }
-
-    #[test]
-    fn spread_order_serializes_required_and_selected_optional_fields() {
+    fn serializes_documented_place_order_example() {
         let request = PlaceSpreadOrderRequest::new(
             "BTC-USDT_BTC-USDT-SWAP",
             "buy",
             "limit",
-            "1",
+            "2",
         )
-        .price("10");
+        .client_order_id("b15")
+        .price("2.15");
+        request.validate().unwrap();
         let value = serde_json::to_value(request).unwrap();
-        assert!(value.get("clOrdId").is_none());
-        assert_eq!(value["px"], "10");
         assert_eq!(value["sprdId"], "BTC-USDT_BTC-USDT-SWAP");
+        assert_eq!(value["ordType"], "limit");
+        assert_eq!(value["px"], "2.15");
+    }
+
+    #[test]
+    fn rejects_incomplete_amend_request() {
+        let error = AmendSpreadOrderRequest::by_order_id("1").validate().unwrap_err();
+        assert!(matches!(error, RequestValidationError::AtLeastOneRequired { .. }));
+    }
+
+    #[test]
+    fn accepts_negative_spread_prices() {
+        PlaceSpreadOrderRequest::new("A_B", "sell", "limit", "1")
+            .price("-2.5")
+            .validate()
+            .unwrap();
+        AmendSpreadOrderRequest::by_order_id("1")
+            .new_price("-1.25")
+            .validate()
+            .unwrap();
+    }
+
+    #[test]
+    fn mass_cancel_all_serializes_as_empty_object() {
+        let value = serde_json::to_value(MassCancelSpreadOrdersRequest::all()).unwrap();
+        assert_eq!(value, serde_json::json!({}));
     }
 }

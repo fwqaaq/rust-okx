@@ -486,50 +486,6 @@ async fn set_isolated_mode_posts_body() {
 }
 
 #[tokio::test]
-async fn borrow_repay_posts_body() {
-    let body = r#"{"code":"0","msg":"","data":[
-        {"ccy":"USDT","side":"borrow","amt":"100","ordId":"1"}]}"#;
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::BorrowRepayRequest::new("USDT", "borrow", "100").order_id("1");
-
-    let result = client.account().borrow_repay(&request).await.unwrap();
-    assert_eq!(result[0].ord_id, "1");
-
-    let req = mock.captured();
-    assert_eq!(req.method, http::Method::POST);
-    assert!(req.uri.ends_with("/api/v5/account/borrow-repay"));
-    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
-    assert_eq!(sent["ccy"], "USDT");
-    assert_eq!(sent["side"], "borrow");
-    assert_eq!(sent["amt"], "100");
-    assert_eq!(sent["ordId"], "1");
-    assert!(req.is_signed());
-}
-
-#[tokio::test]
-async fn get_borrow_repay_history_uses_builder_query() {
-    let body = r#"{"code":"0","msg":"","data":[
-        {"ccy":"USDT","side":"borrow","amt":"100","ordId":"1","state":"2","ts":"1597026383085"}]}"#;
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-    let request = super::BorrowRepayHistoryRequest::new()
-        .currency("USDT")
-        .limit(1);
-
-    let result = client
-        .account()
-        .get_borrow_repay_history(&request)
-        .await
-        .unwrap();
-    assert_eq!(result[0].state, "2");
-
-    let req = mock.captured();
-    assert_eq!(req.query(), Some("ccy=USDT&limit=1"));
-    assert!(req.is_signed());
-}
-
-#[tokio::test]
 async fn get_interest_limits_uses_builder_query() {
     let body = r#"{"code":"0","msg":"","data":[
         {"ccy":"USDT","rate":"0.0001","loanQuota":"1000","usedLoan":"100"}]}"#;

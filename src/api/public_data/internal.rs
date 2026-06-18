@@ -24,9 +24,3 @@ pub(super) struct CurrencyQuery<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) ccy: Option<&'a str>,
 }
-
-#[derive(Serialize)]
-pub(super) struct UnderlyingQuery<'a> {
-    #[serde(rename = "instType")]
-    pub(super) inst_type: &'a InstType,
-}

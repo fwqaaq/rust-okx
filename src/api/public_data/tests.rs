@@ -183,16 +183,16 @@ async fn get_position_tiers_uses_builder_query() {
 
 #[tokio::test]
 async fn get_underlying_queries_inst_type() {
-    let body = r#"{"code":"0","msg":"","data":["BTC-USD"]}"#;
+    let body = r#"{"code":"0","msg":"","data":[["BTC-USD"]]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
     let rows = client
         .public_data()
-        .get_underlying(InstType::Swap)
+        .get_underlying(&super::UnderlyingRequest::new("SWAP"))
         .await
         .unwrap();
-    assert_eq!(rows[0], "BTC-USD");
+    assert_eq!(rows[0], vec!["BTC-USD"]);
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SWAP"));
@@ -341,39 +341,6 @@ async fn public_edge_requests_use_typed_queries() {
         mock.captured().query(),
         Some("module=1&instType=SPOT&instIdList=BTC-USDT&dateAggrType=1D")
     );
-}
-
-#[tokio::test]
-async fn loan_quota_requests_are_public_and_typed() {
-    let body = r#"{"code":"0","msg":"","data":[{
-        "basic":[{"ccy":"USDT","rate":"0.01","quota":"100"}],
-        "vip":[],"regular":[],"configCcyList":[],"config":[]
-    }]}"#;
-
-    let mock = MockTransport::new(body);
-    let client = OkxClient::with_transport(mock.clone()).build();
-    let request = super::InterestRateLoanQuotaRequest::new();
-    let rows = client
-        .public_data()
-        .get_interest_rate_loan_quota(&request)
-        .await
-        .unwrap();
-    assert_eq!(rows[0].basic[0].rate.as_str(), "0.01");
-    assert_eq!(mock.captured().query(), None);
-    assert!(!mock.captured().is_signed());
-
-    let vip_body = r#"{"code":"0","msg":"","data":[
-        {"ccy":"USDT","level":"1","rate":"0.01","quota":"100"}]}"#;
-    let mock = MockTransport::new(vip_body);
-    let client = OkxClient::with_transport(mock.clone()).build();
-    let request = super::VipInterestRateLoanQuotaRequest::new().currency("USDT");
-    client
-        .public_data()
-        .get_vip_interest_rate_loan_quota(&request)
-        .await
-        .unwrap();
-    assert_eq!(mock.captured().query(), Some("ccy=USDT"));
-    assert!(!mock.captured().is_signed());
 }
 
 #[tokio::test]

@@ -102,8 +102,11 @@ pub use block::{
     PublicStructureBlockTradeUpdate, StructureBlockTradeUpdate,
 };
 pub use spread::{
-    SpreadAmendOrderResult, SpreadCancelOrderResult, SpreadOrderUpdate, SpreadPlaceOrderResult,
-    SpreadTradeLeg, SpreadTradeUpdate,
+    SpreadAmendOrderResult, SpreadCancelOrderResult, SpreadMassCancelResult, SpreadOrderUpdate,
+    SpreadPlaceOrderResult, SpreadTradeLeg, SpreadTradeUpdate,
 };
 pub use funding::{DepositInfoUpdate, WithdrawalInfoUpdate};
 pub use status::StatusUpdate;
+
+#[cfg(test)]
+mod compile_checks;

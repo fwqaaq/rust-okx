@@ -133,6 +133,28 @@ impl OkxWs<TungsteniteConnector> {
 }
 
 impl<C: WsConnector> OkxWs<C> {
+    pub(crate) fn require_channel_group(
+        &self,
+        required: WsChannelGroup,
+        operation: &str,
+    ) -> Result<(), Error> {
+        if self.group != required {
+            return Err(Error::Configuration(format!(
+                "WebSocket operation `{operation}` requires the {required:?} channel group"
+            )));
+        }
+        Ok(())
+    }
+
+    pub(crate) fn require_credentials(&self, operation: &str) -> Result<(), Error> {
+        if self.credentials.is_none() {
+            return Err(Error::Configuration(format!(
+                "WebSocket operation `{operation}` requires API credentials"
+            )));
+        }
+        Ok(())
+    }
+
     /// Subscribe to one or more channel arguments.
     ///
     /// OKX docs: <https://www.okx.com/docs-v5/en/#overview-websocket-subscribe>

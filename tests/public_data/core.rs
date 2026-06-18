@@ -1,4 +1,5 @@
 use crate::common::public_client;
+use rust_okx::api::public_data::UnderlyingRequest;
 use rust_okx::model::InstType;
 
 #[tokio::test]
@@ -48,7 +49,7 @@ async fn public_derivatives_reference_data_parse() {
     // STATUS: LIVE — public, read-only.
     client
         .public_data()
-        .get_underlying(InstType::Option)
+        .get_underlying(&UnderlyingRequest::new("OPTION"))
         .await
         .expect("public/underlying");
 }

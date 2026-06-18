@@ -4,8 +4,5 @@
   ],
   "rust-analyzer.check.features": [
     "websocket"
-  ],
-  "rust-analyzer.diagnostics.disabled": [
-    "unlinked-file"
   ]
 }

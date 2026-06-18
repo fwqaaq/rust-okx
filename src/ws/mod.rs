@@ -26,8 +26,9 @@ pub use request::{
     MassCancelRequest, MassCancelSpreadOrdersRequest, OperationRequest, PlaceSpreadOrderRequest,
 };
 pub use response::{
-    ChannelAcknowledgement, ChannelConnectionCountResponse, LoginAcknowledgement, NoticeResponse,
-    OperationResponse, PushResponse, ResponseExtraFields,
+    AmendSpreadOrderResponse, CancelSpreadOrderResponse, ChannelAcknowledgement,
+    ChannelConnectionCountResponse, LoginAcknowledgement, MassCancelSpreadOrdersResponse,
+    NoticeResponse, OperationResponse, PlaceSpreadOrderResponse, PushResponse, ResponseExtraFields,
 };
 
 #[cfg(test)]

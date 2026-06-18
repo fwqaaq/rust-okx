@@ -314,36 +314,6 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(MAX_WITHDRAWAL, &query, true).await
     }
 
-    /// Borrow or repay margin.
-    ///
-    /// `POST /api/v5/account/borrow-repay`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn borrow_repay(
-        &self,
-        request: &BorrowRepayRequest,
-    ) -> Result<Vec<BorrowRepayResult>, Error> {
-        request.validate()?;
-        self.client.post(BORROW_REPAY, request, true).await
-    }
-
-    /// Retrieve borrow/repay history.
-    ///
-    /// `GET /api/v5/account/borrow-repay-history`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn get_borrow_repay_history(
-        &self,
-        request: &BorrowRepayHistoryRequest,
-    ) -> Result<Vec<BorrowRepayHistory>, Error> {
-        request.validate()?;
-        self.client.get(BORROW_REPAY_HISTORY, request, true).await
-    }
-
     /// Retrieve borrowing rate and limit information.
     ///
     /// `GET /api/v5/account/interest-limits`. Authenticated.

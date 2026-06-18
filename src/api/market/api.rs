@@ -88,18 +88,6 @@ impl<'a, T: Transport> Market<'a, T> {
         self.client.get(BOOKS, &query, false).await
     }
 
-    /// Retrieve the lightweight order book for an instrument.
-    ///
-    /// `GET /api/v5/market/books-lite`. Public.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_ticker`](Self::get_ticker).
-    pub async fn get_order_lite_book(&self, inst_id: &str) -> Result<Vec<OrderBook>, Error> {
-        let query = InstIdQuery { inst_id };
-        self.client.get(BOOKS_LITE, &query, false).await
-    }
-
     /// Retrieve candlestick (OHLCV) data.
     ///
     /// `GET /api/v5/market/candles`. `bar` is the bar size, e.g. `1m`, `1H`,
@@ -258,22 +246,6 @@ impl<'a, T: Transport> Market<'a, T> {
             inst_family,
         };
         self.client.get(BLOCK_TICKERS, &query, false).await
-    }
-
-    /// Retrieve recent block trades for an instrument.
-    ///
-    /// `GET /api/v5/market/block-trades`. Public.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_ticker`](Self::get_ticker).
-    pub async fn get_block_trades(
-        &self,
-        inst_id: &str,
-        limit: Option<u32>,
-    ) -> Result<Vec<BlockTrade>, Error> {
-        let query = TradesQuery { inst_id, limit };
-        self.client.get(BLOCK_TRADES, &query, false).await
     }
 
     /// Retrieve option trades aggregated by instrument family.

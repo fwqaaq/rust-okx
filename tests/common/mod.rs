@@ -97,3 +97,19 @@ pub fn expect_ok_or_api_unavailable<T>(result: Result<T, Error>, endpoint: &str)
         Err(error) => panic!("{endpoint} failed: {error}"),
     }
 }
+
+/// Unwrap a result, returning `None` and printing a skip message when the
+/// server responds with a 5xx transient error. Other errors still panic.
+///
+/// Use this in sequential lifecycle tests where a transient failure on any
+/// step means the rest of the test cannot proceed.
+pub fn ok_or_skip<T>(result: Result<T, Error>, label: &str) -> Option<T> {
+    match result {
+        Ok(v) => Some(v),
+        Err(Error::HttpStatus { status, .. }) if status.is_server_error() => {
+            eprintln!("skipping {label}: OKX returned HTTP {status}");
+            None
+        }
+        Err(e) => panic!("{label}: {e}"),
+    }
+}

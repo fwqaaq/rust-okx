@@ -11,7 +11,7 @@ fn remaining_market_endpoints_todo() {
     // API: GET /api/v5/market/index-components
     // API: GET /api/v5/market/exchange-rate
     // API: GET /api/v5/market/block-ticker
-    // API: GET /api/v5/market/block-trades
+    // API: GET /api/v5/market/books
     // STATUS: TODO — add stable instrument/index fixtures and field-level assertions.
     todo!("promote each endpoint to a live test after defining a stable fixture");
 }

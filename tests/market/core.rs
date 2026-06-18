@@ -22,33 +22,6 @@ async fn market_ticker_parses() {
 }
 
 #[tokio::test]
-async fn market_order_books_parse() {
-    let client = public_client();
-
-    // API: GET /api/v5/market/books
-    // STATUS: LIVE — public, read-only.
-    let books = client
-        .market()
-        .get_orderbook("BTC-USDT", Some(5))
-        .await
-        .expect("market/books");
-    let book = &books[0];
-    assert!(!book.asks.is_empty());
-    assert!(!book.bids.is_empty());
-    let best_ask: f64 = book.asks[0].price.parse().expect("numeric ask");
-    let best_bid: f64 = book.bids[0].price.parse().expect("numeric bid");
-    assert!(best_ask >= best_bid);
-
-    // API: GET /api/v5/market/books-lite
-    // STATUS: LIVE — public, read-only.
-    client
-        .market()
-        .get_order_lite_book("BTC-USDT")
-        .await
-        .expect("market/books-lite");
-}
-
-#[tokio::test]
 async fn market_candles_and_trades_parse() {
     let client = public_client();
 

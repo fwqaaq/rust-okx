@@ -136,30 +136,6 @@ impl<'a, T: Transport> Funding<'a, T> {
         self.client.get(DEPOSIT_HISTORY, request, true).await
     }
 
-    /// Subscribe or redeem savings through the legacy purchase/redemption
-    /// endpoint.
-    ///
-    /// `POST /api/v5/asset/purchase_redempt`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_currencies`](Self::get_currencies).
-    pub async fn purchase_redempt(
-        &self,
-        ccy: &str,
-        amt: &str,
-        side: &str,
-        rate: &str,
-    ) -> Result<Vec<PurchaseRedemptResult>, Error> {
-        let body = PurchaseRedemptBody {
-            ccy,
-            amt,
-            side,
-            rate,
-        };
-        self.client.post(PURCHASE_REDEMPT, &body, true).await
-    }
-
     /// Retrieve funding-account bills.
     ///
     /// `GET /api/v5/asset/bills`. Authenticated.
@@ -212,21 +188,6 @@ impl<'a, T: Transport> Funding<'a, T> {
     pub async fn cancel_withdrawal(&self, wd_id: &str) -> Result<Vec<WithdrawalResult>, Error> {
         let body = WithdrawalIdBody { wd_id };
         self.client.post(CANCEL_WITHDRAWAL, &body, true).await
-    }
-
-    /// Convert small balances into another asset.
-    ///
-    /// `POST /api/v5/asset/convert-dust-assets`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_currencies`](Self::get_currencies).
-    pub async fn convert_dust_assets(
-        &self,
-        ccy: &[&str],
-    ) -> Result<Vec<ConvertDustAssetsResult>, Error> {
-        let body = ConvertDustAssetsBody { ccy };
-        self.client.post(CONVERT_DUST_ASSETS, &body, true).await
     }
 
     /// Retrieve total asset valuation.

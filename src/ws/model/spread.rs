@@ -114,6 +114,15 @@ ws_object! {
     }
 }
 
+ws_object! {
+    /// Result row returned by `sprd-mass-cancel`.
+    ///
+    /// OKX docs: <https://www.okx.com/docs-v5/en/#spread-trading-websocket-trade-api-ws-cancel-all-orders>
+    SpreadMassCancelResult {
+        result: bool
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

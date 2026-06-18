@@ -54,32 +54,6 @@ impl ValidateRequest for InterestRateLoanQuotaRequest {
     }
 }
 
-/// Query parameters for `GET /api/v5/public/vip-interest-rate-loan-quota`.
-#[derive(Debug, Clone, Default, Serialize)]
-pub struct VipInterestRateLoanQuotaRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
-}
-
-impl VipInterestRateLoanQuotaRequest {
-    /// Create an unfiltered VIP loan-quota query.
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Restrict the response to one currency.
-    pub fn currency(mut self, value: impl Into<String>) -> Self {
-        self.ccy = Some(value.into());
-        self
-    }
-}
-
-impl ValidateRequest for VipInterestRateLoanQuotaRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("ccy", self.ccy.as_deref())
-    }
-}
-
 /// Query parameters for `GET /api/v5/public/instrument-tick-bands`.
 #[derive(Debug, Clone, Serialize)]
 pub struct InstrumentTickBandsRequest {
@@ -103,6 +77,33 @@ impl ValidateRequest for InstrumentTickBandsRequest {
             &self.inst_type,
             &["FUTURES", "OPTION"],
             "FUTURES or OPTION",
+        )
+    }
+}
+
+/// Query parameters for `GET /api/v5/public/underlying`.
+#[derive(Debug, Clone, Serialize)]
+pub struct UnderlyingRequest {
+    #[serde(rename = "instType")]
+    inst_type: String,
+}
+
+impl UnderlyingRequest {
+    /// Create a query for `SWAP`, `FUTURES`, or `OPTION` instruments.
+    pub fn new(inst_type: impl Into<String>) -> Self {
+        Self {
+            inst_type: inst_type.into(),
+        }
+    }
+}
+
+impl ValidateRequest for UnderlyingRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        one_of(
+            "instType",
+            &self.inst_type,
+            &["SWAP", "FUTURES", "OPTION"],
+            "SWAP, FUTURES, or OPTION",
         )
     }
 }

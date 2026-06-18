@@ -21,21 +21,8 @@ pub(super) struct TransferStateQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-pub(super) struct PurchaseRedemptBody<'a> {
-    pub(super) ccy: &'a str,
-    pub(super) amt: &'a str,
-    pub(super) side: &'a str,
-    pub(super) rate: &'a str,
-}
-
-#[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct WithdrawalIdBody<'a> {
     #[serde(rename = "wdId")]
     pub(super) wd_id: &'a str,
-}
-
-#[derive(Debug, Serialize)]
-pub(super) struct ConvertDustAssetsBody<'a> {
-    pub(super) ccy: &'a [&'a str],
 }

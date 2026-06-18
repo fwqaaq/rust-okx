@@ -85,28 +85,6 @@ async fn get_orderbook_parses_levels_and_passes_depth() {
 }
 
 #[tokio::test]
-async fn get_order_lite_book_queries_instrument() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"asks":[["42000.2","1","0","3"]],"bids":[["42000.0","2","0","1"]],
-             "ts":"1597026383085"}]}"#;
-    let mock = MockTransport::new(body);
-    let client = OkxClient::with_transport(mock.clone()).build();
-
-    let books = client
-        .market()
-        .get_order_lite_book("BTC-USDT")
-        .await
-        .unwrap();
-    assert_eq!(books[0].asks[0].price.as_str(), "42000.2");
-
-    let req = mock.captured();
-    assert!(
-        req.uri
-            .ends_with("/api/v5/market/books-lite?instId=BTC-USDT")
-    );
-}
-
-#[tokio::test]
 async fn get_candlesticks_parses_array_rows() {
     let body = r#"{"code":"0","msg":"","data":[
             ["1597026383085","42000","43000","41000","42500","100","4250000","4250000","1"]]}"#;
@@ -308,24 +286,6 @@ async fn get_block_tickers_builds_filter_query() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SWAP&instFamily=BTC-USDT"));
-}
-
-#[tokio::test]
-async fn get_block_trades_builds_query() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"instId":"BTC-USDT","tradeId":"1","px":"42000","sz":"0.1","side":"buy","ts":"1597026383085"}]}"#;
-    let mock = MockTransport::new(body);
-    let client = OkxClient::with_transport(mock.clone()).build();
-
-    let trades = client
-        .market()
-        .get_block_trades("BTC-USDT", Some(1))
-        .await
-        .unwrap();
-    assert_eq!(trades[0].px.as_str(), "42000");
-
-    let req = mock.captured();
-    assert_eq!(req.query(), Some("instId=BTC-USDT&limit=1"));
 }
 
 #[tokio::test]
