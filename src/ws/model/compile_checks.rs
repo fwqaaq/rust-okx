@@ -45,7 +45,6 @@ fn all_exported_websocket_models_are_deserializable() {
     assert_deserializable::<BalanceAndPositionPosition>();
     assert_deserializable::<BalanceAndPositionTrade>();
     assert_deserializable::<BalanceAndPositionUpdate>();
-    assert_deserializable::<EventType>();
     assert_deserializable::<LiquidationWarningUpdate>();
     assert_deserializable::<PosData>();
     assert_deserializable::<PositionUpdate>();

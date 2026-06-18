@@ -15,6 +15,7 @@ pub(super) const ETH_PRODUCT_INFO: &str = "/api/v5/finance/staking-defi/eth/prod
 pub(super) const ETH_PURCHASE: &str = "/api/v5/finance/staking-defi/eth/purchase";
 pub(super) const ETH_REDEEM: &str = "/api/v5/finance/staking-defi/eth/redeem";
 pub(super) const ETH_BALANCE: &str = "/api/v5/finance/staking-defi/eth/balance";
+pub(super) const ETH_CANCEL_REDEEM: &str = "/api/v5/finance/staking-defi/eth/cancel-redeem";
 pub(super) const ETH_HISTORY: &str = "/api/v5/finance/staking-defi/eth/purchase-redeem-history";
 pub(super) const ETH_APY_HISTORY: &str = "/api/v5/finance/staking-defi/eth/apy-history";
 pub(super) const SOL_PRODUCT_INFO: &str = "/api/v5/finance/staking-defi/sol/product-info";

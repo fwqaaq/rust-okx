@@ -1,3 +1,4 @@
+use crate::api::finance::internal::CancelRedeemBody;
 use crate::client::OkxClient;
 use crate::error::Error;
 use crate::model::ValidateRequest;
@@ -270,6 +271,16 @@ impl<T: Transport> EthStaking<'_, T> {
     pub async fn redeem(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
         let body = AmountBody { amt };
         self.client.post(ETH_REDEEM, &body, true).await
+    }
+
+    /// Cancel redeem ETH staking.
+    ///
+    /// # Errors
+    ///
+    /// Returns authentication, API, transport, or decode errors.
+    pub async fn cancel_redeem(&self, ord_id: &str) -> Result<Vec<CancelRedeem>, Error> {
+        let body = CancelRedeemBody { ord_id };
+        self.client.post(ETH_CANCEL_REDEEM, &body, true).await
     }
 
     /// Retrieve ETH staking balance.

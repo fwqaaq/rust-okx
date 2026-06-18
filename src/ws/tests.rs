@@ -7,7 +7,6 @@ use crate::signing;
 use crate::ws::channels;
 use crate::ws::client::login_payload;
 use crate::ws::event::parse_text_event;
-use crate::ws::model::EventType;
 use crate::ws::ops::operation_payload_with_expiry;
 use crate::ws::request::{
     AmendSpreadOrderRequest, CancelSpreadOrderRequest, MassCancelRequest,
@@ -149,7 +148,7 @@ fn parse_balance_and_position_push() {
     let rows: Vec<crate::ws::model::BalanceAndPositionUpdate> = push.parse().unwrap();
     assert_eq!(rows.len(), 1);
     assert_eq!(rows[0].p_time.as_str(), "1597026383085");
-    assert_eq!(rows[0].event_type, Some(EventType::Snapshot));
+    assert_eq!(rows[0].event_type, "snapshot");
     assert_eq!(rows[0].bal_data[0].ccy, "BTC");
     assert_eq!(rows[0].bal_data[0].cash_bal.as_str(), "1");
     assert_eq!(rows[0].pos_data[0].inst_id, "BTC-USD-191018");

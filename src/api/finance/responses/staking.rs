@@ -134,6 +134,16 @@ pub struct StakingOrder {
     pub c_time: NumberString,
 }
 
+/// Cancel redeem ETH
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct CancelRedeem {
+    /// Value returned by OKX in the `ordId` field
+    #[serde(default)]
+    pub ord_id: String,
+}
+
 /// Staking balance row.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]

@@ -155,7 +155,6 @@
 - [x] GET /api/v5/public/instrument-tick-bands
 - [x] GET /api/v5/public/option-trades
 - [x] GET /api/v5/public/market-data-history
-- [ ] GET /api/v5/public/block-trades
 - [ ] GET /api/v5/public/economic-calendar
 - [ ] GET /api/v5/public/premium-history
 - [ ] GET /api/v5/public/event-contract/series
@@ -281,7 +280,7 @@
 - [x] GET /api/v5/finance/staking-defi/eth/product-info
 - [x] POST /api/v5/finance/staking-defi/eth/purchase
 - [x] POST /api/v5/finance/staking-defi/eth/redeem
-- [ ] POST /api/v5/finance/staking-defi/eth/cancel-redeem
+- [x] POST /api/v5/finance/staking-defi/eth/cancel-redeem
 - [x] GET /api/v5/finance/staking-defi/eth/balance
 - [x] GET /api/v5/finance/staking-defi/eth/purchase-redeem-history
 - [x] GET /api/v5/finance/staking-defi/eth/apy-history

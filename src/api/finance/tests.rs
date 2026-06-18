@@ -90,6 +90,20 @@ async fn eth_and_sol_public_product_info_are_public() {
 }
 
 #[tokio::test]
+async fn eth_cancel_redeem() {
+    let mock = MockTransport::new(r#"{"code":"0","data":[{ "ordId":"1234567890"}],"msg":""}"#);
+    let client = signed_client(mock.clone());
+    let rows = client
+        .finance()
+        .eth_staking()
+        .cancel_redeem("1234567890")
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].ord_id, "1234567890");
+}
+
+#[tokio::test]
 async fn flexible_loan_max_loan_posts_typed_body() {
     let body = r#"{"code":"0","msg":"","data":[{"borrowCcy":"USDT","maxLoan":"100"}]}"#;
     let mock = MockTransport::new(body);

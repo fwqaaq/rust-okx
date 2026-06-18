@@ -5,6 +5,7 @@ fn finance_uncovered_read_only_endpoints_todo() {
     // API: GET /api/v5/finance/savings/lending-history
     // API: GET /api/v5/finance/staking-defi/orders-active
     // API: GET /api/v5/finance/staking-defi/orders-history
+    // API: POST /api/v5/finance/staking-defi/eth/cancel-redeem
     // API: GET /api/v5/finance/staking-defi/eth/balance
     // API: GET /api/v5/finance/staking-defi/eth/purchase-redeem-history
     // API: GET /api/v5/finance/staking-defi/eth/apy-history

@@ -102,9 +102,11 @@ pub struct BalanceAndPositionUpdate {
 
     /// Event that caused this update.
     ///
-    /// See [`EventType`] for the documented OKX string values.
-    #[serde(default)]
-    pub event_type: Option<EventType>,
+    /// - Typical values include:
+    ///   `delivered`, `exercised`, `transferred`, `filled`, `liquidation`
+    ///   `claw_back`, `adl`, `funding_fee`, `adjust_margin`,`set_leverage`
+    ///   `interest_deduction`, `settlement`
+    pub event_type: String,
 
     /// Updated account cash-balance records.
     ///
@@ -284,71 +286,6 @@ pub struct Trade {
     pub extra: ExtraFields,
 }
 
-/// Event type for [`BalanceAndPositionUpdate`].
-///
-/// OKX docs:
-/// <https://www.okx.com/docs-v5/en/#trading-account-websocket-balance-and-position-channel>
-///
-/// OKX serializes these values as lowercase `snake_case` strings.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[non_exhaustive]
-pub enum EventType {
-    /// OKX value: `snapshot`.
-    Snapshot,
-    /// OKX value: `delivered`.
-    Delivered,
-    /// OKX value: `exercised`.
-    Exercised,
-    /// OKX value: `transferred`.
-    Transferred,
-    /// OKX value: `filled`.
-    Filled,
-    /// OKX value: `liquidation`.
-    Liquidation,
-    /// OKX value: `claw_back`.
-    ClawBack,
-    /// OKX value: `adl`.
-    Adl,
-    /// OKX value: `funding_fee`.
-    FundingFee,
-    /// OKX value: `adjust_margin`.
-    AdjustMargin,
-    /// OKX value: `set_leverage`.
-    SetLeverage,
-    /// OKX value: `interest_deduction`.
-    InterestDeduction,
-    /// OKX value: `settlement`.
-    Settlement,
-    /// Missing or currently unknown OKX event type.
-    Unknown(String),
-}
-
-impl<'de> Deserialize<'de> for EventType {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let value = String::deserialize(deserializer)?;
-
-        Ok(match value.as_str() {
-            "snapshot" => Self::Snapshot,
-            "delivered" => Self::Delivered,
-            "exercised" => Self::Exercised,
-            "transferred" => Self::Transferred,
-            "filled" => Self::Filled,
-            "liquidation" => Self::Liquidation,
-            "claw_back" => Self::ClawBack,
-            "adl" => Self::Adl,
-            "funding_fee" => Self::FundingFee,
-            "adjust_margin" => Self::AdjustMargin,
-            "set_leverage" => Self::SetLeverage,
-            "interest_deduction" => Self::InterestDeduction,
-            "settlement" => Self::Settlement,
-            _ => Self::Unknown(value),
-        })
-    }
-}
-
 ws_object! {
     /// Balance row in a `balance_and_position` push.
     BalanceAndPositionBalance {
@@ -438,7 +375,7 @@ ws_object! {
 /// Only currencies with a non-zero `eq`, `availEq`, or `availBal` are included
 /// in the initial and regular snapshots.
 ///
-/// The outer WebSocket message fields `eventType`, `curPage`, and `lastPage`
+/// The outer WebSocket message fields `curPage` and `lastPage`
 /// are not part of this structure. They belong to the WebSocket push envelope.
 ///
 /// OKX docs:

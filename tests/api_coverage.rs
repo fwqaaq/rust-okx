@@ -144,6 +144,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("POST", "/api/v5/finance/staking-defi/cancel"),
     ("POST", "/api/v5/finance/staking-defi/eth/purchase"),
     ("POST", "/api/v5/finance/staking-defi/eth/redeem"),
+    ("POST", "/api/v5/finance/staking-defi/eth/cancel-redeem"),
     ("POST", "/api/v5/finance/staking-defi/purchase"),
     ("POST", "/api/v5/finance/staking-defi/redeem"),
     ("POST", "/api/v5/finance/staking-defi/sol/purchase"),

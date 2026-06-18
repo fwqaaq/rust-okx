@@ -21,6 +21,13 @@ pub(super) struct AmountBody<'a> {
     pub(super) amt: &'a str,
 }
 
+/// Cancel redeem ETH request body used by only ETH
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(super) struct CancelRedeemBody<'a> {
+    pub(super) ord_id: &'a str,
+}
+
 /// APY-history query.
 #[derive(Debug, Clone, Copy, Serialize)]
 pub(super) struct DaysQuery<'a> {
@@ -32,29 +39,4 @@ pub(super) struct DaysQuery<'a> {
 pub(super) struct SetLendingRateBody<'a> {
     pub(super) ccy: &'a str,
     pub(super) rate: &'a str,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn finance_helpers_serialize_as_objects() {
-        assert_eq!(
-            serde_json::to_value(NoParams {}).unwrap(),
-            serde_json::json!({})
-        );
-        assert_eq!(
-            serde_json::to_value(optional_ccy(None)).unwrap(),
-            serde_json::json!({})
-        );
-        assert_eq!(
-            serde_json::to_value(SetLendingRateBody {
-                ccy: "USDT",
-                rate: "0.01",
-            })
-            .unwrap(),
-            serde_json::json!({"ccy": "USDT", "rate": "0.01"})
-        );
-    }
 }

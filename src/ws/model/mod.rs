@@ -64,49 +64,49 @@ pub struct WsRow {
     pub fields: ExtraFields,
 }
 
+pub mod account;
+pub mod algo;
+pub mod block;
+pub mod funding;
+pub mod grid;
 pub mod market;
 pub mod public_data;
-pub mod account;
-pub mod trade;
-pub mod algo;
-pub mod grid;
-pub mod block;
 pub mod spread;
-pub mod funding;
 pub mod status;
+pub mod trade;
 
 // Re-exports — keeping the flat `crate::ws::model::*` namespace
-pub use market::{
-    BookLevel, CallAuctionDetailsUpdate, CandleUpdate, OptionTradeUpdate,
-    OrderBookUpdate, TickerUpdate, TradeUpdate,
-};
-pub use public_data::{
-    AdlWarningUpdate, EconomicCalendarUpdate, EstimatedPriceUpdate, EventContractMarketUpdate,
-    FundingRateUpdate, IndexTickerUpdate, InstrumentUpdate, InstrumentUpcomingParamChange,
-    LiquidationOrderDetail, LiquidationOrderUpdate, MarkPriceUpdate, OpenInterestUpdate,
-    OptionSummaryUpdate, PriceLimitUpdate,
-};
 pub use account::{
-    AccountBalanceUpdate, AccountGreeksUpdate, AccountUpdate, BalData,
-    BalanceAndPositionBalance, BalanceAndPositionPosition, BalanceAndPositionTrade,
-    BalanceAndPositionUpdate, EventType, LiquidationWarningUpdate, PosData, PositionUpdate, Trade,
+    AccountBalanceUpdate, AccountGreeksUpdate, AccountUpdate, BalData, BalanceAndPositionBalance,
+    BalanceAndPositionPosition, BalanceAndPositionTrade, BalanceAndPositionUpdate,
+    LiquidationWarningUpdate, PosData, PositionUpdate, Trade,
 };
-pub use trade::{FillUpdate, MassCancelOperationResult, OrderOperationResult, OrderUpdate};
 pub use algo::{AdvancedAlgoOrderUpdate, AlgoOrderUpdate};
+pub use block::{
+    BlockLeg, BlockQuoteUpdate, BlockRfqUpdate, BlockTickerUpdate, PublicBlockTradeUpdate,
+    PublicStructureBlockTradeUpdate, StructureBlockTradeUpdate,
+};
+pub use funding::{DepositInfoUpdate, WithdrawalInfoUpdate};
 pub use grid::{
     CopyTradingNotification, GridOrderUpdate, GridPositionUpdate, GridSubOrderUpdate,
     RecurringBuyAllocation, RecurringBuyOrderUpdate, TradingBotUpdate,
 };
-pub use block::{
-    BlockLeg, BlockQuoteUpdate, BlockRfqUpdate, BlockTickerUpdate, PublicBlockTradeUpdate,
-    PublicStructureBlockTradeUpdate, StructureBlockTradeUpdate,
+pub use market::{
+    BookLevel, CallAuctionDetailsUpdate, CandleUpdate, OptionTradeUpdate, OrderBookUpdate,
+    TickerUpdate, TradeUpdate,
+};
+pub use public_data::{
+    AdlWarningUpdate, EconomicCalendarUpdate, EstimatedPriceUpdate, EventContractMarketUpdate,
+    FundingRateUpdate, IndexTickerUpdate, InstrumentUpcomingParamChange, InstrumentUpdate,
+    LiquidationOrderDetail, LiquidationOrderUpdate, MarkPriceUpdate, OpenInterestUpdate,
+    OptionSummaryUpdate, PriceLimitUpdate,
 };
 pub use spread::{
     SpreadAmendOrderResult, SpreadCancelOrderResult, SpreadMassCancelResult, SpreadOrderUpdate,
     SpreadPlaceOrderResult, SpreadTradeLeg, SpreadTradeUpdate,
 };
-pub use funding::{DepositInfoUpdate, WithdrawalInfoUpdate};
 pub use status::StatusUpdate;
+pub use trade::{FillUpdate, MassCancelOperationResult, OrderOperationResult, OrderUpdate};
 
 #[cfg(test)]
 mod compile_checks;
