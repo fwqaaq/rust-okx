@@ -2,6 +2,8 @@
 
 use crate::model::RequestValidationError;
 use crate::transport::TransportError;
+#[cfg(feature = "websocket")]
+pub use crate::ws::WsError;
 
 type BoxError = Box<dyn std::error::Error + Send + Sync>;
 
@@ -25,7 +27,7 @@ pub enum Error {
     /// An error from the WebSocket layer.
     #[cfg(feature = "websocket")]
     #[error(transparent)]
-    Ws(#[from] crate::ws::WsError),
+    Ws(#[from] WsError),
 
     /// The typed request failed client-side validation before it was sent.
     #[error("invalid request: {0}")]
@@ -39,6 +41,7 @@ pub enum RestError {
     /// The underlying HTTP transport failed (connection, TLS, timeout, …).
     #[error("transport error: {source}")]
     Transport {
+        /// Finding the position of the error
         #[from]
         source: TransportError,
     },

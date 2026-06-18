@@ -53,7 +53,10 @@ async fn missing_credentials_is_configuration_error() {
     let mock = MockTransport::new("{}");
     let client = OkxClient::with_transport(mock).build();
     let err = client.account().get_balance(None).await.unwrap_err();
-    assert!(matches!(err, crate::Error::Configuration(_)));
+    assert!(matches!(
+        err,
+        crate::Error::Rest(crate::RestError::Configuration(_))
+    ));
 }
 
 #[tokio::test]

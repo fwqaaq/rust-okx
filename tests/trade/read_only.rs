@@ -1,6 +1,6 @@
 use crate::common::{expect_ok_or_api_unavailable, live_client_or_skip};
 use rust_okx::api::trade::{
-    AlgoOrderListRequest, EasyConvertHistoryRequest, FillsRequest,
+    AlgoOrderListRequest, EasyConvertHistoryRequest, FillHistoryRequest, FillsRequest,
     OneClickRepayCurrencyListRequest, OneClickRepayHistoryRequest, OrderHistoryRequest,
     OrderListRequest,
 };
@@ -40,7 +40,7 @@ async fn standard_trade_read_only_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     client
         .trade()
-        .get_fills_history(&FillsRequest::new().inst_type(InstType::Spot).limit(10))
+        .get_fills_history(&FillHistoryRequest::new(InstType::Spot).limit(10))
         .await
         .expect("trade/fills-history");
 }

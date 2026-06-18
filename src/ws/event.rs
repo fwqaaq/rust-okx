@@ -95,9 +95,9 @@ impl WsOperation {
     /// Deserialize the response `data` array into typed rows.
     pub fn parse<T: DeserializeOwned>(&self) -> Result<Vec<T>, Error> {
         serde_json::from_slice(&self.raw)
-            .map_err(|e| WsError::Decode {
-                context: format!("op:{}", self.op),
-                source: e,
+            .map_err(|source| WsError::Decode {
+                context: "operation".to_owned(),
+                source,
             })
             .map_err(Error::from)
     }
@@ -132,9 +132,9 @@ impl Push {
     /// Deserialize the push `data` array into typed rows.
     pub fn parse<T: DeserializeOwned>(&self) -> Result<Vec<T>, Error> {
         serde_json::from_slice(&self.raw)
-            .map_err(|e| WsError::Decode {
-                context: format!("channel:{}", self.arg.channel),
-                source: e,
+            .map_err(|source| WsError::Decode {
+                context: "push".to_owned(),
+                source,
             })
             .map_err(Error::from)
     }
@@ -146,9 +146,9 @@ impl Push {
 }
 
 pub(crate) fn parse_text_event(text: &str) -> Result<Option<WsEvent>, Error> {
-    let value: Value = serde_json::from_str(text).map_err(|e| WsError::Decode {
-        context: text.chars().take(80).collect(),
-        source: e,
+    let value: Value = serde_json::from_str(text).map_err(|source| WsError::Decode {
+        context: text.chars().take(40).collect(),
+        source,
     })?;
     match value.get("event").and_then(Value::as_str) {
         Some("subscribe") => {
@@ -215,19 +215,14 @@ fn parse_operation(value: &Value) -> Result<WsOperation, Error> {
 }
 
 fn parse_arg(value: &Value) -> Result<Arg, Error> {
-    let arg = value.get("arg").ok_or_else(|| {
-        let raw = value.to_string();
-        let raw = if raw.len() > 200 {
-            format!("{}…", &raw[..200])
-        } else {
-            raw
-        };
-        WsError::MissingArg { raw }
+    let arg = value.get("arg").ok_or_else(|| WsError::MissingArg {
+        raw: value_snippet(value),
     })?;
+    let channel_name = channel_name(value);
     serde_json::from_value(arg.clone())
-        .map_err(|e| WsError::Decode {
-            context: "arg".to_owned(),
-            source: e,
+        .map_err(|source| WsError::Decode {
+            context: format!("channel {channel_name}"),
+            source,
         })
         .map_err(Error::from)
 }
@@ -238,9 +233,31 @@ fn data_bytes(value: &Value) -> Result<Bytes, Error> {
         .cloned()
         .unwrap_or_else(|| Value::Array(vec![]));
     let raw = serde_json::to_vec(&data)
-        .map_err(|e| WsError::Encode { source: e })
+        .map_err(|source| WsError::Encode { source })
         .map_err(Error::from)?;
     Ok(Bytes::from(raw))
+}
+
+fn channel_name(value: &Value) -> String {
+    value
+        .get("arg")
+        .and_then(|arg| arg.get("channel"))
+        .and_then(Value::as_str)
+        .unwrap_or("<unknown>")
+        .to_owned()
+}
+
+fn value_snippet(value: &Value) -> String {
+    raw_snippet(&value.to_string())
+}
+
+fn raw_snippet(raw: &str) -> String {
+    const MAX_RAW_SNIPPET_CHARS: usize = 200;
+    let mut snippet: String = raw.chars().take(MAX_RAW_SNIPPET_CHARS).collect();
+    if raw.chars().count() > MAX_RAW_SNIPPET_CHARS {
+        snippet.push('…');
+    }
+    snippet
 }
 
 fn string_field(value: &Value, field: &str) -> String {

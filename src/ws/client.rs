@@ -3,8 +3,8 @@
 use std::collections::VecDeque;
 
 use crate::credentials::Credentials;
-use crate::{Error, signing};
 use crate::ws::WsError;
+use crate::{Error, signing};
 
 use super::arg::Arg;
 use super::conn::{TungsteniteConnector, WsConn, WsConnector, WsFrame};
@@ -221,7 +221,7 @@ impl<C: WsConnector> OkxWs<C> {
 
     /// Close the WebSocket connection.
     pub async fn close(&mut self) -> Result<(), Error> {
-        self.conn.close().await
+        self.conn.close().await.map_err(Error::from)
     }
 
     pub(crate) async fn send_operation_payload(&mut self, payload: String) -> Result<(), Error> {
@@ -232,7 +232,7 @@ impl<C: WsConnector> OkxWs<C> {
             }
             return Ok(());
         }
-        self.conn.send_text(payload).await
+        self.conn.send_text(payload).await.map_err(Error::from)
     }
 
     fn track_subscriptions(&mut self, args: &[Arg]) {
@@ -245,9 +245,10 @@ impl<C: WsConnector> OkxWs<C> {
 
     fn needs_login(&self) -> Result<bool, Error> {
         if self.group == WsChannelGroup::Private && self.credentials.is_none() {
-            return Err(
-                WsError::Configuration("private WebSocket requires credentials".to_owned()).into(),
-            );
+            return Err(WsError::Configuration(
+                "private WebSocket requires credentials".to_owned(),
+            )
+            .into());
         }
         Ok(self.group == WsChannelGroup::Private
             || (self.group == WsChannelGroup::Business && self.credentials.is_some()))
@@ -283,15 +284,10 @@ impl<C: WsConnector> OkxWs<C> {
         let request = match op {
             "subscribe" => ChannelRequest::subscribe(args),
             "unsubscribe" => ChannelRequest::unsubscribe(args),
-            _ => ChannelRequest {
-                id: None,
-                op,
-                args,
-            },
+            _ => ChannelRequest { id: None, op, args },
         };
-        let payload = serde_json::to_string(&request)
-            .map_err(|e| WsError::Encode { source: e })?;
-        self.conn.send_text(payload).await
+        let payload = serde_json::to_string(&request).map_err(|e| WsError::Encode { source: e })?;
+        self.conn.send_text(payload).await.map_err(Error::from)
     }
 
     async fn parse_text(&mut self, text: &str) -> Result<Option<WsEvent>, Error> {

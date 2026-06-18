@@ -194,7 +194,11 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// # Errors
     ///
     /// See [`place_order`](Self::place_order).
-    pub async fn get_fills_history(&self, request: &FillsRequest) -> Result<Vec<Fill>, Error> {
+    pub async fn get_fills_history(
+        &self,
+        request: &FillHistoryRequest,
+    ) -> Result<Vec<FillHistory>, Error> {
+        request.validate()?;
         self.client.get(FILLS_HISTORY, request, true).await
     }
 

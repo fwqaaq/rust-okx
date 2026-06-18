@@ -9,6 +9,7 @@ pub enum WsError {
     /// A WebSocket transport error (connection, TLS, I/O, …).
     #[error("WebSocket transport error: {source}")]
     Transport {
+        /// Finding the position of the error
         #[from]
         source: TransportError,
     },

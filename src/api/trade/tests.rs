@@ -321,20 +321,16 @@ async fn get_fills_uses_builder_query() {
 
 #[tokio::test]
 async fn get_fills_history_uses_builder_query() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"SPOT","instId":"BTC-USDT","tradeId":"t1","ordId":"312",
-             "fillPx":"42000","fillSz":"0.01","side":"buy","ordType":"limit",
-             "feeCcy":"USDT","fee":"-1","ts":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"side": "buy","fillSz": "0.00192834","fillPx": "51858","fillPxVol": "","fillFwdPx": "","fee": "-0.00000192834","fillPnl": "0","ordId": "680800019749904384","feeRate": "-0.001","instType": "SPOT","fillPxUsd": "","instId": "BTC-USDT","clOrdId": "","posSide": "net","billId": "680800019754098688","subType": "1","fillMarkVol": "","tag": "","fillTime": "1708587373361","execType": "T","fillIdxPx": "","tradeId": "744876980","fillMarkPx": "","feeCcy": "BTC","ts": "1708587373362","tradeQuoteCcy": "USDT"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = super::FillsRequest::new()
-        .inst_type(crate::model::InstType::Spot)
+    let request = super::FillHistoryRequest::new(crate::model::InstType::Spot)
         .begin("100")
         .end("200")
         .limit(1);
 
     let fills = client.trade().get_fills_history(&request).await.unwrap();
-    assert_eq!(fills[0].fee.as_str(), "-1");
+    assert_eq!(fills[0].fee.as_str(), "-0.00000192834");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SPOT&begin=100&end=200&limit=1"));

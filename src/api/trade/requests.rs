@@ -1,6 +1,9 @@
 use serde::Serialize;
 
-use crate::model::{OrderSide, OrderState, OrderType, PositionSide, TradeMode};
+use crate::model::{
+    OrderSide, OrderState, OrderType, PositionSide, TradeMode, ValidateRequest, one_of,
+    optional_non_empty, optional_unsigned_integer_string, range_u64,
+};
 
 mod advanced;
 mod algo;
@@ -399,7 +402,7 @@ impl OrderHistoryRequest {
 /// Query parameters for fills.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct FillsRequest {
-    #[serde(rename = "instType")]
+    #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
     inst_type: Option<crate::model::InstType>,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
     underlying: Option<String>,
@@ -485,5 +488,104 @@ impl FillsRequest {
     pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
+    }
+}
+
+/// Query parameters for historical fills.
+///
+/// This is intentionally separate from [`FillsRequest`] because OKX documents
+/// `instType` as required for `GET /api/v5/trade/fills-history`, while it is
+/// optional for `GET /api/v5/trade/fills`.
+#[derive(Debug, Clone, Serialize)]
+pub struct FillHistoryRequest {
+    #[serde(rename = "instType")]
+    inst_type: crate::model::InstType,
+    #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
+    inst_id: Option<String>,
+    #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
+    ord_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    after: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    before: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    begin: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    end: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<u32>,
+}
+
+impl FillHistoryRequest {
+    /// Create a historical fills query with the required instrument type.
+    pub fn new(inst_type: crate::model::InstType) -> Self {
+        Self {
+            inst_type,
+            inst_id: None,
+            ord_id: None,
+            after: None,
+            before: None,
+            begin: None,
+            end: None,
+            limit: None,
+        }
+    }
+
+    /// Set the instrument ID filter.
+    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+        self.inst_id = Some(inst_id.into());
+        self
+    }
+
+    /// Set the order ID filter.
+    pub fn order_id(mut self, ord_id: impl Into<String>) -> Self {
+        self.ord_id = Some(ord_id.into());
+        self
+    }
+
+    /// Return records after this pagination cursor.
+    pub fn after(mut self, after: impl Into<String>) -> Self {
+        self.after = Some(after.into());
+        self
+    }
+
+    /// Return records before this pagination cursor.
+    pub fn before(mut self, before: impl Into<String>) -> Self {
+        self.before = Some(before.into());
+        self
+    }
+
+    /// Set the begin timestamp.
+    pub fn begin(mut self, begin: impl Into<String>) -> Self {
+        self.begin = Some(begin.into());
+        self
+    }
+
+    /// Set the end timestamp.
+    pub fn end(mut self, end: impl Into<String>) -> Self {
+        self.end = Some(end.into());
+        self
+    }
+
+    /// Set the maximum number of rows to return.
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+}
+
+impl ValidateRequest for FillHistoryRequest {
+    fn validate(&self) -> Result<(), crate::model::RequestValidationError> {
+        one_of("instType", self.inst_type.as_str(), &["SPOT"], "SPOT")?;
+        optional_non_empty("instId", self.inst_id.as_deref())?;
+        optional_unsigned_integer_string("ordId", self.ord_id.as_deref())?;
+        optional_unsigned_integer_string("after", self.after.as_deref())?;
+        optional_unsigned_integer_string("before", self.before.as_deref())?;
+        optional_unsigned_integer_string("begin", self.begin.as_deref())?;
+        optional_unsigned_integer_string("end", self.end.as_deref())?;
+        if let Some(limit) = self.limit {
+            range_u64("limit", u64::from(limit), 1, 100)?;
+        }
+        Ok(())
     }
 }

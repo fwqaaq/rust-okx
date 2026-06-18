@@ -21,7 +21,7 @@ async fn read_only_suite(client: &OkxClient, label: &str) {
         ($call:expr, $endpoint:literal) => {
             match $call.await {
                 Ok(_) => {}
-                Err(Error::Api { code, message })
+                Err(Error::Rest(rust_okx::RestError::Okx { code, message, .. }))
                     if ACCOUNT_MODE_CODES.contains(&code.as_str()) =>
                 {
                     eprintln!(

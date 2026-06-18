@@ -4,7 +4,7 @@ use std::future::Future;
 
 use bytes::Bytes;
 
-use crate::Error;
+use super::error::WsError;
 
 /// A WebSocket frame handled by the OKX WebSocket client.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -26,16 +26,16 @@ pub enum WsFrame {
 /// without depending on a concrete WebSocket implementation.
 pub trait WsConn: Send {
     /// Send a text frame.
-    fn send_text(&mut self, text: String) -> impl Future<Output = Result<(), Error>> + Send;
+    fn send_text(&mut self, text: String) -> impl Future<Output = Result<(), WsError>> + Send;
 
     /// Send a pong control frame with the supplied ping payload.
-    fn send_pong(&mut self, payload: Bytes) -> impl Future<Output = Result<(), Error>> + Send;
+    fn send_pong(&mut self, payload: Bytes) -> impl Future<Output = Result<(), WsError>> + Send;
 
     /// Receive the next frame.
-    fn recv(&mut self) -> impl Future<Output = Result<Option<WsFrame>, Error>> + Send;
+    fn recv(&mut self) -> impl Future<Output = Result<Option<WsFrame>, WsError>> + Send;
 
     /// Close the connection.
-    fn close(&mut self) -> impl Future<Output = Result<(), Error>> + Send;
+    fn close(&mut self) -> impl Future<Output = Result<(), WsError>> + Send;
 }
 
 /// Creates WebSocket connections for an OKX WebSocket endpoint URL.
@@ -44,7 +44,7 @@ pub trait WsConnector: Send + Sync {
     type Conn: WsConn;
 
     /// Connect to a WebSocket URL.
-    fn connect(&self, url: &str) -> impl Future<Output = Result<Self::Conn, Error>> + Send;
+    fn connect(&self, url: &str) -> impl Future<Output = Result<Self::Conn, WsError>> + Send;
 }
 
 #[cfg(feature = "websocket")]
@@ -56,7 +56,6 @@ mod tungstenite_impl {
 
     use super::*;
     use crate::TransportError;
-    use crate::ws::WsError;
 
     /// Default WebSocket connector backed by `tokio-tungstenite`.
     #[derive(Debug, Clone, Copy, Default)]
@@ -70,12 +69,12 @@ mod tungstenite_impl {
     impl WsConnector for TungsteniteConnector {
         type Conn = TungsteniteConn;
 
-        fn connect(&self, url: &str) -> impl Future<Output = Result<Self::Conn, Error>> + Send {
+        fn connect(&self, url: &str) -> impl Future<Output = Result<Self::Conn, WsError>> + Send {
             let url = url.to_owned();
             async move {
                 let (inner, _) = connect_async(url)
                     .await
-                    .map_err(|e| Error::from(WsError::from(TransportError::new(e))))?;
+                    .map_err(|e| WsError::from(TransportError::new(e)))?;
                 Ok(TungsteniteConn { inner })
             }
         }
@@ -83,32 +82,32 @@ mod tungstenite_impl {
 
     #[allow(clippy::manual_async_fn)]
     impl WsConn for TungsteniteConn {
-        fn send_text(&mut self, text: String) -> impl Future<Output = Result<(), Error>> + Send {
+        fn send_text(&mut self, text: String) -> impl Future<Output = Result<(), WsError>> + Send {
             async move {
                 self.inner
                     .send(Message::Text(text))
                     .await
-                    .map_err(|e| Error::from(WsError::from(TransportError::new(e))))
+                    .map_err(|e| WsError::from(TransportError::new(e)))
             }
         }
 
-        fn send_pong(&mut self, payload: Bytes) -> impl Future<Output = Result<(), Error>> + Send {
+        fn send_pong(&mut self, payload: Bytes) -> impl Future<Output = Result<(), WsError>> + Send {
             async move {
                 self.inner
                     .send(Message::Pong(payload.to_vec()))
                     .await
-                    .map_err(|e| Error::from(WsError::from(TransportError::new(e))))
+                    .map_err(|e| WsError::from(TransportError::new(e)))
             }
         }
 
-        fn recv(&mut self) -> impl Future<Output = Result<Option<WsFrame>, Error>> + Send {
+        fn recv(&mut self) -> impl Future<Output = Result<Option<WsFrame>, WsError>> + Send {
             async move {
                 loop {
                     let Some(message) = self.inner.next().await else {
                         return Ok(None);
                     };
                     let message = message
-                        .map_err(|e| Error::from(WsError::from(TransportError::new(e))))?;
+                        .map_err(|e| WsError::from(TransportError::new(e)))?;
                     match message {
                         Message::Text(text) => return Ok(Some(WsFrame::Text(text))),
                         Message::Ping(bytes) => return Ok(Some(WsFrame::Ping(Bytes::from(bytes)))),
@@ -120,12 +119,12 @@ mod tungstenite_impl {
             }
         }
 
-        fn close(&mut self) -> impl Future<Output = Result<(), Error>> + Send {
+        fn close(&mut self) -> impl Future<Output = Result<(), WsError>> + Send {
             async move {
                 self.inner
                     .close(None)
                     .await
-                    .map_err(|e| Error::from(WsError::from(TransportError::new(e))))
+                    .map_err(|e| WsError::from(TransportError::new(e)))
             }
         }
     }
