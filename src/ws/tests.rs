@@ -80,6 +80,18 @@ fn channel_helpers_build_expected_args() {
     assert_eq!(account.channel, "account");
     assert_eq!(account.extra.get("ccy").map(String::as_str), Some("USDT"));
 
+    let pos = channels::account::positions("ANY", Some("0"));
+    assert_eq!(pos.channel, "positions");
+    assert_eq!(pos.inst_type.as_deref(), Some("ANY"));
+    assert_eq!(
+        pos.extra.get("extraParams").map(String::as_str),
+        Some(r#"{"updateInterval":"0"}"#)
+    );
+
+    let pos_default = channels::account::positions("ANY", None);
+    assert_eq!(pos_default.channel, "positions");
+    assert!(!pos_default.extra.contains_key("extraParams"));
+
     let spread = channels::spread::orders_by_spread("BTC-USDT_BTC-USDT-SWAP");
     assert_eq!(spread.channel, "sprd-orders");
     assert_eq!(

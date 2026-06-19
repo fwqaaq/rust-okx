@@ -7,6 +7,36 @@ use serde::Deserialize;
 use super::ExtraFields;
 use crate::model::NumberString;
 
+/// A close-order algo attached to a position.
+///
+/// Populated in [`PositionUpdate::close_order_algo`] when a close-position
+/// algo order (placed with `closeFraction=1`) is associated with the position.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-positions-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct CloseOrderAlgo {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Stop-loss trigger price.
+    #[serde(default)]
+    pub sl_trigger_px: String,
+    /// Stop-loss trigger price type: `last`, `index`, or `mark`.
+    #[serde(default)]
+    pub sl_trigger_px_type: String,
+    /// Take-profit trigger price.
+    #[serde(default)]
+    pub tp_trigger_px: String,
+    /// Take-profit trigger price type: `last`, `index`, or `mark`.
+    #[serde(default)]
+    pub tp_trigger_px_type: String,
+    /// Fraction of the position to close when the algo is triggered (e.g. `"0.6"`).
+    #[serde(default)]
+    pub close_fraction: String,
+}
+
 /// Private `positions` channel row.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-positions-channel>
@@ -170,6 +200,35 @@ pub struct PositionUpdate {
     /// Push time (Unix milliseconds).
     #[serde(default)]
     pub p_time: NumberString,
+    /// Realized profit and loss.
+    ///
+    /// `realizedPnl = pnl + fee + fundingFee + liqPenalty + settledPnl`
+    ///
+    /// Only applicable to FUTURES/SWAP/OPTION.
+    #[serde(default)]
+    pub realized_pnl: NumberString,
+    /// Accumulated PnL from closing orders, excluding fees.
+    #[serde(default)]
+    pub pnl: NumberString,
+    /// Accumulated transaction fee. Negative = fee charged; positive = rebate.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Accumulated funding fee.
+    #[serde(default)]
+    pub funding_fee: NumberString,
+    /// Accumulated liquidation penalty (negative when non-zero).
+    #[serde(default)]
+    pub liq_penalty: NumberString,
+    /// Accumulated settled P&L calculated by settlement price.
+    ///
+    /// Only applicable to cross FUTURES.
+    #[serde(default)]
+    pub settled_pnl: NumberString,
+    /// Close-position algo orders attached to this position.
+    ///
+    /// Non-empty only after placing an algo order with `closeFraction=1`.
+    #[serde(default)]
+    pub close_order_algo: Vec<CloseOrderAlgo>,
     /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,

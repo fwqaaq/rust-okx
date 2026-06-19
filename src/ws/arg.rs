@@ -67,6 +67,12 @@ impl Arg {
         self
     }
 
+    /// Set the extraParams parameter.
+    pub fn extra_param(self, update_interval: impl Into<String>) -> Self {
+        let extra = format!("{{\"updateInterval\":\"{}\"}}", update_interval.into());
+        self.param("extraParams", extra)
+    }
+
     /// Set the currency parameter.
     pub fn ccy(self, ccy: impl Into<String>) -> Self {
         self.param("ccy", ccy)

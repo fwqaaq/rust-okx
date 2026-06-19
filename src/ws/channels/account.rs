@@ -18,9 +18,21 @@ pub fn account_by_currency(ccy: impl Into<String>) -> Arg {
 
 /// Subscribe to `positions` for one instrument type.
 ///
+/// `update_interval` controls push frequency via OKX's `extraParams` field:
+/// - `None`: OKX default (events + ~5-second periodic push)
+/// - `Some("0")`: event-driven only
+/// - `Some("2000")` / `Some("3000")` / `Some("4000")`: events + periodic at that interval (ms)
+///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-positions-channel>
-pub fn positions(inst_type: impl Into<String>) -> Arg {
-    Arg::new("positions").inst_type(inst_type)
+pub fn positions(inst_type: impl Into<String>, update_interval: Option<&str>) -> Arg {
+    let mut arg = Arg::new("positions").inst_type(inst_type);
+    if let Some(interval) = update_interval {
+        arg = arg.param(
+            "extraParams",
+            format!(r#"{{"updateInterval":"{interval}"}}"#),
+        );
+    }
+    arg
 }
 
 /// Subscribe to `balance_and_position`.
