@@ -22,12 +22,20 @@ pub struct ChannelRequest<'a> {
 impl<'a> ChannelRequest<'a> {
     /// Build a subscription request.
     pub fn subscribe(args: &'a [Arg]) -> Self {
-        Self { id: None, op: "subscribe", args }
+        Self {
+            id: None,
+            op: "subscribe",
+            args,
+        }
     }
 
     /// Build an unsubscription request.
     pub fn unsubscribe(args: &'a [Arg]) -> Self {
-        Self { id: None, op: "unsubscribe", args }
+        Self {
+            id: None,
+            op: "unsubscribe",
+            args,
+        }
     }
 
     /// Attach a client message ID.
@@ -52,7 +60,10 @@ pub struct LoginRequest<'a> {
 impl<'a> LoginRequest<'a> {
     /// Build a login request from one authentication argument.
     pub fn new(arg: LoginArg<'a>) -> Self {
-        Self { op: "login", args: [arg] }
+        Self {
+            op: "login",
+            args: [arg],
+        }
     }
 }
 
@@ -79,7 +90,12 @@ impl<'a> LoginArg<'a> {
         timestamp: &'a str,
         sign: impl Into<String>,
     ) -> Self {
-        Self { api_key, passphrase, timestamp, sign: sign.into() }
+        Self {
+            api_key,
+            passphrase,
+            timestamp,
+            sign: sign.into(),
+        }
     }
 }
 
@@ -104,7 +120,12 @@ pub struct OperationRequest<'a, A> {
 impl<'a, A> OperationRequest<'a, A> {
     /// Build an operation request without an expiration deadline.
     pub fn new(id: impl Into<String>, op: impl Into<String>, args: &'a [A]) -> Self {
-        Self { id: id.into(), op: op.into(), exp_time: None, args }
+        Self {
+            id: id.into(),
+            op: op.into(),
+            exp_time: None,
+            args,
+        }
     }
 
     /// Set the request effective deadline in Unix milliseconds.

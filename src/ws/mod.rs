@@ -18,10 +18,10 @@ pub mod response;
 
 pub use arg::Arg;
 pub use client::{OkxWs, OkxWsBuilder, WsChannelGroup};
-pub use error::WsError;
 #[cfg(feature = "websocket")]
 pub use conn::{TungsteniteConn, TungsteniteConnector};
 pub use conn::{WsConn, WsConnector, WsFrame};
+pub use error::WsError;
 pub use event::{Push, WsChannelConnectionCount, WsEvent, WsNotice, WsOperation};
 pub use request::{
     AmendSpreadOrderRequest, CancelSpreadOrderRequest, ChannelRequest, LoginArg, LoginRequest,

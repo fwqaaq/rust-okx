@@ -42,10 +42,9 @@ mod tests {
 
     #[test]
     fn parses_login_acknowledgement_metadata() {
-        let response: LoginAcknowledgement = serde_json::from_str(
-            r#"{"event":"login","code":"0","msg":"","connId":"abc"}"#,
-        )
-        .unwrap();
+        let response: LoginAcknowledgement =
+            serde_json::from_str(r#"{"event":"login","code":"0","msg":"","connId":"abc"}"#)
+                .unwrap();
         assert_eq!(response.code, "0");
         assert_eq!(response.conn_id, "abc");
     }

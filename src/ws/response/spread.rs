@@ -1,8 +1,7 @@
 //! Typed aliases for Spread Trading WebSocket operation responses.
 
 use crate::ws::model::{
-    SpreadAmendOrderResult, SpreadCancelOrderResult, SpreadMassCancelResult,
-    SpreadPlaceOrderResult,
+    SpreadAmendOrderResult, SpreadCancelOrderResult, SpreadMassCancelResult, SpreadPlaceOrderResult,
 };
 
 use super::OperationResponse;

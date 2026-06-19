@@ -50,10 +50,7 @@ pub fn option_summary(inst_family: impl Into<String>) -> Arg {
 /// or `EVENTS`.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-public-data-ws-estimated-delivery-exercise-settlement-price-channel>
-pub fn estimated_price(
-    inst_type: impl Into<String>,
-    inst_id: impl Into<String>,
-) -> Arg {
+pub fn estimated_price(inst_type: impl Into<String>, inst_id: impl Into<String>) -> Arg {
     Arg::new("estimated-price")
         .inst_type(inst_type)
         .inst_id(inst_id)

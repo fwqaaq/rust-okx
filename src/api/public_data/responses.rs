@@ -71,6 +71,9 @@ pub struct OpenInterest {
     /// Open interest in coin/currency units.
     #[serde(default)]
     pub oi_ccy: NumberString,
+    /// Open interest in USD.
+    #[serde(default)]
+    pub oi_usd: NumberString,
     /// Timestamp (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
@@ -107,6 +110,12 @@ pub struct FundingRate {
 pub struct FundingRateHistory {
     /// Instrument ID.
     pub inst_id: String,
+    /// Instrument type.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Funding rate formula type.
+    #[serde(default)]
+    pub formula_type: String,
     /// Funding rate.
     #[serde(default)]
     pub funding_rate: NumberString,
@@ -126,6 +135,9 @@ pub struct FundingRateHistory {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct PriceLimit {
+    /// Instrument type.
+    #[serde(default)]
+    pub inst_type: String,
     /// Instrument ID.
     pub inst_id: String,
     /// Highest buy price.
@@ -134,6 +146,9 @@ pub struct PriceLimit {
     /// Lowest sell price.
     #[serde(default)]
     pub sell_lmt: NumberString,
+    /// Whether the price limit is enabled.
+    #[serde(default)]
+    pub enabled: bool,
     /// Timestamp (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,

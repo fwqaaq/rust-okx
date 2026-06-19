@@ -47,9 +47,9 @@ pub mod ws;
 
 pub use client::{OkxClient, OkxClientBuilder};
 pub use credentials::Credentials;
-pub use error::{Error, RestError, Result};
 #[cfg(feature = "websocket")]
 pub use error::WsError;
+pub use error::{Error, RestError, Result};
 pub use model::NumberString;
 #[cfg(feature = "reqwest")]
 pub use transport::ReqwestTransport;

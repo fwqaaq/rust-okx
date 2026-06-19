@@ -16,8 +16,7 @@ fn signed_client(mock: MockTransport) -> OkxClient<MockTransport> {
 async fn invalid_advanced_trade_request_fails_before_transport() {
     let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
     let client = signed_client(mock.clone());
-    let request =
-        super::AlgoOrderRequest::new("BTC-USDT-SWAP", "cross", "buy", "trigger", "1");
+    let request = super::AlgoOrderRequest::new("BTC-USDT-SWAP", "cross", "buy", "trigger", "1");
 
     let error = client.trade().place_algo_order(&request).await.unwrap_err();
     assert!(matches!(error, Error::InvalidRequest(_)));

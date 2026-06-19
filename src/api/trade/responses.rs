@@ -30,6 +30,9 @@ pub struct PlaceOrderResult {
     /// Per-order status message.
     #[serde(default)]
     pub s_msg: String,
+    /// Per-order sub status code.
+    #[serde(default)]
+    pub sub_code: String,
     /// Timestamp (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
@@ -51,6 +54,9 @@ pub struct CancelOrderResult {
     /// Per-order status message.
     #[serde(default)]
     pub s_msg: String,
+    /// Timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
 }
 
 /// The result of amending an order.
@@ -72,6 +78,12 @@ pub struct AmendOrderResult {
     /// Per-order status message.
     #[serde(default)]
     pub s_msg: String,
+    /// Per-order sub status code.
+    #[serde(default)]
+    pub sub_code: String,
+    /// Timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
 }
 
 /// The result of closing a position.

@@ -4,8 +4,8 @@
 
 use serde::Deserialize;
 
-use crate::model::NumberString;
 use super::ExtraFields;
+use crate::model::NumberString;
 
 /// Private `sprd-orders` channel row.
 ///

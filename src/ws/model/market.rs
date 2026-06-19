@@ -4,8 +4,8 @@
 
 use serde::Deserialize;
 
-use crate::model::NumberString;
 use super::ExtraFields;
+use crate::model::NumberString;
 
 /// Access element `index` from a JSON array, falling back to `NumberString::default()`.
 pub(super) fn array_value(values: &[NumberString], index: usize) -> NumberString {

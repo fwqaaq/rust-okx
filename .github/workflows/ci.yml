@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  guidelines:
+    name: Lint & Contributing Guidelines
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format check
+        run: cargo fmt --check
+      - name: Clippy
+        run: cargo clippy --tests -- -D warnings
+      - name: Unit tests
+        run: cargo test --lib
+      - name: CONTRIBUTING.md lint
+        run: python3 scripts/check_contributing.py
+
+  examples:
+    name: Check Examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check default examples
+        run: cargo check --examples
+      - name: Check WebSocket examples
+        run: cargo check --examples --features websocket

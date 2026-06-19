@@ -7,7 +7,8 @@ use super::signed_client;
 
 #[tokio::test]
 async fn withdrawal_posts_signed_body() {
-    let body = r#"{"code":"0","msg":"","data":[{"wdId":"58700","clientId":"","ccy":"USDT","amt":"10"}]}"#;
+    let body =
+        r#"{"code":"0","msg":"","data":[{"wdId":"58700","clientId":"","ccy":"USDT","amt":"10"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = WithdrawalRequest::new("USDT", "10", "4", "TN4E3PsU3YfEYvJW7i5YQKQ5P5y3YPAXB")
@@ -58,15 +59,12 @@ async fn withdrawal_lightning_posts_signed_body() {
 
 #[tokio::test]
 async fn cancel_withdrawal_posts_wd_id() {
-    let body = r#"{"code":"0","msg":"","data":[{"wdId":"58700","clientId":"","ccy":"USDT","amt":"10"}]}"#;
+    let body =
+        r#"{"code":"0","msg":"","data":[{"wdId":"58700","clientId":"","ccy":"USDT","amt":"10"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client
-        .funding()
-        .cancel_withdrawal("58700")
-        .await
-        .unwrap();
+    let rows = client.funding().cancel_withdrawal("58700").await.unwrap();
     assert_eq!(rows[0].wd_id, "58700");
 
     let req = mock.captured();

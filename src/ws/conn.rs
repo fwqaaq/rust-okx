@@ -91,7 +91,10 @@ mod tungstenite_impl {
             }
         }
 
-        fn send_pong(&mut self, payload: Bytes) -> impl Future<Output = Result<(), WsError>> + Send {
+        fn send_pong(
+            &mut self,
+            payload: Bytes,
+        ) -> impl Future<Output = Result<(), WsError>> + Send {
             async move {
                 self.inner
                     .send(Message::Pong(payload.to_vec()))
@@ -106,8 +109,7 @@ mod tungstenite_impl {
                     let Some(message) = self.inner.next().await else {
                         return Ok(None);
                     };
-                    let message = message
-                        .map_err(|e| WsError::from(TransportError::new(e)))?;
+                    let message = message.map_err(|e| WsError::from(TransportError::new(e)))?;
                     match message {
                         Message::Text(text) => return Ok(Some(WsFrame::Text(text))),
                         Message::Ping(bytes) => return Ok(Some(WsFrame::Ping(Bytes::from(bytes)))),

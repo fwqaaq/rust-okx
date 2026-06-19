@@ -87,7 +87,7 @@ pub struct EstimatedPrice {
     pub ts: NumberString,
 }
 
-/// Discount tier returned for interest-free quota calculations.
+/// Discount tier returned for interest-free quota calculations (legacy format).
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
@@ -103,6 +103,31 @@ pub struct DiscountLevel {
     pub max_amt: NumberString,
 }
 
+/// Discount tier returned in the `details` array.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DiscountDetail {
+    /// Value returned by OKX in the `discountRate` field.
+    #[serde(default)]
+    pub discount_rate: NumberString,
+    /// Value returned by OKX in the `liqPenaltyRate` field.
+    #[serde(default)]
+    pub liq_penalty_rate: NumberString,
+    /// Value returned by OKX in the `minAmt` field.
+    #[serde(default)]
+    pub min_amt: NumberString,
+    /// Value returned by OKX in the `maxAmt` field.
+    #[serde(default)]
+    pub max_amt: NumberString,
+    /// Value returned by OKX in the `tier` field.
+    #[serde(default)]
+    pub tier: String,
+    /// Value returned by OKX in the `disCcyEq` field.
+    #[serde(default)]
+    pub dis_ccy_eq: NumberString,
+}
+
 /// Discount-rate and interest-free quota row.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -114,9 +139,18 @@ pub struct DiscountRateInterestFreeQuota {
     /// Value returned by OKX in the `amt` field.
     #[serde(default)]
     pub amt: NumberString,
-    /// Value returned by OKX in the `discountLv` field.
-    #[serde(default, deserialize_with = "deserialize_vec_or_empty_string")]
-    pub discount_lv: Vec<DiscountLevel>,
+    /// Value returned by OKX in the `discountLv` field (discount level ID).
+    #[serde(default)]
+    pub discount_lv: String,
+    /// Value returned by OKX in the `details` field.
+    #[serde(default)]
+    pub details: Vec<DiscountDetail>,
+    /// Value returned by OKX in the `collateralRestrict` field.
+    #[serde(default)]
+    pub collateral_restrict: bool,
+    /// Value returned by OKX in the `minDiscountRate` field.
+    #[serde(default)]
+    pub min_discount_rate: NumberString,
 }
 
 /// Per-currency base rate and quota.

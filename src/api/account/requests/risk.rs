@@ -339,4 +339,3 @@ impl ValidateRequest for PositionBuilderRequest {
         Ok(())
     }
 }
-

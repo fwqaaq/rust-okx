@@ -22,7 +22,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
 
     /// Retrieve the list of tradable instruments.
     ///
-    /// `GET /api/v5/public/instruments`
+    /// `GET /api/v5/public/instruments`. Public.
     ///
     /// `inst_family` is required for `FUTURES`, `SWAP`, and `OPTION` and ignored for `SPOT`/`MARGIN`.
     ///

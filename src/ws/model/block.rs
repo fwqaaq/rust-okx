@@ -5,8 +5,8 @@
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::model::NumberString;
 use super::ExtraFields;
+use crate::model::NumberString;
 
 /// A leg embedded in block RFQ/quote/trade messages.
 #[derive(Debug, Clone, Default, Deserialize)]

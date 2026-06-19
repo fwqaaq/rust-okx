@@ -1,7 +1,7 @@
 use http::Method;
 
-use crate::test_util::MockTransport;
 use crate::OkxClient;
+use crate::test_util::MockTransport;
 
 use super::super::{
     FlexibleLoanAdjustCollateralRequest, FlexibleLoanCollateralAssetsRequest,
@@ -53,7 +53,10 @@ async fn borrow_currencies_sends_signed_request() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
-    assert!(req.uri.ends_with("/api/v5/finance/flexible-loan/borrow-currencies"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/flexible-loan/borrow-currencies")
+    );
     assert_eq!(req.query(), None);
     assert!(req.is_signed());
 }
@@ -107,8 +110,7 @@ async fn adjust_collateral_posts_signed_body() {
     let body = r#"{"code":"0","msg":"","data":[{"ordId":"1001","borrowCcy":"USDT","borrowAmt":"500","collateralCcy":"BTC","collateralAmt":"0.01","state":"normal","cTime":"1597026383085","uTime":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request =
-        FlexibleLoanAdjustCollateralRequest::new("1001", "BTC", "0.005", "add");
+    let request = FlexibleLoanAdjustCollateralRequest::new("1001", "BTC", "0.005", "add");
 
     let rows = client
         .finance()
@@ -121,7 +123,10 @@ async fn adjust_collateral_posts_signed_body() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::POST);
-    assert!(req.uri.ends_with("/api/v5/finance/flexible-loan/adjust-collateral"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/flexible-loan/adjust-collateral")
+    );
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["ordId"], "1001");
     assert_eq!(sent["collateralCcy"], "BTC");
@@ -179,8 +184,9 @@ async fn interest_accrued_sends_signed_query() {
     let body = r#"{"code":"0","msg":"","data":[{"ordId":"1001","ccy":"USDT","interest":"0.0001","rate":"0.0001","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request =
-        FlexibleLoanInterestAccruedRequest::new().currency("USDT").limit(10);
+    let request = FlexibleLoanInterestAccruedRequest::new()
+        .currency("USDT")
+        .limit(10);
 
     let rows = client
         .finance()

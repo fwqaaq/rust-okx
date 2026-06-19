@@ -12,9 +12,8 @@ async fn place_algo_order_posts_signed_body() {
         "algoId":"2510789768709120","algoClOrdId":"","sCode":"0","sMsg":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request =
-        AlgoOrderRequest::new("BTC-USDT", "cash", "buy", "conditional", "0.1")
-            .take_profit("65000", "68000");
+    let request = AlgoOrderRequest::new("BTC-USDT", "cash", "buy", "conditional", "0.1")
+        .take_profit("65000", "68000");
 
     let rows = client.trade().place_algo_order(&request).await.unwrap();
     assert_eq!(rows[0].algo_id, "2510789768709120");
@@ -34,11 +33,7 @@ async fn cancel_algo_orders_posts_signed_body() {
     let client = signed_client(mock.clone());
     let cancel = CancelAlgoOrderRequest::new("2510789768709120", "BTC-USDT");
 
-    client
-        .trade()
-        .cancel_algo_orders(&[cancel])
-        .await
-        .unwrap();
+    client.trade().cancel_algo_orders(&[cancel]).await.unwrap();
 
     let req = mock.captured();
     assert!(req.is_signed());
@@ -112,10 +107,7 @@ async fn get_algo_orders_history_sends_signed_query() {
         .unwrap();
 
     let req = mock.captured();
-    assert_eq!(
-        req.query(),
-        Some("ordType=conditional&state=canceled")
-    );
+    assert_eq!(req.query(), Some("ordType=conditional&state=canceled"));
     assert!(req.is_signed());
 }
 

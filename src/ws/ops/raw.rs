@@ -2,8 +2,8 @@
 
 use serde::Serialize;
 
-use crate::model::ValidateRequest;
 use crate::Error;
+use crate::model::ValidateRequest;
 use crate::ws::WsError;
 use crate::ws::client::OkxWs;
 use crate::ws::conn::WsConnector;

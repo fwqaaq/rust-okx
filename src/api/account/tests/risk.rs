@@ -97,9 +97,7 @@ async fn position_builder_posts_body_and_omits_unset_fields() {
     let request = PositionBuilderRequest::new()
         .account_level("2")
         .include_real_positions_and_equity(false)
-        .simulated_positions(vec![
-            SimulatedPosition::new("BTC-USDT-SWAP").position("1"),
-        ])
+        .simulated_positions(vec![SimulatedPosition::new("BTC-USDT-SWAP").position("1")])
         .simulated_assets(vec![SimulatedAsset::new("USDT").equity("10000")]);
 
     let result = client.account().position_builder(&request).await.unwrap();

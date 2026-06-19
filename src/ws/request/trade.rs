@@ -3,8 +3,8 @@
 use serde::Serialize;
 
 use crate::model::{
-    RequestValidationError, ValidateRequest, non_empty, one_of,
-    optional_unsigned_integer_string, range_u64,
+    RequestValidationError, ValidateRequest, non_empty, one_of, optional_unsigned_integer_string,
+    range_u64,
 };
 
 /// MMP mass-cancel request body (`mass-cancel`).
@@ -48,10 +48,13 @@ impl ValidateRequest for MassCancelRequest {
         non_empty("instFamily", &self.inst_family)?;
         optional_unsigned_integer_string("lockInterval", self.lock_interval.as_deref())?;
         if let Some(value) = self.lock_interval.as_deref() {
-            let value = value.parse::<u64>().map_err(|_| RequestValidationError::InvalidFormat {
-                field: "lockInterval",
-                expected: "an integer from 0 through 10000",
-            })?;
+            let value =
+                value
+                    .parse::<u64>()
+                    .map_err(|_| RequestValidationError::InvalidFormat {
+                        field: "lockInterval",
+                        expected: "an integer from 0 through 10000",
+                    })?;
             range_u64("lockInterval", value, 0, 10_000)?;
         }
         Ok(())

@@ -31,8 +31,7 @@ fn funds_transfer_request_omits_unset_optional_fields() {
 #[test]
 fn withdrawal_request_omits_unset_optional_fields() {
     use super::WithdrawalRequest;
-    let value =
-        serde_json::to_value(WithdrawalRequest::new("USDT", "1", "3", "example")).unwrap();
+    let value = serde_json::to_value(WithdrawalRequest::new("USDT", "1", "3", "example")).unwrap();
 
     assert_eq!(value["ccy"], "USDT");
     assert_eq!(value["amt"], "1");

@@ -57,7 +57,10 @@ async fn demo_place_get_cancel_order() {
 
     // API: GET /api/v5/trade/order
     // STATUS: DEMO — reads the simulated order created above.
-    let Some(live) = ok_or_skip(client.trade().get_order("BTC-USDT", &ord_id).await, "get_order") else {
+    let Some(live) = ok_or_skip(
+        client.trade().get_order("BTC-USDT", &ord_id).await,
+        "get_order",
+    ) else {
         return;
     };
     assert_eq!(live[0].state, OrderState::Live);

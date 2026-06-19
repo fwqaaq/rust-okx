@@ -96,11 +96,8 @@ async fn get_orders_history_archive_uses_builder_query() {
         "uTime":"1597026383085","cTime":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = OrderHistoryRequest::new(InstType::Spot).filters(
-        OrderListRequest::new()
-            .inst_type(InstType::Spot)
-            .limit(1),
-    );
+    let request = OrderHistoryRequest::new(InstType::Spot)
+        .filters(OrderListRequest::new().inst_type(InstType::Spot).limit(1));
 
     let orders = client
         .trade()

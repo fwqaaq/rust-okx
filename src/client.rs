@@ -109,8 +109,14 @@ impl<T: Transport> OkxClient<T> {
         } else {
             format!("{endpoint}?{qs}")
         };
-        self.send(endpoint, Method::GET, &request_path, Bytes::new(), authenticated)
-            .await
+        self.send(
+            endpoint,
+            Method::GET,
+            &request_path,
+            Bytes::new(),
+            authenticated,
+        )
+        .await
     }
 
     /// Send a `POST` request with `body` serialized as JSON and return the
@@ -125,10 +131,15 @@ impl<T: Transport> OkxClient<T> {
         B: Serialize,
         D: DeserializeOwned,
     {
-        let body = serde_json::to_vec(body)
-            .map_err(|e| RestError::Encode { source: e.into() })?;
-        self.send(endpoint, Method::POST, endpoint, Bytes::from(body), authenticated)
-            .await
+        let body = serde_json::to_vec(body).map_err(|e| RestError::Encode { source: e.into() })?;
+        self.send(
+            endpoint,
+            Method::POST,
+            endpoint,
+            Bytes::from(body),
+            authenticated,
+        )
+        .await
     }
 
     async fn send<D>(
@@ -157,9 +168,7 @@ impl<T: Transport> OkxClient<T> {
         }
         if authenticated {
             let credentials = self.credentials.as_ref().ok_or_else(|| {
-                RestError::Configuration(
-                    "authenticated endpoint requires credentials".to_owned(),
-                )
+                RestError::Configuration("authenticated endpoint requires credentials".to_owned())
             })?;
             let timestamp = signing::timestamp();
             let body_str = std::str::from_utf8(&body).unwrap_or_default();
@@ -174,7 +183,11 @@ impl<T: Transport> OkxClient<T> {
         let request = builder
             .body(body)
             .map_err(|e| RestError::Encode { source: e.into() })?;
-        let response = self.transport.send(request).await.map_err(RestError::from)?;
+        let response = self
+            .transport
+            .send(request)
+            .await
+            .map_err(RestError::from)?;
         let status = response.status();
         let bytes = response.into_body();
         if !status.is_success() {
@@ -185,8 +198,11 @@ impl<T: Transport> OkxClient<T> {
             }
             .into());
         }
-        let envelope: OkxResponse<D> = serde_json::from_slice(&bytes)
-            .map_err(|e| RestError::Decode { endpoint, source: e })?;
+        let envelope: OkxResponse<D> =
+            serde_json::from_slice(&bytes).map_err(|e| RestError::Decode {
+                endpoint,
+                source: e,
+            })?;
         if envelope.code != "0" {
             return Err(RestError::Okx {
                 endpoint,
@@ -200,9 +216,8 @@ impl<T: Transport> OkxClient<T> {
 }
 
 fn insert_header(headers: &mut HeaderMap, name: &'static str, value: &str) -> Result<(), Error> {
-    let value = HeaderValue::from_str(value).map_err(|e| {
-        RestError::Configuration(format!("invalid header value for {name}: {e}"))
-    })?;
+    let value = HeaderValue::from_str(value)
+        .map_err(|e| RestError::Configuration(format!("invalid header value for {name}: {e}")))?;
     headers.insert(HeaderName::from_static(name), value);
     Ok(())
 }

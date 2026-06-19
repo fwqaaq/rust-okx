@@ -15,7 +15,7 @@ fn signed_client(mock: MockTransport) -> OkxClient<MockTransport> {
 
 #[tokio::test]
 async fn missing_credentials_is_configuration_error() {
-    let mock = MockTransport::new("{}");
+    let mock = MockTransport::new(r#"{}"#);
     let client = OkxClient::with_transport(mock).build();
     let err = client.account().get_balance(None).await.unwrap_err();
     assert!(matches!(

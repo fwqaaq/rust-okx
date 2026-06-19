@@ -5,12 +5,21 @@ use crate::{Error, OkxClient};
 #[tokio::test]
 async fn get_instruments_builds_request_and_parses() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "instType":"SPOT","instId":"BTC-USDT","uly":"","instFamily":"",
-        "baseCcy":"BTC","quoteCcy":"USDT","settleCcy":"","ctVal":"","ctMult":"",
-        "ctValCcy":"","optType":"","stk":"","listTime":"1606468572000","expTime":"",
-        "lever":"10","tickSz":"0.1","lotSz":"0.00000001","minSz":"0.00001",
-        "ctType":"","state":"live","maxLmtSz":"9999999999","maxMktSz":"1000000",
-        "maxLmtAmt":"20000000","maxMktAmt":"1000000","ruleType":"normal","riskLimitType":""}]}"#;
+        "alias":"","auctionEndTime":"","baseCcy":"BTC","category":"1",
+        "ctMult":"","ctType":"","ctVal":"","ctValCcy":"",
+        "contTdSwTime":"1704876947000","expTime":"","futureSettlement":false,
+        "groupId":"1","instFamily":"","instId":"BTC-USDT","instType":"SPOT",
+        "lever":"10","listTime":"1606468572000","lotSz":"0.00000001",
+        "maxIcebergSz":"9999999999.0000000000000000","maxLmtAmt":"1000000",
+        "maxLmtSz":"9999999999","maxMktAmt":"1000000","maxMktSz":"",
+        "maxStopSz":"","maxTriggerSz":"9999999999.0000000000000000",
+        "maxTwapSz":"9999999999.0000000000000000","minSz":"0.00001",
+        "optType":"","openType":"call_auction","preMktSwTime":"",
+        "quoteCcy":"USDT","tradeQuoteCcyList":["USDT"],"settleCcy":"",
+        "state":"live","ruleType":"normal","stk":"","tickSz":"0.1","uly":"",
+        "instIdCode":1000000000,"instCategory":"1",
+        "upcChg":[{"param":"tickSz","newValue":"0.0001","effTime":"1704876947000"}]
+    }]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -36,7 +45,7 @@ async fn get_instruments_builds_request_and_parses() {
 
 #[tokio::test]
 async fn get_system_time_parses_time() {
-    let body = r#"{"code":"0","msg":"","data":[{"ts":"1597026383085","sysTime":""}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -52,7 +61,7 @@ async fn get_system_time_parses_time() {
 #[tokio::test]
 async fn get_open_interest_uses_family_request() {
     let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"SWAP","instId":"BTC-USDT-SWAP","oi":"10","oiCcy":"1","ts":"1597026383085"}]}"#;
+            {"instType":"SWAP","instId":"BTC-USDT-SWAP","oi":"5000","oiCcy":"555.55","oiUsd":"50000","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
     let request = super::InstrumentFamilyRequest::new(InstType::Swap).inst_id("BTC-USDT-SWAP");
@@ -62,10 +71,11 @@ async fn get_open_interest_uses_family_request() {
         .get_open_interest(&request)
         .await
         .unwrap();
-    assert_eq!(rows[0].oi.as_str(), "10");
+    assert_eq!(rows[0].oi.as_str(), "5000");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SWAP&instId=BTC-USDT-SWAP"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -85,13 +95,18 @@ async fn get_funding_rate_queries_instrument() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instId=BTC-USDT-SWAP"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
 async fn get_funding_rate_history_uses_builder_query() {
     let body = r#"{"code":"0","msg":"","data":[
-            {"instId":"BTC-USDT-SWAP","fundingRate":"0.0001","realizedRate":"0.0001",
-             "fundingTime":"1597026383085","method":"current_period"}]}"#;
+            {"formulaType":"noRate","fundingRate":"0.0000746604960499",
+             "fundingTime":"1703059200000","instId":"BTC-USD-SWAP","instType":"SWAP",
+             "method":"next_period","realizedRate":"0.0000746572360545"},
+            {"formulaType":"noRate","fundingRate":"0.000227985782722",
+             "fundingTime":"1703030400000","instId":"BTC-USD-SWAP","instType":"SWAP",
+             "method":"next_period","realizedRate":"0.0002279755647389"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
     let request = super::FundingRateHistoryRequest::new("BTC-USDT-SWAP")
@@ -103,17 +118,18 @@ async fn get_funding_rate_history_uses_builder_query() {
         .get_funding_rate_history(&request)
         .await
         .unwrap();
-    assert_eq!(rows[0].method, "current_period");
+    assert_eq!(rows[0].method, "next_period");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instId=BTC-USDT-SWAP&before=10&limit=1"));
     assert!(!req.query().unwrap().contains("after"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
 async fn get_price_limit_queries_instrument() {
     let body = r#"{"code":"0","msg":"","data":[
-            {"instId":"BTC-USDT-SWAP","buyLmt":"45000","sellLmt":"39000","ts":"1597026383085"}]}"#;
+            {"instType":"SWAP","instId":"BTC-USDT-SWAP","buyLmt":"17057.9","sellLmt":"16388.9","ts":"1597026383085","enabled":true}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -122,25 +138,27 @@ async fn get_price_limit_queries_instrument() {
         .get_price_limit("BTC-USDT-SWAP")
         .await
         .unwrap();
-    assert_eq!(rows[0].buy_lmt.as_str(), "45000");
+    assert_eq!(rows[0].buy_lmt.as_str(), "17057.9");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instId=BTC-USDT-SWAP"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
 async fn get_mark_price_uses_family_request() {
     let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"SWAP","instId":"BTC-USDT-SWAP","markPx":"42000","ts":"1597026383085"}]}"#;
+            {"instType":"SWAP","instId":"BTC-USDT-SWAP","markPx":"200","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
     let request = super::InstrumentFamilyRequest::new(InstType::Swap).inst_family("BTC-USDT");
 
     let rows = client.public_data().get_mark_price(&request).await.unwrap();
-    assert_eq!(rows[0].mark_px.as_str(), "42000");
+    assert_eq!(rows[0].mark_px.as_str(), "200");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SWAP&instFamily=BTC-USDT"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -162,6 +180,7 @@ async fn get_delivery_exercise_history_uses_builder_query() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=FUTURES&uly=BTC-USD&limit=1"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -182,6 +201,7 @@ async fn get_position_tiers_uses_builder_query() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SWAP&tdMode=cross&tier=1"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -199,6 +219,7 @@ async fn get_underlying_queries_inst_type() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SWAP"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -223,6 +244,7 @@ async fn get_insurance_fund_uses_builder_query() {
         req.query(),
         Some("instType=SWAP&type=regular_update&ccy=USDT")
     );
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -247,6 +269,7 @@ async fn get_convert_contract_coin_uses_builder_query() {
         req.query(),
         Some("type=1&instId=BTC-USDT-SWAP&sz=1&px=42000&unit=coin")
     );
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -263,13 +286,15 @@ async fn get_option_summary_uses_typed_query() {
         .await
         .unwrap();
     assert_eq!(rows[0].inst_family, "BTC-USD");
-    assert_eq!(mock.captured().query(), Some("instFamily=BTC-USD"));
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instFamily=BTC-USD"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
 async fn get_estimated_price_queries_inst_id() {
     let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"FUTURES","instId":"BTC-USD-240628","settlePx":"42000","ts":"1597026383085"}]}"#;
+            {"instType":"FUTURES","instId":"BTC-USDT-201227","settlePx":"200","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -278,15 +303,19 @@ async fn get_estimated_price_queries_inst_id() {
         .get_estimated_price("BTC-USD-240628")
         .await
         .unwrap();
-    assert_eq!(rows[0].settle_px.as_str(), "42000");
-    assert_eq!(mock.captured().query(), Some("instId=BTC-USD-240628"));
+    assert_eq!(rows[0].settle_px.as_str(), "200");
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instId=BTC-USD-240628"));
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
 async fn get_discount_rate_interest_free_quota_omits_currency() {
-    let body = r#"{"code":"0","msg":"","data":[{
-        "ccy":"BTC","amt":"0",
-        "discountLv":[{"discountRate":"0.9","maxAmt":"20000","minAmt":"0"}]}]}"#;
+    let body = r#"{"code":"0","data":[{
+        "amt":"0","ccy":"BTC","collateralRestrict":false,
+        "details":[{"discountRate":"0.98","liqPenaltyRate":"0.02","maxAmt":"20","minAmt":"0","tier":"1","disCcyEq":"1000"},
+                   {"discountRate":"0.9775","liqPenaltyRate":"0.0225","maxAmt":"25","minAmt":"20","tier":"2","disCcyEq":"2000"}],
+        "discountLv":"1","minDiscountRate":"0"}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -300,6 +329,7 @@ async fn get_discount_rate_interest_free_quota_omits_currency() {
 
     let req = mock.captured();
     assert_eq!(req.query(), None);
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -315,7 +345,9 @@ async fn public_edge_requests_use_typed_queries() {
         .await
         .unwrap();
     assert_eq!(rows[0].inst_family, "BTC-USD");
-    assert_eq!(mock.captured().query(), Some("instType=OPTION"));
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instType=OPTION"));
+    assert!(!req.is_signed());
 
     let trade_body = r#"{"code":"0","msg":"","data":[
         {"instId":"BTC-USD-240628-50000-C","tradeId":"1","px":"10","sz":"1","side":"buy","ts":"1"}]}"#;
@@ -327,7 +359,9 @@ async fn public_edge_requests_use_typed_queries() {
         .get_option_trades(&request)
         .await
         .unwrap();
-    assert_eq!(mock.captured().query(), Some("instFamily=BTC-USD"));
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instFamily=BTC-USD"));
+    assert!(!req.is_signed());
 
     let history_body = r#"{"code":"0","msg":"","data":[
         {"module":"1","instType":"SPOT","instId":"BTC-USDT","dateAggrType":"1D","value":"1","ts":"1"}]}"#;
@@ -343,10 +377,12 @@ async fn public_edge_requests_use_typed_queries() {
         .get_market_data_history(&request)
         .await
         .unwrap();
+    let req = mock.captured();
     assert_eq!(
-        mock.captured().query(),
+        req.query(),
         Some("module=1&instType=SPOT&instIdList=BTC-USDT&dateAggrType=1D")
     );
+    assert!(!req.is_signed());
 }
 
 #[tokio::test]
@@ -396,8 +432,8 @@ fn public_quota_array_fields_accept_empty_string_or_null() {
 
 #[test]
 fn array_or_empty_string_rejects_non_empty_strings() {
-    let error = serde_json::from_str::<super::DiscountRateInterestFreeQuota>(
-        r#"{"ccy":"USDT","amt":"0","discountLv":"not-an-array"}"#,
+    let error = serde_json::from_str::<super::InstrumentTickBand>(
+        r#"{"instType":"OPTION","instFamily":"BTC-USD","tickBand":"not-an-array","ts":"1"}"#,
     )
     .expect_err("a non-empty string must not silently decode as an empty array");
 

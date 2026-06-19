@@ -1,13 +1,16 @@
 use crate::model::{OrderSide, OrderType, PositionSide, TradeMode};
 use crate::test_util::MockTransport;
 
-use super::super::{AmendOrderRequest, CancelOrderRequest, ClosePositionRequest, PlaceOrderRequest};
+use super::super::{
+    AmendOrderRequest, CancelOrderRequest, ClosePositionRequest, PlaceOrderRequest,
+};
 use super::signed_client;
 
 #[tokio::test]
 async fn place_order_posts_signed_json_body() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "clOrdId":"b15","ordId":"312269865356374016","tag":"","sCode":"0","sMsg":"","ts":"1597026383085"}]}"#;
+        "clOrdId":"oktswap6","ordId":"312269865356374016","tag":"","ts":"1695190491421",
+        "sCode":"0","sMsg":"","subCode":""}],"inTime":"1695190491421339","outTime":"1695190491423240"}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = PlaceOrderRequest::new(
@@ -42,8 +45,11 @@ async fn place_order_posts_signed_json_body() {
 #[tokio::test]
 async fn place_multiple_orders_posts_array_body() {
     let body = r#"{"code":"0","msg":"","data":[
-        {"clOrdId":"b15","ordId":"312269865356374016","tag":"","sCode":"0","sMsg":""},
-        {"clOrdId":"b16","ordId":"312269865356374017","tag":"","sCode":"0","sMsg":""}]}"#;
+        {"clOrdId":"oktswap6","ordId":"12345689","tag":"","ts":"1695190491421",
+         "sCode":"0","sMsg":"","subCode":""},
+        {"clOrdId":"oktswap7","ordId":"12344","tag":"","ts":"1695190491421",
+         "sCode":"0","sMsg":"","subCode":""}],
+        "inTime":"1695190491421339","outTime":"1695190491423240"}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let requests = vec![
@@ -72,7 +78,7 @@ async fn place_multiple_orders_posts_array_body() {
         .place_multiple_orders(&requests)
         .await
         .unwrap();
-    assert_eq!(result[1].ord_id, "312269865356374017");
+    assert_eq!(result[1].ord_id, "12344");
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::POST);
@@ -86,7 +92,8 @@ async fn place_multiple_orders_posts_array_body() {
 #[tokio::test]
 async fn cancel_order_posts_ids() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "clOrdId":"b15","ordId":"312269865356374016","sCode":"0","sMsg":""}]}"#;
+        "clOrdId":"oktswap6","ordId":"12345689","ts":"1695190491421","sCode":"0","sMsg":""}],
+        "inTime":"1695190491421339","outTime":"1695190491423240"}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
@@ -95,22 +102,28 @@ async fn cancel_order_posts_ids() {
         .cancel_order("BTC-USDT", "312269865356374016")
         .await
         .unwrap();
-    assert_eq!(result[0].ord_id, "312269865356374016");
+    assert_eq!(result[0].ord_id, "12345689");
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::POST);
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["instId"], "BTC-USDT");
     assert_eq!(sent["ordId"], "312269865356374016");
+    assert!(req.is_signed());
 }
 
 #[tokio::test]
 async fn cancel_multiple_orders_posts_array_body() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "clOrdId":"b15","ordId":"312269865356374016","sCode":"0","sMsg":""}]}"#;
+        "clOrdId":"oktswap6","ordId":"12345689","ts":"1695190491421","sCode":"0","sMsg":""},
+        {"clOrdId":"oktswap7","ordId":"12344","ts":"1695190491421","sCode":"0","sMsg":""}],
+        "inTime":"1695190491421339","outTime":"1695190491423240"}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let requests = vec![CancelOrderRequest::by_order_id("BTC-USDT", "312269865356374016")];
+    let requests = vec![CancelOrderRequest::by_order_id(
+        "BTC-USDT",
+        "312269865356374016",
+    )];
 
     let result = client
         .trade()
@@ -131,7 +144,8 @@ async fn cancel_multiple_orders_posts_array_body() {
 #[tokio::test]
 async fn amend_order_posts_builder_body() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "clOrdId":"b15","ordId":"312269865356374016","reqId":"r1","sCode":"0","sMsg":""}]}"#;
+        "clOrdId":"","ordId":"12344","ts":"1695190491421","reqId":"b12344",
+        "sCode":"0","sMsg":"","subCode":""}],"inTime":"1695190491421339","outTime":"1695190491423240"}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = AmendOrderRequest::new("BTC-USDT")
@@ -140,7 +154,7 @@ async fn amend_order_posts_builder_body() {
         .new_price("59300");
 
     let result = client.trade().amend_order(&request).await.unwrap();
-    assert_eq!(result[0].req_id, "r1");
+    assert_eq!(result[0].req_id, "b12344");
 
     let req = mock.captured();
     assert!(req.uri.ends_with("/api/v5/trade/amend-order"));
@@ -155,12 +169,17 @@ async fn amend_order_posts_builder_body() {
 #[tokio::test]
 async fn amend_multiple_orders_posts_array_body() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "clOrdId":"b15","ordId":"312269865356374016","reqId":"r1","sCode":"0","sMsg":""}]}"#;
+        "clOrdId":"oktswap6","ordId":"12345689","ts":"1695190491421","reqId":"b12344",
+        "sCode":"0","sMsg":"","subCode":""},
+        {"clOrdId":"oktswap7","ordId":"12344","ts":"1695190491421","reqId":"b12344",
+        "sCode":"0","sMsg":"","subCode":""}],"inTime":"1695190491421339","outTime":"1695190491423240"}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let requests = vec![AmendOrderRequest::new("BTC-USDT")
-        .client_order_id("b15")
-        .new_size("0.2")];
+    let requests = vec![
+        AmendOrderRequest::new("BTC-USDT")
+            .client_order_id("b15")
+            .new_size("0.2"),
+    ];
 
     let result = client
         .trade()

@@ -84,11 +84,7 @@ async fn get_deposit_address_queries_required_currency() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client
-        .funding()
-        .get_deposit_address("USDT")
-        .await
-        .unwrap();
+    let rows = client.funding().get_deposit_address("USDT").await.unwrap();
     assert_eq!(rows[0].ccy, "USDT");
     assert_eq!(rows[0].chain, "USDT-TRC20");
     assert!(rows[0].selected);
@@ -107,11 +103,7 @@ async fn get_asset_valuation_omits_currency_when_absent() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client
-        .funding()
-        .get_asset_valuation(None)
-        .await
-        .unwrap();
+    let rows = client.funding().get_asset_valuation(None).await.unwrap();
     assert_eq!(rows[0].total_bal.as_str(), "1700");
     assert_eq!(rows[0].details.funding.as_str(), "500");
 

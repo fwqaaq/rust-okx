@@ -1,7 +1,7 @@
 //! Standard Trade WebSocket operations.
 
-use crate::api::trade::{AmendOrderRequest, CancelOrderRequest, PlaceOrderRequest};
 use crate::Error;
+use crate::api::trade::{AmendOrderRequest, CancelOrderRequest, PlaceOrderRequest};
 use crate::ws::client::OkxWs;
 use crate::ws::conn::WsConnector;
 use crate::ws::request::MassCancelRequest;
@@ -15,7 +15,8 @@ impl<C: WsConnector> OkxWs<C> {
         id: impl Into<String>,
         request: &PlaceOrderRequest,
     ) -> Result<(), Error> {
-        self.send_request(id, "order", std::slice::from_ref(request)).await
+        self.send_request(id, "order", std::slice::from_ref(request))
+            .await
     }
 
     /// Send `batch-orders` to place multiple orders over WebSocket.
@@ -37,7 +38,8 @@ impl<C: WsConnector> OkxWs<C> {
         id: impl Into<String>,
         request: &CancelOrderRequest,
     ) -> Result<(), Error> {
-        self.send_request(id, "cancel-order", std::slice::from_ref(request)).await
+        self.send_request(id, "cancel-order", std::slice::from_ref(request))
+            .await
     }
 
     /// Send `batch-cancel-orders` to cancel multiple orders over WebSocket.
@@ -59,7 +61,8 @@ impl<C: WsConnector> OkxWs<C> {
         id: impl Into<String>,
         request: &AmendOrderRequest,
     ) -> Result<(), Error> {
-        self.send_request(id, "amend-order", std::slice::from_ref(request)).await
+        self.send_request(id, "amend-order", std::slice::from_ref(request))
+            .await
     }
 
     /// Send `batch-amend-orders` to amend multiple orders over WebSocket.

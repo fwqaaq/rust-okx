@@ -1,7 +1,7 @@
 use http::Method;
 
-use crate::test_util::MockTransport;
 use crate::Error;
+use crate::test_util::MockTransport;
 
 use super::super::{
     StakingDefiActiveOrdersRequest, StakingDefiCancelRequest, StakingDefiInvestment,
@@ -136,7 +136,9 @@ async fn get_orders_history_sends_signed_query() {
     let body = r#"{"code":"0","msg":"","data":[{"ordId":"1","productId":"1234","protocolType":"defi","ccy":"USDT","amt":"100","state":"5","term":"0","apy":"0.08","cTime":"1597026383085","uTime":"1597026383086"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = StakingDefiOrderHistoryRequest::new().protocol_type("defi").limit(5);
+    let request = StakingDefiOrderHistoryRequest::new()
+        .protocol_type("defi")
+        .limit(5);
 
     let rows = client
         .finance()

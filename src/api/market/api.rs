@@ -135,7 +135,7 @@ impl<'a, T: Transport> Market<'a, T> {
     pub async fn get_index_candlesticks(
         &self,
         request: &CandlesticksRequest,
-    ) -> Result<Vec<Candle>, Error> {
+    ) -> Result<Vec<IndexCandle>, Error> {
         self.client.get(INDEX_CANDLES, request, false).await
     }
 
@@ -149,7 +149,7 @@ impl<'a, T: Transport> Market<'a, T> {
     pub async fn get_mark_price_candlesticks(
         &self,
         request: &CandlesticksRequest,
-    ) -> Result<Vec<Candle>, Error> {
+    ) -> Result<Vec<IndexCandle>, Error> {
         self.client.get(MARK_PRICE_CANDLES, request, false).await
     }
 
@@ -258,7 +258,7 @@ impl<'a, T: Transport> Market<'a, T> {
     pub async fn get_option_instrument_family_trades(
         &self,
         inst_family: &str,
-    ) -> Result<Vec<OptionInstrumentFamilyTrade>, Error> {
+    ) -> Result<Vec<OptionFamilyTradeGroup>, Error> {
         let query = InstFamilyQuery { inst_family };
         self.client
             .get(OPTION_INSTRUMENT_FAMILY_TRADES, &query, false)

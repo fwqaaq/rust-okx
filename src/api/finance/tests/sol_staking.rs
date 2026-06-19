@@ -1,7 +1,7 @@
 use http::Method;
 
-use crate::test_util::MockTransport;
 use crate::OkxClient;
+use crate::test_util::MockTransport;
 
 use super::super::FinanceHistoryRequest;
 use super::signed_client;
@@ -24,7 +24,10 @@ async fn sol_product_info_is_authenticated() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
-    assert!(req.uri.ends_with("/api/v5/finance/staking-defi/sol/product-info"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/staking-defi/sol/product-info")
+    );
     assert_eq!(req.query(), None);
     assert!(req.is_signed());
 }
@@ -41,7 +44,10 @@ async fn sol_purchase_posts_signed_body() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::POST);
-    assert!(req.uri.ends_with("/api/v5/finance/staking-defi/sol/purchase"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/staking-defi/sol/purchase")
+    );
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["amt"], "1");
     assert!(req.is_signed());
@@ -76,7 +82,10 @@ async fn sol_balance_sends_signed_request() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
-    assert!(req.uri.ends_with("/api/v5/finance/staking-defi/sol/balance"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/staking-defi/sol/balance")
+    );
     assert_eq!(req.query(), None);
     assert!(req.is_signed());
 }
@@ -105,7 +114,8 @@ async fn sol_purchase_redeem_history_uses_builder_query() {
 
 #[tokio::test]
 async fn sol_apy_history_is_not_signed() {
-    let body = r#"{"code":"0","msg":"","data":[{"ccy":"SOL","apy":"0.0557","ts":"1597026383085"}]}"#;
+    let body =
+        r#"{"code":"0","msg":"","data":[{"ccy":"SOL","apy":"0.0557","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 

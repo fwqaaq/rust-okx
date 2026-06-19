@@ -43,6 +43,12 @@ pub struct Ticker {
     /// Trading volume (quote ccy) over the last 24 hours.
     #[serde(default)]
     pub vol_ccy24h: NumberString,
+    /// Opening price (UTC 0).
+    #[serde(default)]
+    pub sod_utc0: NumberString,
+    /// Opening price (UTC 8).
+    #[serde(default)]
+    pub sod_utc8: NumberString,
     /// Ticker timestamp (Unix milliseconds).
     pub ts: NumberString,
 }
@@ -66,6 +72,12 @@ pub struct IndexTicker {
     /// Lowest price over the last 24 hours.
     #[serde(default)]
     pub low24h: NumberString,
+    /// Opening price (UTC 0).
+    #[serde(default)]
+    pub sod_utc0: NumberString,
+    /// Opening price (UTC 8).
+    #[serde(default)]
+    pub sod_utc8: NumberString,
     /// Timestamp (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
@@ -73,6 +85,7 @@ pub struct IndexTicker {
 
 /// An order book snapshot.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct OrderBook {
     /// Ask levels, sorted from best (lowest) price.
@@ -188,6 +201,9 @@ pub struct MarketTrade {
     /// Trade side (`buy` or `sell`).
     #[serde(default)]
     pub side: String,
+    /// Trade source.
+    #[serde(default)]
+    pub source: String,
     /// Trade timestamp (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
@@ -240,6 +256,12 @@ pub struct BlockTicker {
     /// Trading volume in currency units over the last 24 hours, when present.
     #[serde(default)]
     pub vol_ccy24h: NumberString,
+    /// Opening price (UTC 0), when present.
+    #[serde(default)]
+    pub sod_utc0: NumberString,
+    /// Opening price (UTC 8), when present.
+    #[serde(default)]
+    pub sod_utc8: NumberString,
     /// Ticker timestamp (Unix milliseconds), when present.
     #[serde(default)]
     pub ts: NumberString,
@@ -335,4 +357,61 @@ pub struct ExchangeRate {
     /// USD/CNY rate.
     #[serde(default)]
     pub usd_cny: NumberString,
+}
+
+/// A single candlestick bar for index/mark-price endpoints (6-element array).
+#[derive(Debug, Clone, Deserialize)]
+#[serde(from = "IndexCandleRaw")]
+#[non_exhaustive]
+pub struct IndexCandle {
+    /// Opening timestamp (Unix milliseconds).
+    pub ts: NumberString,
+    /// Open price.
+    pub open: NumberString,
+    /// Highest price.
+    pub high: NumberString,
+    /// Lowest price.
+    pub low: NumberString,
+    /// Close price.
+    pub close: NumberString,
+    /// `1` if the bar is closed/confirmed, `0` otherwise.
+    pub confirm: NumberString,
+}
+
+type IndexCandleRaw = (
+    NumberString,
+    NumberString,
+    NumberString,
+    NumberString,
+    NumberString,
+    NumberString,
+);
+
+impl From<IndexCandleRaw> for IndexCandle {
+    fn from(raw: IndexCandleRaw) -> Self {
+        Self {
+            ts: raw.0,
+            open: raw.1,
+            high: raw.2,
+            low: raw.3,
+            close: raw.4,
+            confirm: raw.5,
+        }
+    }
+}
+
+/// Grouped option trades returned by the instrument-family-trades endpoint.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct OptionFamilyTradeGroup {
+    /// 24-hour volume.
+    #[serde(default)]
+    pub vol24h: NumberString,
+    /// Option type (`C` or `P`).
+    #[serde(default)]
+    pub opt_type: String,
+    /// Individual trades within this group.
+    #[serde(default)]
+    pub trade_info: Vec<OptionInstrumentFamilyTrade>,
 }

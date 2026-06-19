@@ -3,8 +3,8 @@
 use serde::Serialize;
 
 use crate::model::{
-    RequestValidationError, ValidateRequest, at_least_one, non_empty, one_of,
-    optional_non_empty, positive_decimal_string, validate_client_request_id,
+    RequestValidationError, ValidateRequest, at_least_one, non_empty, one_of, optional_non_empty,
+    positive_decimal_string, validate_client_request_id,
 };
 
 fn optional_signed_decimal_string(
@@ -187,11 +187,17 @@ impl AmendSpreadOrderRequest {
 
 impl ValidateRequest for AmendSpreadOrderRequest {
     fn validate(&self) -> Result<(), RequestValidationError> {
-        at_least_one("ordId, clOrdId", &[self.ord_id.is_some(), self.cl_ord_id.is_some()])?;
+        at_least_one(
+            "ordId, clOrdId",
+            &[self.ord_id.is_some(), self.cl_ord_id.is_some()],
+        )?;
         optional_non_empty("ordId", self.ord_id.as_deref())?;
         validate_client_request_id("clOrdId", self.cl_ord_id.as_deref())?;
         validate_client_request_id("reqId", self.req_id.as_deref())?;
-        at_least_one("newSz, newPx", &[self.new_sz.is_some(), self.new_px.is_some()])?;
+        at_least_one(
+            "newSz, newPx",
+            &[self.new_sz.is_some(), self.new_px.is_some()],
+        )?;
         if let Some(value) = self.new_sz.as_deref() {
             positive_decimal_string("newSz", value)?;
         }
@@ -238,7 +244,10 @@ impl CancelSpreadOrderRequest {
 
 impl ValidateRequest for CancelSpreadOrderRequest {
     fn validate(&self) -> Result<(), RequestValidationError> {
-        at_least_one("ordId, clOrdId", &[self.ord_id.is_some(), self.cl_ord_id.is_some()])?;
+        at_least_one(
+            "ordId, clOrdId",
+            &[self.ord_id.is_some(), self.cl_ord_id.is_some()],
+        )?;
         optional_non_empty("ordId", self.ord_id.as_deref())?;
         validate_client_request_id("clOrdId", self.cl_ord_id.as_deref())?;
         Ok(())
@@ -285,14 +294,9 @@ mod tests {
 
     #[test]
     fn serializes_documented_place_order_example() {
-        let request = PlaceSpreadOrderRequest::new(
-            "BTC-USDT_BTC-USDT-SWAP",
-            "buy",
-            "limit",
-            "2",
-        )
-        .client_order_id("b15")
-        .price("2.15");
+        let request = PlaceSpreadOrderRequest::new("BTC-USDT_BTC-USDT-SWAP", "buy", "limit", "2")
+            .client_order_id("b15")
+            .price("2.15");
         request.validate().unwrap();
         let value = serde_json::to_value(request).unwrap();
         assert_eq!(value["sprdId"], "BTC-USDT_BTC-USDT-SWAP");
@@ -302,8 +306,13 @@ mod tests {
 
     #[test]
     fn rejects_incomplete_amend_request() {
-        let error = AmendSpreadOrderRequest::by_order_id("1").validate().unwrap_err();
-        assert!(matches!(error, RequestValidationError::AtLeastOneRequired { .. }));
+        let error = AmendSpreadOrderRequest::by_order_id("1")
+            .validate()
+            .unwrap_err();
+        assert!(matches!(
+            error,
+            RequestValidationError::AtLeastOneRequired { .. }
+        ));
     }
 
     #[test]

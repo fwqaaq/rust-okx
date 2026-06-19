@@ -23,7 +23,10 @@ async fn savings_balance_sends_signed_query() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
-    assert!(req.uri.ends_with("/api/v5/finance/savings/balance?ccy=USDT"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/savings/balance?ccy=USDT")
+    );
     assert!(req.is_signed());
 }
 
@@ -45,7 +48,10 @@ async fn purchase_redemption_posts_signed_body() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::POST);
-    assert!(req.uri.ends_with("/api/v5/finance/savings/purchase-redempt"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/savings/purchase-redempt")
+    );
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["ccy"], "USDT");
     assert_eq!(sent["amt"], "1");
@@ -71,7 +77,10 @@ async fn set_lending_rate_posts_signed_body() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::POST);
-    assert!(req.uri.ends_with("/api/v5/finance/savings/set-lending-rate"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/savings/set-lending-rate")
+    );
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["ccy"], "USDT");
     assert_eq!(sent["rate"], "0.02");
@@ -139,7 +148,10 @@ async fn get_public_borrow_info_omits_currency_when_absent() {
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
-    assert!(req.uri.ends_with("/api/v5/finance/savings/lending-rate-summary"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/finance/savings/lending-rate-summary")
+    );
     assert_eq!(req.query(), None);
     assert!(!req.is_signed(), "public endpoint must not be signed");
 }

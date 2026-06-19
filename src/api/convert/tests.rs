@@ -145,12 +145,12 @@ fn typed_requests_validate_documented_constraints() {
 
 #[tokio::test]
 async fn get_currencies_sends_no_query_string() {
-    let body = r#"{"code":"0","msg":"","data":[{"ccy":"BTC","name":"Bitcoin","logoLink":"https://static.okx.com/cdn/wallet/logo/BTC.png","tag":""}]}"#;
+    let body = r#"{"code":"0","data":[{"min":"","max":"","ccy":"BTC"},{"min":"","max":"","ccy":"ETH"}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
     let rows = client.convert().get_currencies().await.unwrap();
-    assert_eq!(rows.len(), 1);
+    assert_eq!(rows.len(), 2);
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
@@ -180,13 +180,13 @@ async fn get_currency_pair_sends_signed_typed_query() {
 
 #[tokio::test]
 async fn estimate_quote_posts_exact_typed_body() {
-    let body = r#"{"code":"0","msg":"","data":[{"baseCcy":"BTC","baseSz":"0.00003","clQReqId":"","cnvtPx":"30000","origRfqSz":"1","quoteCcy":"USDT","quoteId":"q1","quoteSz":"1","quoteTime":"1646188510461","rfqSz":"1","rfqSzCcy":"USDT","side":"buy","ttlMs":"10000"}]}"#;
+    let body = r#"{"code":"0","data":[{"baseCcy":"ETH","baseSz":"0.01023052","clQReqId":"","cnvtPx":"2932.40104429","origRfqSz":"30","quoteCcy":"USDT","quoteId":"quoterETH-USDT16461885104612381","quoteSz":"30","quoteTime":"1646188510461","rfqSz":"30","rfqSzCcy":"USDT","side":"buy","ttlMs":"10000"}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = ConvertQuoteRequest::new("BTC", "USDT", OrderSide::Buy, "1", "USDT");
 
     let rows = client.convert().estimate_quote(&request).await.unwrap();
-    assert_eq!(rows[0].quote_id, "q1");
+    assert_eq!(rows[0].quote_id, "quoterETH-USDT16461885104612381");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::POST);
@@ -206,13 +206,13 @@ async fn estimate_quote_posts_exact_typed_body() {
 
 #[tokio::test]
 async fn convert_trade_posts_exact_typed_body() {
-    let body = r#"{"code":"0","msg":"","data":[{"baseCcy":"BTC","clTReqId":"","fillBaseSz":"0.00003","fillPx":"30000","fillQuoteSz":"1","instId":"BTC-USDT","quoteCcy":"USDT","quoteId":"q1","side":"buy","state":"fullyFilled","tradeId":"1","ts":"1646188520338"}]}"#;
+    let body = r#"{"code":"0","data":[{"baseCcy":"ETH","clTReqId":"","fillBaseSz":"0.01023052","fillPx":"2932.40104429","fillQuoteSz":"30","instId":"ETH-USDT","quoteCcy":"USDT","quoteId":"quoterETH-USDT16461885104612381","side":"buy","state":"fullyFilled","tradeId":"trader16461885203381437","ts":"1646188520338"}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = ConvertTradeRequest::new("q1", "BTC", "USDT", OrderSide::Buy, "1", "USDT");
 
     let rows = client.convert().convert_trade(&request).await.unwrap();
-    assert_eq!(rows[0].trade_id, "1");
+    assert_eq!(rows[0].trade_id, "trader16461885203381437");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::POST);
@@ -247,7 +247,7 @@ async fn invalid_request_fails_before_transport() {
 
 #[tokio::test]
 async fn get_convert_history_sends_typed_query() {
-    let body = r#"{"code":"0","msg":"","data":[{"clTReqId":"","instId":"BTC-USDT","side":"buy","fillPx":"30000","baseCcy":"BTC","quoteCcy":"USDT","fillBaseSz":"0.00003","state":"fullyFilled","tradeId":"1","fillQuoteSz":"1","ts":"1646188520000"}]}"#;
+    let body = r#"{"code":"0","data":[{"clTReqId":"","instId":"ETH-USDT","side":"buy","fillPx":"2932.401044","baseCcy":"ETH","quoteCcy":"USDT","fillBaseSz":"0.01023052","state":"fullyFilled","tradeId":"trader16461885203381437","fillQuoteSz":"30","ts":"1646188520000"}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = ConvertHistoryRequest::new().limit(1);
@@ -257,7 +257,7 @@ async fn get_convert_history_sends_typed_query() {
         .get_convert_history(&request)
         .await
         .unwrap();
-    assert_eq!(rows[0].trade_id, "1");
+    assert_eq!(rows[0].trade_id, "trader16461885203381437");
     assert_eq!(rows[0].state, ConvertTradeState::FullyFilled);
 
     let req = mock.captured();
