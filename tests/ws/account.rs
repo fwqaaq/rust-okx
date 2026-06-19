@@ -1,35 +1,12 @@
-//! Integration test for the private `account` WebSocket channel.
-//!
-//! Run with:
-//! ```
-//! OKX_DEMO=1 cargo test -F websocket --test ws_account -- --ignored
-//! ```
-//!
-//! Required env vars (or `.env` file): `OKX_API_KEY`, `OKX_API_SECRET`, `OKX_PASSPHRASE`.
-//! `OKX_DEMO` defaults to `1` (demo trading) for safety.
-
-#![cfg(feature = "websocket")]
+//! Integration tests for the private `account` WebSocket channel.
 
 use std::time::Duration;
 
 use rust_okx::ws::channels::account;
 use rust_okx::ws::model::AccountUpdate;
-use rust_okx::{Credentials, OkxWs, WsEvent};
+use rust_okx::{OkxWs, WsEvent};
 
-fn credentials() -> Option<Credentials> {
-    let _ = dotenvy::dotenv();
-    Some(Credentials::new(
-        std::env::var("OKX_API_KEY").ok()?,
-        std::env::var("OKX_API_SECRET").ok()?,
-        std::env::var("OKX_PASSPHRASE").ok()?,
-    ))
-}
-
-fn is_demo() -> bool {
-    std::env::var("OKX_DEMO")
-        .map(|v| v != "0" && v != "false")
-        .unwrap_or(true)
-}
+use super::common::credentials;
 
 /// Verifies the full private WebSocket flow for the `account` channel:
 /// connect → auto-login → subscribe → receive snapshot push → parse rows.
@@ -37,18 +14,13 @@ fn is_demo() -> bool {
 /// OKX always sends a snapshot on subscribe, so this test passes regardless
 /// of whether the account holds any USDT balance.
 #[tokio::test]
-#[ignore = "requires OKX_API_KEY / OKX_API_SECRET / OKX_PASSPHRASE env vars"]
 async fn account_login_subscribe_and_parse() {
     let Some(creds) = credentials() else {
         eprintln!("skipping: OKX credentials not set");
         return;
     };
 
-    let demo = is_demo();
-    eprintln!("connecting (demo={})", demo);
-
     let mut ws = OkxWs::private(creds)
-        .demo_trading(demo)
         .connect()
         .await
         .expect("connect to OKX WebSocket");

@@ -1,35 +1,12 @@
-//! Integration test for the private `positions` WebSocket channel.
-//!
-//! Run with:
-//! ```
-//! OKX_DEMO=1 cargo test -F websocket --test ws_positions -- --ignored
-//! ```
-//!
-//! Required env vars (or `.env` file): `OKX_API_KEY`, `OKX_API_SECRET`, `OKX_PASSPHRASE`.
-//! `OKX_DEMO` defaults to `1` (demo trading) for safety.
-
-#![cfg(feature = "websocket")]
+//! Integration tests for the private `positions` WebSocket channel.
 
 use std::time::Duration;
 
 use rust_okx::ws::channels::account;
 use rust_okx::ws::model::PositionUpdate;
-use rust_okx::{Credentials, OkxWs, WsEvent};
+use rust_okx::{OkxWs, WsEvent};
 
-fn credentials() -> Option<Credentials> {
-    let _ = dotenvy::dotenv();
-    Some(Credentials::new(
-        std::env::var("OKX_API_KEY").ok()?,
-        std::env::var("OKX_API_SECRET").ok()?,
-        std::env::var("OKX_PASSPHRASE").ok()?,
-    ))
-}
-
-fn is_demo() -> bool {
-    std::env::var("OKX_DEMO")
-        .map(|v| v != "0" && v != "false")
-        .unwrap_or(true)
-}
+use super::common::credentials;
 
 /// Verifies the full private WebSocket flow for the `positions` channel:
 /// connect → auto-login → subscribe → receive snapshot push → parse rows.
@@ -37,18 +14,13 @@ fn is_demo() -> bool {
 /// OKX sends a snapshot push even when there are no open positions, so this
 /// test passes regardless of account state.
 #[tokio::test]
-#[ignore = "requires OKX_API_KEY / OKX_API_SECRET / OKX_PASSPHRASE env vars"]
 async fn positions_login_subscribe_and_parse() {
     let Some(creds) = credentials() else {
         eprintln!("skipping: OKX credentials not set");
         return;
     };
 
-    let demo = is_demo();
-    eprintln!("connecting (demo={})", demo);
-
     let mut ws = OkxWs::private(creds)
-        .demo_trading(demo)
         .connect()
         .await
         .expect("connect to OKX WebSocket");
@@ -80,15 +52,10 @@ async fn positions_login_subscribe_and_parse() {
                         subscribed = true;
                     }
                     Some(WsEvent::Push(push)) if push.arg.channel == "positions" => {
-                        eprintln!(
-                            "push received: action={:?}",
-                            push.action
-                        );
+                        eprintln!("push received: action={:?}", push.action);
                         let rows: Vec<PositionUpdate> =
                             push.parse().expect("parse PositionUpdate rows");
                         eprintln!("parsed {} position row(s)", rows.len());
-                        // Snapshot action is "snapshot"; event-driven updates are "event_update".
-                        // The channel may also send empty snapshots.
                         assert!(
                             matches!(
                                 push.action.as_deref(),
