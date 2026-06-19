@@ -854,13 +854,6 @@ pub struct AccountBalanceUpdate {
     #[serde(default)]
     pub collateral_enabled: bool,
 
-    /// Deprecated platform collateral-restriction indicator.
-    ///
-    /// Use [`Self::col_res`] instead.
-    #[deprecated(note = "OKX deprecated collateralRestrict; use col_res instead")]
-    #[serde(default)]
-    pub collateral_restrict: bool,
-
     /// Auto-conversion risk indicator.
     ///
     /// Documented levels range from `"0"` through `"5"`:

@@ -7,6 +7,7 @@ use crate::signing;
 use crate::ws::channels;
 use crate::ws::client::login_payload;
 use crate::ws::event::parse_text_event;
+use crate::ws::model::AccountUpdate;
 use crate::ws::ops::operation_payload_with_expiry;
 use crate::ws::request::{
     AmendSpreadOrderRequest, CancelSpreadOrderRequest, MassCancelRequest,
@@ -76,7 +77,7 @@ fn channel_helpers_build_expected_args() {
     let recurring = channels::grid::recurring_buy_orders();
     assert_eq!(recurring.channel, "algo-recurring-buy");
 
-    let account = channels::account::account_by_currency("USDT");
+    let account = channels::account::account_by_currency("USDT", None);
     assert_eq!(account.channel, "account");
     assert_eq!(account.extra.get("ccy").map(String::as_str), Some("USDT"));
 
@@ -166,6 +167,60 @@ fn parse_balance_and_position_push() {
     assert_eq!(rows[0].pos_data[0].inst_id, "BTC-USD-191018");
     assert_eq!(rows[0].pos_data[0].pos.as_str(), "10");
     assert_eq!(rows[0].trades[0].trade_id, "2");
+}
+
+#[test]
+fn parse_account_push() {
+    let json = r#"{
+        "arg":{"channel":"account","uid":"44**584"},
+        "eventType":"snapshot",
+        "curPage":1,
+        "lastPage":true,
+        "data":[{
+            "adjEq":"55444.12","availEq":"55444.12","borrowFroz":"0",
+            "delta":"0","deltaLever":"0","deltaNeutralStatus":"0",
+            "imr":"0","isoEq":"0","mgnRatio":"","mmr":"0",
+            "notionalUsd":"0","notionalUsdForBorrow":"0","notionalUsdForFutures":"0",
+            "notionalUsdForOption":"0","notionalUsdForSwap":"0",
+            "ordFroz":"0","totalEq":"55868.06","uTime":"1705564223311","upl":"0",
+            "details":[{
+                "availBal":"4734.37","availEq":"4734.37","borrowFroz":"0",
+                "cashBal":"4750.42","ccy":"USDT","coinUsdPrice":"0.99927",
+                "crossLiab":"0","colRes":"0","collateralEnabled":false,
+                "colBorrAutoConversion":"0","disEq":"4889.37","eq":"4892.95",
+                "eqUsd":"4889.37","smtSyncEq":"0","spotCopyTradingEq":"0",
+                "fixedBal":"0","frozenBal":"158.57","frpType":"0",
+                "imr":"","interest":"0","isoEq":"0","isoLiab":"0","isoUpl":"0",
+                "liab":"0","maxLoan":"0","mgnRatio":"","mmr":"","notionalLever":"",
+                "ordFrozen":"0","rewardBal":"0","spotInUseAmt":"","clSpotInUseAmt":"",
+                "maxSpotInUseAmt":"","spotIsoBal":"0","stgyEq":"150","twap":"0",
+                "uTime":"1705564213903","upl":"-7.47","uplLiab":"0",
+                "spotBal":"","openAvgPx":"","accAvgPx":"","spotUpl":"",
+                "spotUplRatio":"","totalPnl":"","totalPnlRatio":""
+            }]
+        }]
+    }"#;
+
+    let event = parse_text_event(json).unwrap().unwrap();
+    let WsEvent::Push(push) = event else {
+        panic!("expected Push, got {:?}", event);
+    };
+    assert_eq!(push.arg.channel, "account");
+    assert_eq!(
+        push.arg.extra.get("uid").map(String::as_str),
+        Some("44**584")
+    );
+    assert_eq!(push.action.as_deref(), Some("snapshot"));
+
+    let rows: Vec<AccountUpdate> = push.parse().unwrap();
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].total_eq.as_str(), "55868.06");
+    assert_eq!(rows[0].u_time.as_str(), "1705564223311");
+    assert_eq!(rows[0].details.len(), 1);
+    assert_eq!(rows[0].details[0].ccy, "USDT");
+    assert_eq!(rows[0].details[0].cash_bal.as_str(), "4750.42");
+    assert_eq!(rows[0].details[0].stgy_eq.as_str(), "150");
+    assert!(!rows[0].details[0].collateral_enabled);
 }
 
 #[test]

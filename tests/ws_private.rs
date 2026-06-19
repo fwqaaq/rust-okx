@@ -57,7 +57,7 @@ async fn private_login_and_read_only_subscriptions() {
         }
     };
 
-    let args = [channels::account::account(), channels::trade::orders("ANY")];
+    let args = [channels::trade::orders("ANY")];
     if let Err(err) = ws.subscribe(&args).await {
         eprintln!("skipping private_login_and_read_only_subscriptions: subscribe failed: {err}");
         return;
