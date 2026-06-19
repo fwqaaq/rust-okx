@@ -13,6 +13,7 @@ use crate::api::finance::Finance;
 use crate::api::funding::Funding;
 use crate::api::market::Market;
 use crate::api::public_data::PublicData;
+use crate::api::sub_account::SubAccount;
 use crate::api::trade::Trade;
 use crate::credentials::Credentials;
 use crate::error::{Error, RestError};
@@ -83,6 +84,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access the finance endpoints.
     pub fn finance(&self) -> Finance<'_, T> {
         Finance::new(self)
+    }
+
+    /// Access the (authenticated) sub-account management endpoints.
+    pub fn sub_account(&self) -> SubAccount<'_, T> {
+        SubAccount::new(self)
     }
 
     /// Access the (authenticated) trading endpoints.

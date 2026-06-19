@@ -53,7 +53,7 @@ pub async fn get_funding_rate(&self, inst_id: &str) -> Result<Vec<FundingRate>, 
 ///
 /// Returns [`Error::Configuration`] if no credentials are set,
 /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-pub async fn get_risk_state(&self) -> Result<Vec<RiskState>, Error> {
+pub async fn get_risk_state(&self) -> Result<Vec<RiskState>, Error> {}
 ```
 
 ### Authenticated endpoint, with request validation
