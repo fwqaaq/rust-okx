@@ -1,7 +1,22 @@
-use super::*;
+use crate::test_util::MockTransport;
+use crate::{Credentials, OkxClient};
+
+mod assets;
+mod deposits;
+mod transfers;
+mod withdrawals;
+
+fn signed_client(mock: MockTransport) -> OkxClient<MockTransport> {
+    OkxClient::with_transport(mock)
+        .credentials(Credentials::new("key", "secret", "pass"))
+        .build()
+}
+
+// Serialization-only tests that verify request builder field omission.
 
 #[test]
 fn funds_transfer_request_omits_unset_optional_fields() {
+    use super::FundsTransferRequest;
     let value = serde_json::to_value(FundsTransferRequest::new("USDT", "1", "6", "18")).unwrap();
 
     assert_eq!(value["ccy"], "USDT");
@@ -15,7 +30,9 @@ fn funds_transfer_request_omits_unset_optional_fields() {
 
 #[test]
 fn withdrawal_request_omits_unset_optional_fields() {
-    let value = serde_json::to_value(WithdrawalRequest::new("USDT", "1", "3", "example")).unwrap();
+    use super::WithdrawalRequest;
+    let value =
+        serde_json::to_value(WithdrawalRequest::new("USDT", "1", "3", "example")).unwrap();
 
     assert_eq!(value["ccy"], "USDT");
     assert_eq!(value["amt"], "1");
@@ -28,6 +45,8 @@ fn withdrawal_request_omits_unset_optional_fields() {
 
 #[test]
 fn history_requests_omit_unset_optional_fields() {
+    use super::{DepositHistoryRequest, WithdrawalHistoryRequest};
+
     let deposit = serde_urlencoded::to_string(DepositHistoryRequest::new().limit(5)).unwrap();
     assert_eq!(deposit, "limit=5");
 
@@ -38,6 +57,8 @@ fn history_requests_omit_unset_optional_fields() {
 
 #[test]
 fn deposit_withdraw_status_request_omits_unset_optional_fields() {
+    use super::DepositWithdrawStatusRequest;
+
     let query = serde_urlencoded::to_string(
         DepositWithdrawStatusRequest::new()
             .currency("USDT")

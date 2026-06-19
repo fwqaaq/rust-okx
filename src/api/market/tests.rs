@@ -25,8 +25,11 @@ async fn get_ticker_builds_request_and_parses() {
 
 #[tokio::test]
 async fn get_tickers_builds_request_and_parses() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"SWAP","instId":"BTC-USDT-SWAP","last":"42000.1","ts":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{
+        "instType":"SWAP","instId":"BTC-USDT-SWAP","last":"42000.1","lastSz":"3",
+        "askPx":"42000.3","askSz":"8","bidPx":"42000.1","bidSz":"20",
+        "open24h":"41000","high24h":"43000","low24h":"40000",
+        "volCcy24h":"400210","vol24h":"10","ts":"1597026383085","sodUtc0":"","sodUtc8":""}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -45,8 +48,9 @@ async fn get_tickers_builds_request_and_parses() {
 
 #[tokio::test]
 async fn get_index_tickers_builds_request_and_parses() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"instId":"BTC-USD","idxPx":"42000.1","open24h":"41000","high24h":"43000","low24h":"40000","ts":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{
+        "instId":"BTC-USD","idxPx":"42000.1","high24h":"43000","sodUtc0":"40000",
+        "open24h":"41000","low24h":"40000","sodUtc8":"40500","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -254,8 +258,11 @@ async fn get_exchange_rate_parses_rate() {
 
 #[tokio::test]
 async fn get_block_ticker_builds_query() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"SPOT","instId":"BTC-USDT","last":"42000","ts":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{
+        "instType":"SPOT","instId":"BTC-USDT","last":"42000","lastSz":"5",
+        "askPx":"42001","askSz":"3","bidPx":"41999","bidSz":"2",
+        "open24h":"41000","high24h":"43000","low24h":"40000",
+        "volCcy24h":"500000","vol24h":"12","ts":"1597026383085","sodUtc0":"","sodUtc8":""}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -271,8 +278,11 @@ async fn get_block_ticker_builds_query() {
 
 #[tokio::test]
 async fn get_block_tickers_builds_filter_query() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"SWAP","instId":"BTC-USDT-SWAP","ts":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{
+        "instType":"SWAP","instId":"BTC-USDT-SWAP","last":"","lastSz":"",
+        "askPx":"","askSz":"","bidPx":"","bidSz":"",
+        "open24h":"","high24h":"","low24h":"","volCcy24h":"","vol24h":"",
+        "ts":"1597026383085","sodUtc0":"","sodUtc8":""}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 

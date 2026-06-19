@@ -4,10 +4,13 @@ use crate::{Error, OkxClient};
 
 #[tokio::test]
 async fn get_instruments_builds_request_and_parses() {
-    let body = r#"{"code":"0","msg":"","data":[
-            {"instType":"SPOT","instId":"BTC-USDT","uly":"","instFamily":"",
-             "baseCcy":"BTC","quoteCcy":"USDT","settleCcy":"","lotSz":"0.00000001",
-             "tickSz":"0.1","minSz":"0.00001","state":"live"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{
+        "instType":"SPOT","instId":"BTC-USDT","uly":"","instFamily":"",
+        "baseCcy":"BTC","quoteCcy":"USDT","settleCcy":"","ctVal":"","ctMult":"",
+        "ctValCcy":"","optType":"","stk":"","listTime":"1606468572000","expTime":"",
+        "lever":"10","tickSz":"0.1","lotSz":"0.00000001","minSz":"0.00001",
+        "ctType":"","state":"live","maxLmtSz":"9999999999","maxMktSz":"1000000",
+        "maxLmtAmt":"20000000","maxMktAmt":"1000000","ruleType":"normal","riskLimitType":""}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -33,7 +36,7 @@ async fn get_instruments_builds_request_and_parses() {
 
 #[tokio::test]
 async fn get_system_time_parses_time() {
-    let body = r#"{"code":"0","msg":"","data":[{"ts":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"ts":"1597026383085","sysTime":""}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -281,7 +284,9 @@ async fn get_estimated_price_queries_inst_id() {
 
 #[tokio::test]
 async fn get_discount_rate_interest_free_quota_omits_currency() {
-    let body = r#"{"code":"0","msg":"","data":[{"ccy":"USDT","amt":"100"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{
+        "ccy":"BTC","amt":"0",
+        "discountLv":[{"discountRate":"0.9","maxAmt":"20000","minAmt":"0"}]}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -290,7 +295,8 @@ async fn get_discount_rate_interest_free_quota_omits_currency() {
         .get_discount_rate_interest_free_quota(None)
         .await
         .unwrap();
-    assert_eq!(rows[0].ccy, "USDT");
+    assert_eq!(rows[0].ccy, "BTC");
+    assert_eq!(rows[0].amt.as_str(), "0");
 
     let req = mock.captured();
     assert_eq!(req.query(), None);

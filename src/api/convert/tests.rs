@@ -145,7 +145,7 @@ fn typed_requests_validate_documented_constraints() {
 
 #[tokio::test]
 async fn get_currencies_sends_no_query_string() {
-    let body = r#"{"code":"0","msg":"","data":[{"ccy":"BTC"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"ccy":"BTC","name":"Bitcoin","logoLink":"https://static.okx.com/cdn/wallet/logo/BTC.png","tag":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
