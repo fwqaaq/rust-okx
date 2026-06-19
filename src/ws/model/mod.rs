@@ -50,9 +50,8 @@ pub mod trade;
 
 // Re-exports — keeping the flat `crate::ws::model::*` namespace
 pub use account::{
-    AccountBalanceUpdate, AccountGreeksUpdate, AccountUpdate, BalData, BalanceAndPositionBalance,
-    BalanceAndPositionPosition, BalanceAndPositionTrade, BalanceAndPositionUpdate,
-    LiquidationWarningUpdate, PosData, PositionUpdate, Trade,
+    AccountBalanceUpdate, AccountGreeksUpdate, AccountUpdate, BalData, BalanceAndPositionUpdate,
+    CloseOrderAlgo, LiquidationWarningUpdate, PosData, PositionUpdate, Trade,
 };
 pub use algo::{AdvancedAlgoOrderUpdate, AlgoOrderUpdate};
 pub use block::{

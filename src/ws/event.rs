@@ -181,6 +181,7 @@ pub(crate) fn parse_text_event(text: &str) -> Result<Option<WsEvent>, Error> {
                 arg,
                 value
                     .get("action")
+                    .or_else(|| value.get("eventType"))
                     .and_then(Value::as_str)
                     .map(ToOwned::to_owned),
                 raw,

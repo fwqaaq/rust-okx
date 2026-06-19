@@ -7,6 +7,36 @@ use serde::Deserialize;
 use super::ExtraFields;
 use crate::model::NumberString;
 
+/// A close-order algo attached to a position.
+///
+/// Populated in [`PositionUpdate::close_order_algo`] when a close-position
+/// algo order (placed with `closeFraction=1`) is associated with the position.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-positions-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct CloseOrderAlgo {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Stop-loss trigger price.
+    #[serde(default)]
+    pub sl_trigger_px: String,
+    /// Stop-loss trigger price type: `last`, `index`, or `mark`.
+    #[serde(default)]
+    pub sl_trigger_px_type: String,
+    /// Take-profit trigger price.
+    #[serde(default)]
+    pub tp_trigger_px: String,
+    /// Take-profit trigger price type: `last`, `index`, or `mark`.
+    #[serde(default)]
+    pub tp_trigger_px_type: String,
+    /// Fraction of the position to close when the algo is triggered (e.g. `"0.6"`).
+    #[serde(default)]
+    pub close_fraction: String,
+}
+
 /// Private `positions` channel row.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-account-websocket-positions-channel>
@@ -170,6 +200,35 @@ pub struct PositionUpdate {
     /// Push time (Unix milliseconds).
     #[serde(default)]
     pub p_time: NumberString,
+    /// Realized profit and loss.
+    ///
+    /// `realizedPnl = pnl + fee + fundingFee + liqPenalty + settledPnl`
+    ///
+    /// Only applicable to FUTURES/SWAP/OPTION.
+    #[serde(default)]
+    pub realized_pnl: NumberString,
+    /// Accumulated PnL from closing orders, excluding fees.
+    #[serde(default)]
+    pub pnl: NumberString,
+    /// Accumulated transaction fee. Negative = fee charged; positive = rebate.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Accumulated funding fee.
+    #[serde(default)]
+    pub funding_fee: NumberString,
+    /// Accumulated liquidation penalty (negative when non-zero).
+    #[serde(default)]
+    pub liq_penalty: NumberString,
+    /// Accumulated settled P&L calculated by settlement price.
+    ///
+    /// Only applicable to cross FUTURES.
+    #[serde(default)]
+    pub settled_pnl: NumberString,
+    /// Close-position algo orders attached to this position.
+    ///
+    /// Non-empty only after placing an algo order with `closeFraction=1`.
+    #[serde(default)]
+    pub close_order_algo: Vec<CloseOrderAlgo>,
     /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,
@@ -390,90 +449,6 @@ pub struct Trade {
     pub trade_id: String,
 
     /// Additional fields added by OKX that are not yet represented explicitly.
-    #[serde(flatten, default)]
-    pub extra: ExtraFields,
-}
-
-/// Balance row in a `balance_and_position` push.
-#[derive(Debug, Clone, Default, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct BalanceAndPositionBalance {
-    /// Currency code, e.g., `BTC` or `USDT`.
-    #[serde(default)]
-    pub ccy: String,
-    /// Cash balance of the currency.
-    #[serde(default)]
-    pub cash_bal: NumberString,
-    /// Time when this currency balance was last updated (Unix milliseconds).
-    #[serde(default)]
-    pub u_time: NumberString,
-    /// Unrecognized fields retained for forward compatibility.
-    #[serde(flatten, default)]
-    pub extra: ExtraFields,
-}
-
-/// Position row in a `balance_and_position` push.
-#[derive(Debug, Clone, Default, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct BalanceAndPositionPosition {
-    /// OKX-assigned position ID.
-    #[serde(default)]
-    pub pos_id: String,
-    /// Trade ID of the most recent fill for this position.
-    #[serde(default)]
-    pub trade_id: String,
-    /// Instrument ID, e.g., `BTC-USDT-SWAP`.
-    #[serde(default)]
-    pub inst_id: String,
-    /// Instrument type, e.g., `MARGIN`, `SWAP`, `FUTURES`, `OPTION`.
-    #[serde(default)]
-    pub inst_type: String,
-    /// Margin mode: `cross` or `isolated`.
-    #[serde(default)]
-    pub mgn_mode: String,
-    /// Position side: `long`, `short`, or `net`.
-    #[serde(default)]
-    pub pos_side: String,
-    /// Position quantity (contracts for derivatives; base currency for margin).
-    #[serde(default)]
-    pub pos: NumberString,
-    /// Settlement or margin currency of the position.
-    #[serde(default)]
-    pub ccy: String,
-    /// Position currency (base currency for MARGIN positions only).
-    #[serde(default)]
-    pub pos_ccy: String,
-    /// Average entry price of the position.
-    #[serde(default)]
-    pub avg_px: NumberString,
-    /// Non-settlement average entry price (cross FUTURES only).
-    #[serde(default)]
-    pub non_settle_avg_px: NumberString,
-    /// Accumulated settled PnL using settlement prices (cross FUTURES only).
-    #[serde(default)]
-    pub settled_pnl: NumberString,
-    /// Time when this position was last updated (Unix milliseconds).
-    #[serde(default)]
-    pub u_time: NumberString,
-    /// Unrecognized fields retained for forward compatibility.
-    #[serde(flatten, default)]
-    pub extra: ExtraFields,
-}
-
-/// Trade row in a `balance_and_position` push.
-#[derive(Debug, Clone, Default, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct BalanceAndPositionTrade {
-    /// Instrument ID of the fill, e.g., `BTC-USDT` or `BTC-USDT-SWAP`.
-    #[serde(default)]
-    pub inst_id: String,
-    /// Trade ID assigned by OKX.
-    #[serde(default)]
-    pub trade_id: String,
-    /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,
 }
@@ -794,13 +769,6 @@ pub struct AccountBalanceUpdate {
     /// Primarily applicable to Multi-currency margin mode.
     #[serde(default)]
     pub collateral_enabled: bool,
-
-    /// Deprecated platform collateral-restriction indicator.
-    ///
-    /// Use [`Self::col_res`] instead.
-    #[deprecated(note = "OKX deprecated collateralRestrict; use col_res instead")]
-    #[serde(default)]
-    pub collateral_restrict: bool,
 
     /// Auto-conversion risk indicator.
     ///
