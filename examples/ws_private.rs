@@ -1,15 +1,17 @@
 use std::env;
 use std::time::Duration;
 
-use rust_okx::{Arg, Credentials, OkxWs, WsEvent, ws::model::BalanceAndPositionUpdate};
+use rust_okx::ws::channels::account;
+use rust_okx::ws::model::BalanceAndPositionUpdate;
+use rust_okx::{Credentials, OkxWs, WsEvent};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let _ = dotenvy::dotenv();
+    let arg = account::balance_and_position();
     let mut ws = OkxWs::private(live_credentials()?).connect().await?;
 
-    let args = Arg::new("balance_and_position");
-    ws.subscribe(std::slice::from_ref(&args)).await?;
+    ws.subscribe(std::slice::from_ref(&arg)).await?;
 
     let deadline = tokio::time::sleep(Duration::from_secs(20));
     tokio::pin!(deadline);
@@ -17,33 +19,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     loop {
         tokio::select! {
             _ = &mut deadline => {
-                println!("timed out waiting for private events");
+                println!("timed out waiting for private balance_and_position push");
                 break;
             }
-            event = ws.next_event() => {
-                match event? {
-                    Some(WsEvent::Login) => println!("logged in"),
-                    Some(WsEvent::Subscribed(arg)) => println!("subscribed: {}", arg.channel),
-                    Some(WsEvent::Push(push)) => {
-                        if push.arg.channel == "balance_and_position" {
-                            let row: Vec<BalanceAndPositionUpdate> = push.parse().unwrap();
-                            for subscribed_object in row {
-                                subscribed_object.bal_data.iter().for_each(|item| {
-                                    println!("Crypto: {}, Balance: {}", item.ccy, item.cash_bal.as_str())
-                                });
-                            }
+            event = ws.next_event() => match event? {
+                Some(WsEvent::Login) => println!("logged in"),
+                Some(WsEvent::Subscribed(arg)) => println!("subscribed: {}", arg.channel),
+                Some(WsEvent::Push(push)) if push.arg.channel == "balance_and_position" => {
+                    let rows: Vec<BalanceAndPositionUpdate> = push.parse()?;
+                    for update in rows {
+                        println!(
+                            "event={} pTime={} balances={} positions={} trades={}",
+                            update.event_type,
+                            update.p_time,
+                            update.bal_data.len(),
+                            update.pos_data.len(),
+                            update.trades.len()
+                        );
+                        for balance in update.bal_data {
+                            println!("  balance ccy={} cashBal={}", balance.ccy, balance.cash_bal);
                         }
                     }
-                    Some(WsEvent::Error { code, msg }) => {
-                        return Err(format!("OKX WS error {code}: {msg}").into());
-                    }
-                    Some(_) => {}
-                    None => break,
+                    break;
                 }
+                Some(WsEvent::Error { code, msg }) => {
+                    return Err(format!("OKX WS error {code}: {msg}").into());
+                }
+                Some(WsEvent::Disconnected) | None => break,
+                Some(_) => {}
             }
         }
     }
 
+    ws.unsubscribe(&[arg]).await?;
     ws.close().await?;
     Ok(())
 }

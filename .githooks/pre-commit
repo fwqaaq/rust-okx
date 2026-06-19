@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+echo "running cargo fmt --all..."
+cargo fmt --all
+
+git diff --name-only -- '*.rs' | xargs -r git add
+
+echo "cargo fmt done."
