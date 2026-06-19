@@ -13,21 +13,21 @@
   <img alt="Edition" src="https://img.shields.io/badge/edition-2024-blue">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
   <img alt="HTTP" src="https://img.shields.io/badge/default%20HTTP-reqwest-green">
-  <img alt="Status" src="https://img.shields.io/badge/status-early%200.4.x-orange">
+  <img alt="Status" src="https://img.shields.io/badge/status-early%200.5.x-orange">
 </p>
 
 `rust-okx` is an unofficial OKX client focused on typed request/response models,
 clear error handling, demo trading support, regional API hosts, and optional
 WebSocket streams.
 
-> Status: early `0.4.x`. The REST surface is usable and still expanding. Public
+> Status: early `0.5.x`. The REST surface is usable and still expanding. Public
 > API details may change before `1.0`.
 
 ## Installation
 
 ```toml
 [dependencies]
-rust-okx = "0.4"
+rust-okx = "0.5"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 ```
 
@@ -36,14 +36,14 @@ features only when you provide your own `Transport` implementation.
 
 ```toml
 [dependencies]
-rust-okx = { version = "0.4", default-features = false }
+rust-okx = { version = "0.5", default-features = false }
 ```
 
 Enable optional WebSocket support when you need streaming market, business, or
 private account channels.
 
 ```toml
-rust-okx = { version = "0.4", features = ["websocket"] }
+rust-okx = { version = "0.5", features = ["websocket"] }
 ```
 
 ## Quick start
