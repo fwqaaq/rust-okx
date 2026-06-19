@@ -4,6 +4,7 @@ use crate::test_util::MockTransport;
 use super::super::{
     ManagedSubAccountBillsRequest, SubAccountBillsRequest, SubAccountFundingBalancesRequest,
     SubAccountMaxWithdrawalRequest, SubAccountTradingBalancesRequest, SubAccountTransferRequest,
+    SubAccountType,
 };
 
 #[tokio::test]
@@ -117,8 +118,14 @@ async fn transfer_between_subaccounts_posts_and_parses() {
     let body = r#"{"code":"0","msg":"","data":[{"transId":"12345"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request =
-        SubAccountTransferRequest::new("USDT", "10", "6", "6", "subAcct001", "subAcct002");
+    let request = SubAccountTransferRequest::new(
+        "USDT",
+        "10",
+        SubAccountType::Funding,
+        SubAccountType::Funding,
+        "subAcct001",
+        "subAcct002",
+    );
 
     let rows = client
         .sub_account()

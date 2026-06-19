@@ -1,8 +1,17 @@
 use serde::Serialize;
 
-use crate::model::{
-    RequestValidationError, ValidateRequest, at_least_one, non_empty, one_of, range_u64,
-};
+use crate::model::{RequestValidationError, ValidateRequest, at_least_one, range_u64};
+
+/// Account type used in sub-account asset transfers.
+#[derive(Debug, Clone, Copy, Serialize)]
+pub enum SubAccountType {
+    /// Funding account (wire value `"6"`).
+    #[serde(rename = "6")]
+    Funding,
+    /// Trading account (wire value `"18"`).
+    #[serde(rename = "18")]
+    Trading,
+}
 
 /// Query parameters for [`SubAccount::get_subaccount_list`].
 #[derive(Debug, Clone, Default, Serialize)]
@@ -302,8 +311,8 @@ impl DeleteSubAccountApiKeyRequest {
 pub struct SubAccountTransferRequest {
     ccy: String,
     amt: String,
-    from: String,
-    to: String,
+    from: SubAccountType,
+    to: SubAccountType,
     from_sub_account: String,
     to_sub_account: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -315,21 +324,21 @@ pub struct SubAccountTransferRequest {
 impl SubAccountTransferRequest {
     /// Transfer `amt` of `ccy` between sub-accounts.
     ///
-    /// `from` / `to` are account-type codes: `"6"` = funding account,
-    /// `"18"` = trading account.
+    /// `from` / `to` select the account type on each side:
+    /// [`SubAccountType::Funding`] or [`SubAccountType::Trading`].
     pub fn new(
         ccy: impl Into<String>,
         amt: impl Into<String>,
-        from: impl Into<String>,
-        to: impl Into<String>,
+        from: SubAccountType,
+        to: SubAccountType,
         from_sub_account: impl Into<String>,
         to_sub_account: impl Into<String>,
     ) -> Self {
         Self {
             ccy: ccy.into(),
             amt: amt.into(),
-            from: from.into(),
-            to: to.into(),
+            from,
+            to,
             from_sub_account: from_sub_account.into(),
             to_sub_account: to_sub_account.into(),
             loan_trans: None,
@@ -514,6 +523,9 @@ pub struct EntrustSubAccountListRequest {
 }
 
 // ── ValidateRequest impls ────────────────────────────────────────────────────
+// Only rules the type system cannot express are checked here:
+//   - bounded integer ranges (limit 1-100)
+//   - at-least-one optional field constraints
 
 impl ValidateRequest for SubAccountListRequest {
     fn validate(&self) -> Result<(), RequestValidationError> {
@@ -524,76 +536,12 @@ impl ValidateRequest for SubAccountListRequest {
     }
 }
 
-impl ValidateRequest for SubAccountApiKeysRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)
-    }
-}
-
-impl ValidateRequest for SubAccountTradingBalancesRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)
-    }
-}
-
-impl ValidateRequest for SubAccountFundingBalancesRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)
-    }
-}
-
-impl ValidateRequest for SubAccountMaxWithdrawalRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)
-    }
-}
-
-impl ValidateRequest for CreateSubAccountRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)
-    }
-}
-
-impl ValidateRequest for CreateSubAccountApiKeyRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)?;
-        non_empty("label", &self.label)?;
-        non_empty("passphrase", &self.passphrase)
-    }
-}
-
 impl ValidateRequest for ModifySubAccountApiKeyRequest {
     fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)?;
-        non_empty("apiKey", &self.api_key)?;
         at_least_one(
             "label, perm, ip",
             &[self.label.is_some(), self.perm.is_some(), self.ip.is_some()],
         )
-    }
-}
-
-impl ValidateRequest for DeleteSubAccountApiKeyRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)?;
-        non_empty("apiKey", &self.api_key)
-    }
-}
-
-impl ValidateRequest for SubAccountTransferRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("ccy", &self.ccy)?;
-        non_empty("amt", &self.amt)?;
-        non_empty("fromSubAccount", &self.from_sub_account)?;
-        non_empty("toSubAccount", &self.to_sub_account)?;
-        one_of("from", &self.from, &["6", "18"], r#""6" or "18""#)?;
-        one_of("to", &self.to, &["6", "18"], r#""6" or "18""#)
-    }
-}
-
-impl ValidateRequest for SetTransferOutRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("subAcct", &self.sub_acct)
     }
 }
 
