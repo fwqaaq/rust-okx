@@ -1,6 +1,5 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::ValidateRequest;
 use crate::transport::Transport;
 
 use super::requests::{
@@ -40,7 +39,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     /// non-zero OKX code, or transport/decode errors.
     pub async fn get_currencies(&self) -> Result<Vec<ConvertCurrency>, Error> {
         let request = ConvertCurrenciesRequest::new();
-        request.validate()?;
+
         self.client.get(CURRENCIES, &request, true).await
     }
 
@@ -56,7 +55,6 @@ impl<'a, T: Transport> Convert<'a, T> {
         &self,
         request: &ConvertCurrencyPairRequest,
     ) -> Result<Vec<ConvertCurrencyPair>, Error> {
-        request.validate()?;
         self.client.get(CURRENCY_PAIR, request, true).await
     }
 
@@ -73,7 +71,6 @@ impl<'a, T: Transport> Convert<'a, T> {
         &self,
         request: &ConvertQuoteRequest,
     ) -> Result<Vec<ConvertQuote>, Error> {
-        request.validate()?;
         self.client.post(ESTIMATE_QUOTE, request, true).await
     }
 
@@ -90,7 +87,6 @@ impl<'a, T: Transport> Convert<'a, T> {
         &self,
         request: &ConvertTradeRequest,
     ) -> Result<Vec<ConvertTradeResult>, Error> {
-        request.validate()?;
         self.client.post(TRADE, request, true).await
     }
 
@@ -107,7 +103,6 @@ impl<'a, T: Transport> Convert<'a, T> {
         &self,
         request: &ConvertHistoryRequest,
     ) -> Result<Vec<ConvertHistory>, Error> {
-        request.validate()?;
         self.client.get(HISTORY, request, true).await
     }
 }

@@ -2,11 +2,6 @@
 
 use serde::Serialize;
 
-use crate::model::{
-    RequestValidationError, ValidateRequest, non_empty, one_of, optional_unsigned_integer_string,
-    range_u64,
-};
-
 /// MMP mass-cancel request body (`mass-cancel`).
 ///
 /// Only `OPTION` in Portfolio Margin mode is supported by OKX.
@@ -39,24 +34,5 @@ impl MassCancelRequest {
     pub fn lock_interval(mut self, lock_interval: impl Into<String>) -> Self {
         self.lock_interval = Some(lock_interval.into());
         self
-    }
-}
-
-impl ValidateRequest for MassCancelRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        one_of("instType", &self.inst_type, &["OPTION"], "OPTION")?;
-        non_empty("instFamily", &self.inst_family)?;
-        optional_unsigned_integer_string("lockInterval", self.lock_interval.as_deref())?;
-        if let Some(value) = self.lock_interval.as_deref() {
-            let value =
-                value
-                    .parse::<u64>()
-                    .map_err(|_| RequestValidationError::InvalidFormat {
-                        field: "lockInterval",
-                        expected: "an integer from 0 through 10000",
-                    })?;
-            range_u64("lockInterval", value, 0, 10_000)?;
-        }
-        Ok(())
     }
 }

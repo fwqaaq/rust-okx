@@ -1,9 +1,9 @@
 use http::Method;
 use serde_json::json;
 
-use crate::model::{OrderSide, RequestValidationError, ValidateRequest};
+use crate::model::OrderSide;
 use crate::test_util::MockTransport;
-use crate::{Credentials, Error, OkxClient};
+use crate::{Credentials, OkxClient};
 
 use super::*;
 
@@ -86,60 +86,6 @@ fn history_query_uses_string_wire_values_and_omits_unset_fields() {
     assert_eq!(
         serde_urlencoded::to_string(request).unwrap(),
         "after=1596386767954&before=1596386768000&limit=100"
-    );
-}
-
-#[test]
-fn typed_requests_validate_documented_constraints() {
-    let empty_currency = ConvertCurrencyPairRequest::new("", "BTC")
-        .validate()
-        .unwrap_err();
-    assert_eq!(
-        empty_currency,
-        RequestValidationError::EmptyField { field: "fromCcy" }
-    );
-
-    let invalid_id = ConvertQuoteRequest::new("ETH", "USDT", OrderSide::Buy, "30", "USDT")
-        .client_quote_request_id("not-valid!")
-        .validate()
-        .unwrap_err();
-    assert_eq!(
-        invalid_id,
-        RequestValidationError::InvalidFormat {
-            field: "clQReqId",
-            expected: "1-32 ASCII alphanumeric characters",
-        }
-    );
-
-    let invalid_side = ConvertTradeRequest::new(
-        "q1",
-        "ETH",
-        "USDT",
-        OrderSide::Unknown("hold".to_owned()),
-        "30",
-        "USDT",
-    )
-    .validate()
-    .unwrap_err();
-    assert_eq!(
-        invalid_side,
-        RequestValidationError::InvalidFormat {
-            field: "side",
-            expected: "buy or sell",
-        }
-    );
-
-    let invalid_limit = ConvertHistoryRequest::new()
-        .limit(0)
-        .validate()
-        .unwrap_err();
-    assert_eq!(
-        invalid_limit,
-        RequestValidationError::OutOfRange {
-            field: "limit",
-            min: 1,
-            max: 100,
-        }
     );
 }
 
@@ -229,20 +175,6 @@ async fn convert_trade_posts_exact_typed_body() {
         })
     );
     assert!(req.is_signed());
-}
-
-#[tokio::test]
-async fn invalid_request_fails_before_transport() {
-    let body = r#"{"code":"0","msg":"","data":[]}"#;
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock);
-    let request = ConvertQuoteRequest::new("", "USDT", OrderSide::Buy, "1", "USDT");
-
-    let error = client.convert().estimate_quote(&request).await.unwrap_err();
-    assert!(matches!(
-        error,
-        Error::InvalidRequest(RequestValidationError::EmptyField { field: "baseCcy" })
-    ));
 }
 
 #[tokio::test]

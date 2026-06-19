@@ -1,9 +1,6 @@
 use serde::Serialize;
 
-use crate::model::{
-    OrderSide, OrderState, OrderType, PositionSide, TradeMode, ValidateRequest, one_of,
-    optional_non_empty, optional_unsigned_integer_string, range_u64,
-};
+use crate::model::{OrderSide, OrderState, OrderType, PositionSide, TradeMode};
 
 mod advanced;
 mod algo;
@@ -571,21 +568,5 @@ impl FillHistoryRequest {
     pub fn limit(mut self, limit: u32) -> Self {
         self.limit = Some(limit);
         self
-    }
-}
-
-impl ValidateRequest for FillHistoryRequest {
-    fn validate(&self) -> Result<(), crate::model::RequestValidationError> {
-        one_of("instType", self.inst_type.as_str(), &["SPOT"], "SPOT")?;
-        optional_non_empty("instId", self.inst_id.as_deref())?;
-        optional_unsigned_integer_string("ordId", self.ord_id.as_deref())?;
-        optional_unsigned_integer_string("after", self.after.as_deref())?;
-        optional_unsigned_integer_string("before", self.before.as_deref())?;
-        optional_unsigned_integer_string("begin", self.begin.as_deref())?;
-        optional_unsigned_integer_string("end", self.end.as_deref())?;
-        if let Some(limit) = self.limit {
-            range_u64("limit", u64::from(limit), 1, 100)?;
-        }
-        Ok(())
     }
 }

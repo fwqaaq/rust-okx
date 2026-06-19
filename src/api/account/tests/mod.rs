@@ -49,15 +49,3 @@ async fn demo_trading_sets_simulated_header() {
     );
     assert!(req.is_signed());
 }
-
-#[tokio::test]
-async fn invalid_account_request_fails_before_transport() {
-    use crate::Error;
-    let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
-    let client = signed_client(mock.clone());
-    let request = super::MaxLoanRequest::new("", crate::model::TradeMode::Cross);
-
-    let error = client.account().get_max_loan(&request).await.unwrap_err();
-    assert!(matches!(error, Error::InvalidRequest(_)));
-    assert!(!mock.was_called());
-}

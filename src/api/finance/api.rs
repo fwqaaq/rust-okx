@@ -1,7 +1,6 @@
 use crate::api::finance::internal::CancelRedeemBody;
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::ValidateRequest;
 use crate::transport::Transport;
 
 use super::endpoints::*;
@@ -87,7 +86,6 @@ impl<T: Transport> Savings<'_, T> {
         &self,
         request: &SavingsPurchaseRedemptionRequest,
     ) -> Result<Vec<SavingsPurchaseRedemptionResult>, Error> {
-        request.validate()?;
         self.client
             .post(SAVINGS_PURCHASE_REDEMPT, request, true)
             .await
@@ -124,7 +122,6 @@ impl<T: Transport> Savings<'_, T> {
         &self,
         request: &FinanceHistoryRequest,
     ) -> Result<Vec<LendingHistory>, Error> {
-        request.validate()?;
         self.client
             .get(SAVINGS_LENDING_HISTORY, request, true)
             .await
@@ -141,7 +138,6 @@ impl<T: Transport> Savings<'_, T> {
         &self,
         request: &FinanceHistoryRequest,
     ) -> Result<Vec<PublicBorrowHistory>, Error> {
-        request.validate()?;
         self.client
             .get(SAVINGS_PUBLIC_BORROW_HISTORY, request, false)
             .await
@@ -182,7 +178,6 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiOffersRequest,
     ) -> Result<Vec<StakingDefiOffer>, Error> {
-        request.validate()?;
         self.client.get(STAKING_DEFI_OFFERS, request, true).await
     }
 
@@ -197,7 +192,6 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiPurchaseRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
-        request.validate()?;
         self.client.post(STAKING_DEFI_PURCHASE, request, true).await
     }
 
@@ -212,7 +206,6 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiRedeemRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
-        request.validate()?;
         self.client.post(STAKING_DEFI_REDEEM, request, true).await
     }
 
@@ -227,7 +220,6 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiCancelRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
-        request.validate()?;
         self.client.post(STAKING_DEFI_CANCEL, request, true).await
     }
 
@@ -242,7 +234,6 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiActiveOrdersRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
-        request.validate()?;
         self.client
             .get(STAKING_DEFI_ACTIVE_ORDERS, request, true)
             .await
@@ -259,7 +250,6 @@ impl<T: Transport> StakingDefi<'_, T> {
         &self,
         request: &StakingDefiOrderHistoryRequest,
     ) -> Result<Vec<StakingDefiOrder>, Error> {
-        request.validate()?;
         self.client
             .get(STAKING_DEFI_ORDERS_HISTORY, request, true)
             .await
@@ -341,7 +331,6 @@ impl<T: Transport> EthStaking<'_, T> {
         &self,
         request: &FinanceHistoryRequest,
     ) -> Result<Vec<StakingHistory>, Error> {
-        request.validate()?;
         self.client.get(ETH_HISTORY, request, true).await
     }
 
@@ -421,7 +410,6 @@ impl<T: Transport> SolStaking<'_, T> {
         &self,
         request: &FinanceHistoryRequest,
     ) -> Result<Vec<StakingHistory>, Error> {
-        request.validate()?;
         self.client.get(SOL_HISTORY, request, true).await
     }
 
@@ -468,7 +456,6 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanCollateralAssetsRequest,
     ) -> Result<Vec<FlexibleLoanCollateralAsset>, Error> {
-        request.validate()?;
         self.client
             .get(FLEX_COLLATERAL_ASSETS, request, false)
             .await
@@ -485,7 +472,6 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanMaxLoanRequest,
     ) -> Result<Vec<FlexibleLoanMaxLoan>, Error> {
-        request.validate()?;
         self.client.post(FLEX_MAX_LOAN, request, true).await
     }
 
@@ -500,7 +486,6 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanMaxRedeemRequest,
     ) -> Result<Vec<FlexibleLoanMaxRedeem>, Error> {
-        request.validate()?;
         self.client.get(FLEX_MAX_REDEEM, request, true).await
     }
 
@@ -515,7 +500,6 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanAdjustCollateralRequest,
     ) -> Result<Vec<FlexibleLoanOrder>, Error> {
-        request.validate()?;
         self.client
             .post(FLEX_ADJUST_COLLATERAL, request, true)
             .await
@@ -532,7 +516,6 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanInfoRequest,
     ) -> Result<Vec<FlexibleLoanInfo>, Error> {
-        request.validate()?;
         self.client.get(FLEX_LOAN_INFO, request, true).await
     }
 
@@ -547,7 +530,6 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanHistoryRequest,
     ) -> Result<Vec<FlexibleLoanHistory>, Error> {
-        request.validate()?;
         self.client.get(FLEX_LOAN_HISTORY, request, true).await
     }
 
@@ -562,7 +544,6 @@ impl<T: Transport> FlexibleLoan<'_, T> {
         &self,
         request: &FlexibleLoanInterestAccruedRequest,
     ) -> Result<Vec<FlexibleLoanInterest>, Error> {
-        request.validate()?;
         self.client.get(FLEX_INTEREST_ACCRUED, request, true).await
     }
 }

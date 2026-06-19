@@ -84,12 +84,7 @@ impl<C: WsConnector> OkxWs<C> {
         id: impl Into<String>,
         request: &MassCancelRequest,
     ) -> Result<(), Error> {
-        self.send_validated_request_with_expiry(
-            id,
-            "mass-cancel",
-            None,
-            std::slice::from_ref(request),
-        )
-        .await
+        self.send_request_with_expiry(id, "mass-cancel", None, std::slice::from_ref(request))
+            .await
     }
 }

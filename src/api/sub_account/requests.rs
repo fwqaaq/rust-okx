@@ -1,7 +1,5 @@
 use serde::Serialize;
 
-use crate::model::{RequestValidationError, ValidateRequest, at_least_one, range_u64};
-
 /// Account type used in sub-account asset transfers.
 #[derive(Debug, Clone, Copy, Serialize)]
 pub enum SubAccountType {
@@ -520,45 +518,4 @@ impl ManagedSubAccountBillsRequest {
 pub struct EntrustSubAccountListRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     sub_acct: Option<String>,
-}
-
-// ── ValidateRequest impls ────────────────────────────────────────────────────
-// Only rules the type system cannot express are checked here:
-//   - bounded integer ranges (limit 1-100)
-//   - at-least-one optional field constraints
-
-impl ValidateRequest for SubAccountListRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        if let Some(limit) = self.limit {
-            range_u64("limit", u64::from(limit), 1, 100)?;
-        }
-        Ok(())
-    }
-}
-
-impl ValidateRequest for ModifySubAccountApiKeyRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        at_least_one(
-            "label, perm, ip",
-            &[self.label.is_some(), self.perm.is_some(), self.ip.is_some()],
-        )
-    }
-}
-
-impl ValidateRequest for SubAccountBillsRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        if let Some(limit) = self.limit {
-            range_u64("limit", u64::from(limit), 1, 100)?;
-        }
-        Ok(())
-    }
-}
-
-impl ValidateRequest for ManagedSubAccountBillsRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        if let Some(limit) = self.limit {
-            range_u64("limit", u64::from(limit), 1, 100)?;
-        }
-        Ok(())
-    }
 }

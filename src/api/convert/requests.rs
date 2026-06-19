@@ -1,9 +1,6 @@
 use serde::Serialize;
 
-use crate::model::{
-    OrderSide, RequestValidationError, ValidateRequest, non_empty, range_u64,
-    validate_client_request_id, validate_side,
-};
+use crate::model::OrderSide;
 
 /// Convert mode used by currency-pair, quote, and trade requests.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
@@ -25,12 +22,6 @@ impl ConvertCurrenciesRequest {
     /// Create the empty currencies request.
     pub const fn new() -> Self {
         Self {}
-    }
-}
-
-impl ValidateRequest for ConvertCurrenciesRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        Ok(())
     }
 }
 
@@ -58,13 +49,6 @@ impl ConvertCurrencyPairRequest {
     pub fn convert_mode(mut self, convert_mode: ConvertMode) -> Self {
         self.convert_mode = Some(convert_mode);
         self
-    }
-}
-
-impl ValidateRequest for ConvertCurrencyPairRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("fromCcy", &self.from_ccy)?;
-        non_empty("toCcy", &self.to_ccy)
     }
 }
 
@@ -122,17 +106,6 @@ impl ConvertQuoteRequest {
     pub fn convert_mode(mut self, convert_mode: ConvertMode) -> Self {
         self.convert_mode = Some(convert_mode);
         self
-    }
-}
-
-impl ValidateRequest for ConvertQuoteRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("baseCcy", &self.base_ccy)?;
-        non_empty("quoteCcy", &self.quote_ccy)?;
-        validate_side(&self.side)?;
-        non_empty("rfqSz", &self.rfq_sz)?;
-        non_empty("rfqSzCcy", &self.rfq_sz_ccy)?;
-        validate_client_request_id("clQReqId", self.cl_q_req_id.as_deref())
     }
 }
 
@@ -196,18 +169,6 @@ impl ConvertTradeRequest {
     }
 }
 
-impl ValidateRequest for ConvertTradeRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("quoteId", &self.quote_id)?;
-        non_empty("baseCcy", &self.base_ccy)?;
-        non_empty("quoteCcy", &self.quote_ccy)?;
-        validate_side(&self.side)?;
-        non_empty("sz", &self.sz)?;
-        non_empty("szCcy", &self.sz_ccy)?;
-        validate_client_request_id("clTReqId", self.cl_t_req_id.as_deref())
-    }
-}
-
 /// Query parameters for [`Convert::get_convert_history`](super::Convert::get_convert_history).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -258,22 +219,5 @@ impl ConvertHistoryRequest {
     pub fn tag(mut self, tag: impl Into<String>) -> Self {
         self.tag = Some(tag.into());
         self
-    }
-}
-
-impl ValidateRequest for ConvertHistoryRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        validate_client_request_id("clTReqId", self.cl_t_req_id.as_deref())?;
-
-        match &self.limit {
-            Some(limit) => {
-                let parsed = limit
-                    .parse::<u64>()
-                    .expect("ConvertHistoryRequest::limit stores a u8 as decimal text");
-
-                range_u64("limit", parsed, 1, 100)
-            }
-            None => Ok(()),
-        }
     }
 }

@@ -3,7 +3,6 @@
 use serde::Serialize;
 
 use crate::Error;
-use crate::model::ValidateRequest;
 use crate::ws::WsError;
 use crate::ws::client::OkxWs;
 use crate::ws::conn::WsConnector;
@@ -40,19 +39,6 @@ impl<C: WsConnector> OkxWs<C> {
     ) -> Result<(), Error> {
         let payload = operation_payload_with_expiry(id, op, exp_time, args)?;
         self.send_operation_payload(payload).await
-    }
-
-    pub(crate) async fn send_validated_request_with_expiry<A: Serialize + ValidateRequest>(
-        &mut self,
-        id: impl Into<String>,
-        op: &'static str,
-        exp_time: Option<String>,
-        args: &[A],
-    ) -> Result<(), Error> {
-        for arg in args {
-            arg.validate()?;
-        }
-        self.send_request_with_expiry(id, op, exp_time, args).await
     }
 }
 

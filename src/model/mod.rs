@@ -38,17 +38,6 @@ where
     }
 }
 
-mod validation;
-
-pub use validation::{RequestValidationError, ValidateRequest};
-pub(crate) use validation::{
-    at_least_one, collection_length, decimal_string_range, exactly_one, length_range, max_length,
-    non_empty, non_empty_items, non_negative_decimal_string, one_of, optional_non_empty,
-    optional_one_of, optional_positive_decimal_string, optional_unsigned_integer_string,
-    positive_decimal_string, positive_unsigned_integer_string, range_u64, reject_when_present,
-    require_when, validate_client_request_id, validate_side,
-};
-
 /// The OKX response envelope: `{ "code": "...", "msg": "...", "data": [...] }`.
 ///
 /// Internal — the client unwraps it and returns `data` (or an [`Error::Api`]).

@@ -1,13 +1,5 @@
 use serde::Serialize;
 
-use crate::model::{
-    RequestValidationError, ValidateRequest, collection_length, length_range, non_empty, one_of,
-    optional_non_empty, optional_one_of, optional_unsigned_integer_string, positive_decimal_string,
-    range_u64,
-};
-
-const PROTOCOL_TYPES: &[&str] = &["staking", "defi"];
-
 /// Query parameters for `GET /api/v5/finance/staking-defi/offers`.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct StakingDefiOffersRequest {
@@ -44,19 +36,6 @@ impl StakingDefiOffersRequest {
     }
 }
 
-impl ValidateRequest for StakingDefiOffersRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("productId", self.product_id.as_deref())?;
-        optional_one_of(
-            "protocolType",
-            self.protocol_type.as_deref(),
-            PROTOCOL_TYPES,
-            "staking or defi",
-        )?;
-        optional_non_empty("ccy", self.ccy.as_deref())
-    }
-}
-
 /// Currency and amount invested into one On-chain Earn product.
 #[derive(Debug, Clone, Serialize)]
 pub struct StakingDefiInvestment {
@@ -71,13 +50,6 @@ impl StakingDefiInvestment {
             ccy: ccy.into(),
             amt: amt.into(),
         }
-    }
-}
-
-impl ValidateRequest for StakingDefiInvestment {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("investData.ccy", &self.ccy)?;
-        positive_decimal_string("investData.amt", &self.amt)
     }
 }
 
@@ -118,27 +90,6 @@ impl StakingDefiPurchaseRequest {
     }
 }
 
-impl ValidateRequest for StakingDefiPurchaseRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("productId", &self.product_id)?;
-        collection_length("investData", self.invest_data.len(), 1, usize::MAX)?;
-        for investment in &self.invest_data {
-            investment.validate()?;
-        }
-        optional_non_empty("term", self.term.as_deref())?;
-        if let Some(tag) = self.tag.as_deref() {
-            length_range("tag", tag, 1, 16)?;
-            if !tag.bytes().all(|byte| byte.is_ascii_alphanumeric()) {
-                return Err(RequestValidationError::InvalidFormat {
-                    field: "tag",
-                    expected: "1-16 ASCII alphanumeric characters",
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
 /// Request body for `POST /api/v5/finance/staking-defi/redeem`.
 #[derive(Debug, Clone, Serialize)]
 pub struct StakingDefiRedeemRequest {
@@ -167,18 +118,6 @@ impl StakingDefiRedeemRequest {
     }
 }
 
-impl ValidateRequest for StakingDefiRedeemRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("ordId", &self.ord_id)?;
-        one_of(
-            "protocolType",
-            &self.protocol_type,
-            PROTOCOL_TYPES,
-            "staking or defi",
-        )
-    }
-}
-
 /// Request body for `POST /api/v5/finance/staking-defi/cancel`.
 #[derive(Debug, Clone, Serialize)]
 pub struct StakingDefiCancelRequest {
@@ -195,18 +134,6 @@ impl StakingDefiCancelRequest {
             ord_id: ord_id.into(),
             protocol_type: protocol_type.into(),
         }
-    }
-}
-
-impl ValidateRequest for StakingDefiCancelRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("ordId", &self.ord_id)?;
-        one_of(
-            "protocolType",
-            &self.protocol_type,
-            PROTOCOL_TYPES,
-            "staking or defi",
-        )
     }
 }
 
@@ -251,25 +178,6 @@ impl StakingDefiActiveOrdersRequest {
     pub fn state(mut self, value: impl Into<String>) -> Self {
         self.state = Some(value.into());
         self
-    }
-}
-
-impl ValidateRequest for StakingDefiActiveOrdersRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("productId", self.product_id.as_deref())?;
-        optional_one_of(
-            "protocolType",
-            self.protocol_type.as_deref(),
-            PROTOCOL_TYPES,
-            "staking or defi",
-        )?;
-        optional_non_empty("ccy", self.ccy.as_deref())?;
-        optional_one_of(
-            "state",
-            self.state.as_deref(),
-            &["1", "2", "8", "9", "13"],
-            "1, 2, 8, 9, or 13",
-        )
     }
 }
 
@@ -330,51 +238,5 @@ impl StakingDefiOrderHistoryRequest {
     pub fn limit(mut self, value: u32) -> Self {
         self.limit = Some(value);
         self
-    }
-}
-
-impl ValidateRequest for StakingDefiOrderHistoryRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("productId", self.product_id.as_deref())?;
-        optional_one_of(
-            "protocolType",
-            self.protocol_type.as_deref(),
-            PROTOCOL_TYPES,
-            "staking or defi",
-        )?;
-        optional_non_empty("ccy", self.ccy.as_deref())?;
-        optional_unsigned_integer_string("after", self.after.as_deref())?;
-        optional_unsigned_integer_string("before", self.before.as_deref())?;
-        if let Some(limit) = self.limit {
-            range_u64("limit", u64::from(limit), 1, 100)?;
-        }
-        Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn purchase_serializes_nested_investment_data() {
-        let request = StakingDefiPurchaseRequest::new(
-            "product-1",
-            vec![StakingDefiInvestment::new("ETH", "0.5")],
-        );
-        request.validate().unwrap();
-        let value = serde_json::to_value(request).unwrap();
-        assert_eq!(value["productId"], "product-1");
-        assert_eq!(value["investData"][0]["ccy"], "ETH");
-    }
-
-    #[test]
-    fn active_orders_reject_unknown_state() {
-        assert!(
-            StakingDefiActiveOrdersRequest::new()
-                .state("3")
-                .validate()
-                .is_err()
-        );
     }
 }

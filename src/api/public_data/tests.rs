@@ -1,6 +1,6 @@
+use crate::OkxClient;
 use crate::model::InstType;
 use crate::test_util::MockTransport;
-use crate::{Error, OkxClient};
 
 #[tokio::test]
 async fn get_instruments_builds_request_and_parses() {
@@ -383,21 +383,6 @@ async fn public_edge_requests_use_typed_queries() {
         Some("module=1&instType=SPOT&instIdList=BTC-USDT&dateAggrType=1D")
     );
     assert!(!req.is_signed());
-}
-
-#[tokio::test]
-async fn invalid_public_request_fails_before_transport() {
-    let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
-    let client = OkxClient::with_transport(mock.clone()).build();
-    let request = super::InstrumentTickBandsRequest::new("SPOT");
-
-    let error = client
-        .public_data()
-        .get_instrument_tick_bands(&request)
-        .await
-        .unwrap_err();
-    assert!(matches!(error, Error::InvalidRequest(_)));
-    assert!(!mock.was_called());
 }
 
 #[test]

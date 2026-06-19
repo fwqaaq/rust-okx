@@ -1,6 +1,6 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::{InstType, ValidateRequest};
+use crate::model::InstType;
 use crate::transport::Transport;
 
 use super::endpoints::*;
@@ -101,7 +101,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &BillsRequest,
     ) -> Result<Vec<AccountBill>, Error> {
-        request.validate()?;
         self.client.get(BILLS, request, true).await
     }
 
@@ -118,7 +117,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &BillsArchiveRequest,
     ) -> Result<Vec<AccountBill>, Error> {
-        request.validate()?;
         self.client.get(BILLS_ARCHIVE, request, true).await
     }
 
@@ -151,7 +149,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SetLeverageRequest,
     ) -> Result<Vec<LeverageInfo>, Error> {
-        request.validate()?;
         self.client.post(SET_LEVERAGE, request, true).await
     }
 
@@ -168,7 +165,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &LeverageRequest,
     ) -> Result<Vec<LeverageInfo>, Error> {
-        request.validate()?;
         self.client.get(GET_LEVERAGE, request, true).await
     }
 
@@ -185,7 +181,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &MaxOrderSizeRequest,
     ) -> Result<Vec<MaxOrderSize>, Error> {
-        request.validate()?;
         self.client.get(MAX_ORDER_SIZE, request, true).await
     }
 
@@ -202,7 +197,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &MaxAvailableSizeRequest,
     ) -> Result<Vec<MaxAvailableSize>, Error> {
-        request.validate()?;
         self.client.get(MAX_AVAILABLE_SIZE, request, true).await
     }
 
@@ -219,7 +213,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &AdjustMarginRequest,
     ) -> Result<Vec<AdjustMarginResult>, Error> {
-        request.validate()?;
         self.client.post(ADJUST_MARGIN, request, true).await
     }
 
@@ -233,7 +226,6 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_fee_rates(&self, request: &FeeRatesRequest) -> Result<Vec<FeeRate>, Error> {
-        request.validate()?;
         self.client.get(FEE_RATES, request, true).await
     }
 
@@ -250,7 +242,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &AccountInstrumentsRequest,
     ) -> Result<Vec<AccountInstrument>, Error> {
-        request.validate()?;
         self.client.get(ACCOUNT_INSTRUMENTS, request, true).await
     }
 
@@ -264,7 +255,6 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_loan(&self, request: &MaxLoanRequest) -> Result<Vec<MaxLoan>, Error> {
-        request.validate()?;
         self.client.get(MAX_LOAN, request, true).await
     }
 
@@ -281,7 +271,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &InterestAccruedRequest,
     ) -> Result<Vec<InterestAccrued>, Error> {
-        request.validate()?;
         self.client.get(INTEREST_ACCRUED, request, true).await
     }
 
@@ -357,7 +346,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &InterestLimitsRequest,
     ) -> Result<Vec<InterestLimit>, Error> {
-        request.validate()?;
         self.client.get(INTEREST_LIMITS, request, true).await
     }
 
@@ -376,7 +364,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SimulatedMarginRequest,
     ) -> Result<Vec<SimulatedMargin>, Error> {
-        request.validate()?;
         self.client.post(SIMULATED_MARGIN, request, true).await
     }
 
@@ -406,7 +393,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &PositionsHistoryRequest,
     ) -> Result<Vec<PositionHistory>, Error> {
-        request.validate()?;
         self.client.get(POSITIONS_HISTORY, request, true).await
     }
 
@@ -423,7 +409,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &AccountPositionTiersRequest,
     ) -> Result<Vec<AccountPositionTier>, Error> {
-        request.validate()?;
         self.client.get(ACCOUNT_POSITION_TIERS, request, true).await
     }
 
@@ -493,7 +478,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &PositionBuilderRequest,
     ) -> Result<Vec<PositionBuilderResult>, Error> {
-        request.validate()?;
         self.client.post(POSITION_BUILDER, request, true).await
     }
 
@@ -510,7 +494,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SpotManualBorrowRepayRequest,
     ) -> Result<Vec<SpotBorrowRepayResult>, Error> {
-        request.validate()?;
         self.client
             .post(SPOT_MANUAL_BORROW_REPAY, request, true)
             .await
@@ -529,7 +512,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SetAutoRepayRequest,
     ) -> Result<Vec<SetAutoRepayResult>, Error> {
-        request.validate()?;
         self.client.post(SET_AUTO_REPAY, request, true).await
     }
 
@@ -546,7 +528,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SpotBorrowRepayHistoryRequest,
     ) -> Result<Vec<SpotBorrowRepayHistory>, Error> {
-        request.validate()?;
         self.client
             .get(SPOT_BORROW_REPAY_HISTORY, request, true)
             .await
@@ -565,7 +546,6 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &SetAutoEarnRequest,
     ) -> Result<Vec<SetAutoEarnResult>, Error> {
-        request.validate()?;
         self.client.post(SET_AUTO_EARN, request, true).await
     }
 }

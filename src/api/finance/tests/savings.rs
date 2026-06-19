@@ -1,7 +1,7 @@
 use http::Method;
 
+use crate::OkxClient;
 use crate::test_util::MockTransport;
-use crate::{Error, OkxClient};
 
 use super::super::{FinanceHistoryRequest, SavingsPurchaseRedemptionRequest};
 use super::signed_client;
@@ -154,20 +154,4 @@ async fn get_public_borrow_info_omits_currency_when_absent() {
     );
     assert_eq!(req.query(), None);
     assert!(!req.is_signed(), "public endpoint must not be signed");
-}
-
-#[tokio::test]
-async fn invalid_savings_request_fails_before_transport() {
-    let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
-    let client = signed_client(mock.clone());
-    let request = SavingsPurchaseRedemptionRequest::new("USDT", "1", "invalid");
-
-    let error = client
-        .finance()
-        .savings()
-        .purchase_redemption(&request)
-        .await
-        .unwrap_err();
-    assert!(matches!(error, Error::InvalidRequest(_)));
-    assert!(!mock.was_called());
 }
