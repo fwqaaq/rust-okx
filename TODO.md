@@ -63,7 +63,7 @@
 - [ ] POST /api/v5/account/mmp-reset
 - [ ] POST /api/v5/account/demo-adjust-balance
 
-<!-- Account: 35/51 implemented -->
+<!-- Account: 35/50 implemented -->
 
 ## Trade
 

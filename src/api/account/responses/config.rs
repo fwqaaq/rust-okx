@@ -190,16 +190,6 @@ pub struct SetIsolatedModeResult {
     pub mode_type: String,
 }
 
-/// Result of updating risk offset type.
-#[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct SetRiskOffsetTypeResult {
-    /// OKX risk offset type.
-    #[serde(rename = "type", default)]
-    pub risk_offset_type: String,
-}
-
 /// Result of updating auto loan.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]

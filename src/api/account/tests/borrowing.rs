@@ -9,14 +9,13 @@ use super::signed_client;
 
 #[tokio::test]
 async fn get_max_loan_uses_builder_query() {
-    let body = r#"{"code":"0","msg":"","data":[{
-        "instId":"BTC-USDT","mgnMode":"cross","mgnCcy":"USDT","maxLoan":"0.59662225","ccy":"","side":""}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"instId":"BTC-USDT","mgnMode":"isolated","mgnCcy":"","maxLoan":"0.1","ccy":"BTC","side":"sell"},{"instId":"BTC-USDT","mgnMode":"isolated","mgnCcy":"USDT","maxLoan":"0.2","ccy":"USDT","side":"buy"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = MaxLoanRequest::new("BTC-USDT", TradeMode::Cross).margin_currency("USDT");
 
     let result = client.account().get_max_loan(&request).await.unwrap();
-    assert_eq!(result[0].max_loan.as_str(), "0.59662225");
+    assert_eq!(result[0].max_loan.as_str(), "0.1");
 
     let req = mock.captured();
     assert_eq!(

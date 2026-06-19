@@ -2,17 +2,72 @@ use serde::Deserialize;
 
 use crate::model::NumberString;
 
-/// Account risk state.
+/// Per-currency loan record within an account risk-state response.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct LoanRecord {
+    /// Available loan amount.
+    #[serde(default)]
+    pub avail_loan: String,
+    /// Average borrow rate.
+    #[serde(default)]
+    pub avg_rate: String,
+    /// Currency.
+    #[serde(default)]
+    pub ccy: String,
+    /// Accrued interest.
+    #[serde(default)]
+    pub interest: NumberString,
+    /// Total loan quota.
+    #[serde(default)]
+    pub loan_quota: NumberString,
+    /// Position loan.
+    #[serde(default)]
+    pub pos_loan: String,
+    /// Current borrow rate.
+    #[serde(default)]
+    pub rate: NumberString,
+    /// Remaining loan limit.
+    #[serde(default)]
+    pub surplus_lmt: NumberString,
+    /// Used loan limit.
+    #[serde(default)]
+    pub used_lmt: NumberString,
+    /// Used loan amount.
+    #[serde(default)]
+    pub used_loan: String,
+    /// Interest-free liability.
+    #[serde(default)]
+    pub interest_free_liab: String,
+    /// Potential borrowing amount.
+    #[serde(default)]
+    pub potential_borrowing_amt: String,
+}
+
+/// Account risk state (loan allocation summary).
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct RiskState {
-    /// Whether the account is currently at risk, as represented by OKX.
+    /// Total debt.
     #[serde(default)]
-    pub at_risk: String,
-    /// Timestamp (Unix milliseconds).
+    pub debt: NumberString,
+    /// Total accrued interest.
     #[serde(default)]
-    pub ts: NumberString,
+    pub interest: NumberString,
+    /// Loan allocation string.
+    #[serde(default)]
+    pub loan_alloc: String,
+    /// Timestamp of next discount event (Unix milliseconds).
+    #[serde(default)]
+    pub next_discount_time: NumberString,
+    /// Timestamp of next interest accrual (Unix milliseconds).
+    #[serde(default)]
+    pub next_interest_time: NumberString,
+    /// Per-currency loan records.
+    #[serde(default)]
+    pub records: Vec<LoanRecord>,
 }
 
 /// Simulated margin calculation result.

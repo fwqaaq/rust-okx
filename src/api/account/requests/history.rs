@@ -252,3 +252,4 @@ impl ValidateRequest for PositionsHistoryRequest {
         validate_pagination(self.after.as_deref(), self.before.as_deref(), self.limit)
     }
 }
+

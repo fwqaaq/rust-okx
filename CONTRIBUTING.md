@@ -146,8 +146,7 @@ response type actually declares; do not invent values.
 #[tokio::test]
 async fn get_risk_state_signs_and_parses() {
     // Body copied from OKX docs "Response Example" for GET /api/v5/account/risk-state
-    let body = r#"{"code":"0","msg":"","data":[{
-        "atRisk":"false","atRiskIdx":[],"atRiskMgn":[],"ts":"1620282288836"}]}"#;
+    let body = r#"{"code":"0","data":[{"debt":"0.85893159114900247077000000000000","interest":"0.00000000000000000000000000000000","loanAlloc":"","nextDiscountTime":"1729490400000","nextInterestTime":"1729490400000","records":[{"availLoan":"","avgRate":"","ccy":"BTC","interest":"0","loanQuota":"175.00000000","posLoan":"","rate":"0.0000276","surplusLmt":"175.00000000","surplusLmtDetails":{},"usedLmt":"0.00000000","usedLoan":"","interestFreeLiab":"","potentialBorrowingAmt":""}]}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
@@ -169,15 +168,13 @@ async fn get_risk_state_signs_and_parses() {
 #[tokio::test]
 async fn get_max_loan_uses_builder_query() {
     // Body copied from OKX docs "Response Example" for GET /api/v5/account/max-loan
-    let body = r#"{"code":"0","msg":"","data":[{
-        "instId":"BTC-USDT","mgnMode":"cross","mgnCcy":"USDT",
-        "maxLoan":"0.59662225","ccy":"","side":""}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"instId":"BTC-USDT","mgnMode":"isolated","mgnCcy":"","maxLoan":"0.1","ccy":"BTC","side":"sell"},{"instId":"BTC-USDT","mgnMode":"isolated","mgnCcy":"USDT","maxLoan":"0.2","ccy":"USDT","side":"buy"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = MaxLoanRequest::new("BTC-USDT", TradeMode::Cross).margin_currency("USDT");
 
     let result = client.account().get_max_loan(&request).await.unwrap();
-    assert_eq!(result[0].max_loan.as_str(), "0.59662225");
+    assert_eq!(result[0].max_loan.as_str(), "0.1");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instId=BTC-USDT&mgnMode=cross&mgnCcy=USDT"));

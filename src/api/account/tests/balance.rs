@@ -59,10 +59,7 @@ async fn get_positions_passes_filters() {
     assert_eq!(positions[0].pos_side, PositionSide::Long);
 
     let req = mock.captured();
-    assert_eq!(
-        req.query(),
-        Some("instType=FUTURES&instId=ETH-USD-210430")
-    );
+    assert_eq!(req.query(), Some("instType=FUTURES&instId=ETH-USD-210430"));
     assert!(req.is_signed());
 }
 
@@ -114,12 +111,12 @@ async fn get_account_config_signs_and_parses() {
 
 #[tokio::test]
 async fn get_risk_state_signs_and_parses() {
-    let body = r#"{"code":"0","msg":"","data":[{"atRisk":"false","atRiskIdx":[],"atRiskMgn":[],"ts":"1620282288836"}]}"#;
+    let body = r#"{"code":"0","data":[{"debt":"0.85893159114900247077000000000000","interest":"0.00000000000000000000000000000000","loanAlloc":"","nextDiscountTime":"1729490400000","nextInterestTime":"1729490400000","records":[{"availLoan":"","avgRate":"","ccy":"BTC","interest":"0","loanQuota":"175.00000000","posLoan":"","rate":"0.0000276","surplusLmt":"175.00000000","surplusLmtDetails":{},"usedLmt":"0.00000000","usedLoan":"","interestFreeLiab":"","potentialBorrowingAmt":""}]}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
     let result = client.account().get_risk_state().await.unwrap();
-    assert_eq!(result[0].at_risk, "false");
+    assert_eq!(result[0].records[0].ccy, "BTC");
 
     let req = mock.captured();
     assert!(req.uri.ends_with("/api/v5/account/risk-state"));
