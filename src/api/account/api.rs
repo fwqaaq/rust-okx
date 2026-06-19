@@ -44,7 +44,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_positions(
         &self,
         inst_type: Option<InstType>,
@@ -63,7 +64,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_position_risk(
         &self,
         inst_type: Option<InstType>,
@@ -80,7 +82,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_config(&self) -> Result<Vec<AccountConfig>, Error> {
         self.client.get(ACCOUNT_CONFIG, &NoQuery, true).await
     }
@@ -91,7 +94,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_bills(
         &self,
         request: &BillsRequest,
@@ -106,7 +111,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_bills_archive(
         &self,
         request: &BillsArchiveRequest,
@@ -121,7 +128,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_position_mode(
         &self,
         pos_mode: &str,
@@ -136,7 +144,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_leverage(
         &self,
         request: &SetLeverageRequest,
@@ -151,7 +161,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_leverage(
         &self,
         request: &LeverageRequest,
@@ -166,7 +178,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_order_size(
         &self,
         request: &MaxOrderSizeRequest,
@@ -181,7 +195,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_avail_size(
         &self,
         request: &MaxAvailableSizeRequest,
@@ -196,7 +212,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn adjust_margin(
         &self,
         request: &AdjustMarginRequest,
@@ -211,7 +229,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_fee_rates(&self, request: &FeeRatesRequest) -> Result<Vec<FeeRate>, Error> {
         request.validate()?;
         self.client.get(FEE_RATES, request, true).await
@@ -223,7 +243,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_instruments(
         &self,
         request: &AccountInstrumentsRequest,
@@ -238,7 +260,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_loan(&self, request: &MaxLoanRequest) -> Result<Vec<MaxLoan>, Error> {
         request.validate()?;
         self.client.get(MAX_LOAN, request, true).await
@@ -250,7 +274,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_interest_accrued(
         &self,
         request: &InterestAccruedRequest,
@@ -265,7 +291,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_interest_rate(&self, ccy: Option<&str>) -> Result<Vec<InterestRate>, Error> {
         let query = BalanceQuery { ccy };
         self.client.get(INTEREST_RATE, &query, true).await
@@ -277,7 +304,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_greeks(&self, greeks_type: &str) -> Result<Vec<SetGreeksResult>, Error> {
         let body = SetGreeksBody { greeks_type };
         self.client.post(SET_GREEKS, &body, true).await
@@ -289,7 +317,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_isolated_mode(
         &self,
         iso_mode: &str,
@@ -308,7 +337,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_withdrawal(&self, ccy: Option<&str>) -> Result<Vec<MaxWithdrawal>, Error> {
         let query = BalanceQuery { ccy };
         self.client.get(MAX_WITHDRAWAL, &query, true).await
@@ -320,7 +350,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_interest_limits(
         &self,
         request: &InterestLimitsRequest,
@@ -337,7 +369,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_simulated_margin(
         &self,
         request: &SimulatedMarginRequest,
@@ -352,7 +386,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_greeks(&self, ccy: Option<&str>) -> Result<Vec<Greek>, Error> {
         let query = BalanceQuery { ccy };
         self.client.get(GREEKS, &query, true).await
@@ -364,7 +399,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_positions_history(
         &self,
         request: &PositionsHistoryRequest,
@@ -379,7 +416,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_position_tiers(
         &self,
         request: &AccountPositionTiersRequest,
@@ -394,26 +433,10 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_risk_state(&self) -> Result<Vec<RiskState>, Error> {
         self.client.get(RISK_STATE, &NoQuery, true).await
-    }
-
-    /// Set account risk offset type.
-    ///
-    /// `POST /api/v5/account/set-riskOffset-type`. Authenticated.
-    ///
-    /// # Errors
-    ///
-    /// See [`get_balance`](Self::get_balance).
-    pub async fn set_risk_offset_type(
-        &self,
-        risk_offset_type: &str,
-    ) -> Result<Vec<SetRiskOffsetTypeResult>, Error> {
-        let body = TypeBody {
-            value: risk_offset_type,
-        };
-        self.client.post(SET_RISK_OFFSET_TYPE, &body, true).await
     }
 
     /// Set account auto-loan mode.
@@ -422,7 +445,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_auto_loan(&self, auto_loan: bool) -> Result<Vec<SetAutoLoanResult>, Error> {
         let body = SetAutoLoanBody { auto_loan };
         self.client.post(SET_AUTO_LOAN, &body, true).await
@@ -434,7 +458,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_account_level(
         &self,
         acct_lv: &str,
@@ -449,7 +474,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn activate_option(&self) -> Result<Vec<ActivateOptionResult>, Error> {
         self.client.post(ACTIVATE_OPTION, &EmptyBody {}, true).await
     }
@@ -460,7 +486,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn position_builder(
         &self,
         request: &PositionBuilderRequest,
@@ -475,7 +503,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn spot_manual_borrow_repay(
         &self,
         request: &SpotManualBorrowRepayRequest,
@@ -492,7 +522,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_auto_repay(
         &self,
         request: &SetAutoRepayRequest,
@@ -507,7 +539,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_spot_borrow_repay_history(
         &self,
         request: &SpotBorrowRepayHistoryRequest,
@@ -524,7 +558,9 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// See [`get_balance`](Self::get_balance).
+    /// Returns [`Error::InvalidRequest`] on validation failure,
+    /// [`Error::Configuration`] if no credentials are set,
+    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_auto_earn(
         &self,
         request: &SetAutoEarnRequest,

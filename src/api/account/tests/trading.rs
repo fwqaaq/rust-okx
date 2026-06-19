@@ -72,8 +72,7 @@ async fn get_max_order_size_uses_builder_query() {
         "instId":"BTC-USDT","ccy":"","maxBuy":"9.6782340237","maxSell":"0.0049"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request =
-        MaxOrderSizeRequest::new("BTC-USDT", TradeMode::Cash).price("41960.8");
+    let request = MaxOrderSizeRequest::new("BTC-USDT", TradeMode::Cash).price("41960.8");
 
     let result = client.account().get_max_order_size(&request).await.unwrap();
     assert_eq!(result[0].max_buy.as_str(), "9.6782340237");
@@ -89,8 +88,7 @@ async fn get_max_avail_size_uses_builder_query() {
         "instId":"BTC-USDT","availBuy":"186.0717690","availSell":"0.12"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request =
-        MaxAvailableSizeRequest::new("BTC-USDT", TradeMode::Cash).reduce_only(false);
+    let request = MaxAvailableSizeRequest::new("BTC-USDT", TradeMode::Cash).reduce_only(false);
 
     let result = client.account().get_max_avail_size(&request).await.unwrap();
     assert_eq!(result[0].avail_sell.as_str(), "0.12");
@@ -146,13 +144,8 @@ async fn adjust_margin_posts_body() {
         "instId":"BTC-USDT-SWAP","posSide":"long","type":"add","amt":"100","cTime":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = AdjustMarginRequest::new(
-        "BTC-USDT-SWAP",
-        PositionSide::Long,
-        "add",
-        "100",
-    )
-    .loan_transfer(true);
+    let request = AdjustMarginRequest::new("BTC-USDT-SWAP", PositionSide::Long, "add", "100")
+        .loan_transfer(true);
 
     let result = client.account().adjust_margin(&request).await.unwrap();
     assert_eq!(result[0].amt.as_str(), "100");
@@ -231,23 +224,6 @@ async fn set_isolated_mode_posts_body() {
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["isoMode"], "automatic");
     assert_eq!(sent["type"], "MARGIN");
-    assert!(req.is_signed());
-}
-
-#[tokio::test]
-async fn set_risk_offset_type_posts_body() {
-    let body = r#"{"code":"0","msg":"","data":[{"type":"1"}]}"#;
-    let mock = MockTransport::new(body);
-    let client = signed_client(mock.clone());
-
-    let result = client.account().set_risk_offset_type("1").await.unwrap();
-    assert_eq!(result[0].risk_offset_type, "1");
-
-    let req = mock.captured();
-    assert_eq!(req.method, http::Method::POST);
-    assert!(req.uri.ends_with("/api/v5/account/set-riskOffset-type"));
-    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
-    assert_eq!(sent["type"], "1");
     assert!(req.is_signed());
 }
 

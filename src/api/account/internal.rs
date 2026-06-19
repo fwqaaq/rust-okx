@@ -49,12 +49,6 @@ pub(super) struct SetIsolatedModeBody<'a> {
 }
 
 #[derive(Serialize)]
-pub(super) struct TypeBody<'a> {
-    #[serde(rename = "type")]
-    pub(super) value: &'a str,
-}
-
-#[derive(Serialize)]
 pub(super) struct SetAutoLoanBody {
     #[serde(rename = "autoLoan")]
     pub(super) auto_loan: bool,

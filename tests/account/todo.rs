@@ -6,7 +6,6 @@ fn account_configuration_mutations_todo() {
     // API: POST /api/v5/account/set-position-mode
     // API: POST /api/v5/account/set-greeks
     // API: POST /api/v5/account/set-isolated-mode
-    // API: POST /api/v5/account/set-riskOffset-type
     // API: POST /api/v5/account/set-auto-loan
     // API: POST /api/v5/account/set-account-level
     // API: POST /api/v5/account/activate-option

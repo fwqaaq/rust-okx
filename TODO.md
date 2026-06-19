@@ -46,7 +46,6 @@
 - [x] POST /api/v5/account/simulated_margin
 - [x] GET /api/v5/account/position-tiers
 - [x] GET /api/v5/account/risk-state
-- [x] POST /api/v5/account/set-riskOffset-type
 - [ ] POST /api/v5/account/set-riskOffset-amt
 - [x] POST /api/v5/account/set-auto-loan
 - [x] POST /api/v5/account/set-account-level

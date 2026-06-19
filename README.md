@@ -167,6 +167,10 @@ trading-data analytics, and status endpoints.
 
 See [TODO.md](TODO.md) for the detailed backlog.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new API endpoint, including the required doc comment format, unit test and integration test conventions, and the per-PR checklist.
+
 ## Disclaimer
 
 This is an unofficial SDK and is not affiliated with OKX. Trading involves
