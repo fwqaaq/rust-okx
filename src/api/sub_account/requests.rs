@@ -1,5 +1,9 @@
 use serde::Serialize;
 
+use crate::model::{
+    RequestValidationError, ValidateRequest, at_least_one, non_empty, one_of, range_u64,
+};
+
 /// Query parameters for [`SubAccount::get_subaccount_list`].
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -507,4 +511,106 @@ impl ManagedSubAccountBillsRequest {
 pub struct EntrustSubAccountListRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     sub_acct: Option<String>,
+}
+
+// ── ValidateRequest impls ────────────────────────────────────────────────────
+
+impl ValidateRequest for SubAccountListRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        if let Some(limit) = self.limit {
+            range_u64("limit", u64::from(limit), 1, 100)?;
+        }
+        Ok(())
+    }
+}
+
+impl ValidateRequest for SubAccountApiKeysRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)
+    }
+}
+
+impl ValidateRequest for SubAccountTradingBalancesRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)
+    }
+}
+
+impl ValidateRequest for SubAccountFundingBalancesRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)
+    }
+}
+
+impl ValidateRequest for SubAccountMaxWithdrawalRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)
+    }
+}
+
+impl ValidateRequest for CreateSubAccountRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)
+    }
+}
+
+impl ValidateRequest for CreateSubAccountApiKeyRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)?;
+        non_empty("label", &self.label)?;
+        non_empty("passphrase", &self.passphrase)
+    }
+}
+
+impl ValidateRequest for ModifySubAccountApiKeyRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)?;
+        non_empty("apiKey", &self.api_key)?;
+        at_least_one(
+            "label, perm, ip",
+            &[self.label.is_some(), self.perm.is_some(), self.ip.is_some()],
+        )
+    }
+}
+
+impl ValidateRequest for DeleteSubAccountApiKeyRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)?;
+        non_empty("apiKey", &self.api_key)
+    }
+}
+
+impl ValidateRequest for SubAccountTransferRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("ccy", &self.ccy)?;
+        non_empty("amt", &self.amt)?;
+        non_empty("fromSubAccount", &self.from_sub_account)?;
+        non_empty("toSubAccount", &self.to_sub_account)?;
+        one_of("from", &self.from, &["6", "18"], r#""6" or "18""#)?;
+        one_of("to", &self.to, &["6", "18"], r#""6" or "18""#)
+    }
+}
+
+impl ValidateRequest for SetTransferOutRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        non_empty("subAcct", &self.sub_acct)
+    }
+}
+
+impl ValidateRequest for SubAccountBillsRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        if let Some(limit) = self.limit {
+            range_u64("limit", u64::from(limit), 1, 100)?;
+        }
+        Ok(())
+    }
+}
+
+impl ValidateRequest for ManagedSubAccountBillsRequest {
+    fn validate(&self) -> Result<(), RequestValidationError> {
+        if let Some(limit) = self.limit {
+            range_u64("limit", u64::from(limit), 1, 100)?;
+        }
+        Ok(())
+    }
 }

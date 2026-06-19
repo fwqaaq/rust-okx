@@ -42,49 +42,6 @@ Every public method on an accessor type must follow this template exactly.
 pub async fn get_funding_rate(&self, inst_id: &str) -> Result<Vec<FundingRate>, Error> {}
 ```
 
-### Authenticated endpoint, no request validation
-
-```rust
-/// Retrieve the account risk state.
-///
-/// `GET /api/v5/account/risk-state`. Authenticated.
-///
-/// # Errors
-///
-/// Returns [`Error::Configuration`] if no credentials are set,
-/// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-pub async fn get_risk_state(&self) -> Result<Vec<RiskState>, Error> {}
-```
-
-### Authenticated endpoint, with request validation
-
-```rust
-/// Retrieve recent account bills.
-///
-/// `GET /api/v5/account/bills`. Authenticated.
-///
-/// # Errors
-///
-/// Returns [`Error::InvalidRequest`] on validation failure,
-/// [`Error::Configuration`] if no credentials are set,
-/// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-pub async fn get_account_bills(
-    &self,
-    request: &BillsRequest,
-) -> Result<Vec<AccountBill>, Error> {
-    request.validate()?;
-}
-```
-
-**Rules:**
-
-- The first line is always a short, imperative summary.
-- The second paragraph states the HTTP method, the exact OKX path, and whether the endpoint is `Authenticated` or `Public`.
-- The `# Errors` section lists errors in this order: `InvalidRequest` (if `validate()` is called), `Configuration` (if authenticated), `Api`, transport/decode.
-- Never use `See [other_method]` cross-references.
-
----
-
 ## Response types
 
 Every response struct must carry these attributes:
