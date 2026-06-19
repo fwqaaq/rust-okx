@@ -1,6 +1,5 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::ValidateRequest;
 use crate::transport::Transport;
 
 use super::endpoints::*;
@@ -33,7 +32,6 @@ impl<'a, T: Transport> SubAccount<'a, T> {
         &self,
         request: &SubAccountListRequest,
     ) -> Result<Vec<SubAccountEntry>, Error> {
-        request.validate()?;
         self.client.get(SUBACCOUNT_LIST, request, true).await
     }
 
@@ -95,7 +93,6 @@ impl<'a, T: Transport> SubAccount<'a, T> {
         &self,
         request: &ModifySubAccountApiKeyRequest,
     ) -> Result<Vec<SubAccountApiKey>, Error> {
-        request.validate()?;
         self.client
             .post(SUBACCOUNT_APIKEY_MODIFY, request, true)
             .await
@@ -182,7 +179,6 @@ impl<'a, T: Transport> SubAccount<'a, T> {
         &self,
         request: &SubAccountBillsRequest,
     ) -> Result<Vec<SubAccountBill>, Error> {
-        request.validate()?;
         self.client.get(SUBACCOUNT_BILLS, request, true).await
     }
 
@@ -199,7 +195,6 @@ impl<'a, T: Transport> SubAccount<'a, T> {
         &self,
         request: &ManagedSubAccountBillsRequest,
     ) -> Result<Vec<ManagedSubAccountBill>, Error> {
-        request.validate()?;
         self.client
             .get(SUBACCOUNT_MANAGED_BILLS, request, true)
             .await

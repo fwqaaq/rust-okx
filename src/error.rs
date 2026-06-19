@@ -1,6 +1,5 @@
 //! Error types returned by the crate.
 
-use crate::model::RequestValidationError;
 use crate::transport::TransportError;
 #[cfg(feature = "websocket")]
 pub use crate::ws::WsError;
@@ -28,10 +27,6 @@ pub enum Error {
     #[cfg(feature = "websocket")]
     #[error(transparent)]
     Ws(#[from] WsError),
-
-    /// The typed request failed client-side validation before it was sent.
-    #[error("invalid request: {0}")]
-    InvalidRequest(#[from] RequestValidationError),
 }
 
 /// Errors from the REST API layer.

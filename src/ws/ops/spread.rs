@@ -19,13 +19,8 @@ impl<C: WsConnector> OkxWs<C> {
     ) -> Result<(), Error> {
         self.require_channel_group(WsChannelGroup::Business, "sprd-order")?;
         self.require_credentials("sprd-order")?;
-        self.send_validated_request_with_expiry(
-            id,
-            "sprd-order",
-            None,
-            std::slice::from_ref(request),
-        )
-        .await
+        self.send_request_with_expiry(id, "sprd-order", None, std::slice::from_ref(request))
+            .await
     }
 
     /// Send `sprd-amend-order` to amend a spread order over the business WebSocket.
@@ -38,13 +33,8 @@ impl<C: WsConnector> OkxWs<C> {
     ) -> Result<(), Error> {
         self.require_channel_group(WsChannelGroup::Business, "sprd-amend-order")?;
         self.require_credentials("sprd-amend-order")?;
-        self.send_validated_request_with_expiry(
-            id,
-            "sprd-amend-order",
-            None,
-            std::slice::from_ref(request),
-        )
-        .await
+        self.send_request_with_expiry(id, "sprd-amend-order", None, std::slice::from_ref(request))
+            .await
     }
 
     /// Send `sprd-cancel-order` to cancel a spread order over the business WebSocket.
@@ -57,13 +47,8 @@ impl<C: WsConnector> OkxWs<C> {
     ) -> Result<(), Error> {
         self.require_channel_group(WsChannelGroup::Business, "sprd-cancel-order")?;
         self.require_credentials("sprd-cancel-order")?;
-        self.send_validated_request_with_expiry(
-            id,
-            "sprd-cancel-order",
-            None,
-            std::slice::from_ref(request),
-        )
-        .await
+        self.send_request_with_expiry(id, "sprd-cancel-order", None, std::slice::from_ref(request))
+            .await
     }
 
     /// Send `sprd-mass-cancel` to cancel spread orders over the business WebSocket.
@@ -76,12 +61,7 @@ impl<C: WsConnector> OkxWs<C> {
     ) -> Result<(), Error> {
         self.require_channel_group(WsChannelGroup::Business, "sprd-mass-cancel")?;
         self.require_credentials("sprd-mass-cancel")?;
-        self.send_validated_request_with_expiry(
-            id,
-            "sprd-mass-cancel",
-            None,
-            std::slice::from_ref(request),
-        )
-        .await
+        self.send_request_with_expiry(id, "sprd-mass-cancel", None, std::slice::from_ref(request))
+            .await
     }
 }

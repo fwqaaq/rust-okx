@@ -2,44 +2,6 @@
 
 use serde::Serialize;
 
-use crate::model::{
-    RequestValidationError, ValidateRequest, at_least_one, non_empty, one_of, optional_non_empty,
-    positive_decimal_string, validate_client_request_id,
-};
-
-fn optional_signed_decimal_string(
-    field: &'static str,
-    value: Option<&str>,
-) -> Result<(), RequestValidationError> {
-    let Some(value) = value else {
-        return Ok(());
-    };
-    non_empty(field, value)?;
-
-    let unsigned = value.strip_prefix('-').unwrap_or(value);
-    let mut dot_seen = false;
-    let mut digit_seen = false;
-    for byte in unsigned.bytes() {
-        match byte {
-            b'0'..=b'9' => digit_seen = true,
-            b'.' if !dot_seen => dot_seen = true,
-            _ => {
-                return Err(RequestValidationError::InvalidFormat {
-                    field,
-                    expected: "a signed decimal string without exponent notation",
-                });
-            }
-        }
-    }
-    if !digit_seen || unsigned.starts_with('.') || unsigned.ends_with('.') {
-        return Err(RequestValidationError::InvalidFormat {
-            field,
-            expected: "a signed decimal string without exponent notation",
-        });
-    }
-    Ok(())
-}
-
 /// Place-spread-order request body (`sprd-order`).
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#spread-trading-websocket-trade-api-ws-place-order>
@@ -101,24 +63,6 @@ impl PlaceSpreadOrderRequest {
     pub fn price(mut self, price: impl Into<String>) -> Self {
         self.px = Some(price.into());
         self
-    }
-}
-
-impl ValidateRequest for PlaceSpreadOrderRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("sprdId", &self.sprd_id)?;
-        validate_client_request_id("clOrdId", self.cl_ord_id.as_deref())?;
-        optional_non_empty("tag", self.tag.as_deref())?;
-        one_of("side", &self.side, &["buy", "sell"], "buy or sell")?;
-        one_of(
-            "ordType",
-            &self.ord_type,
-            &["limit", "post_only", "ioc"],
-            "limit, post_only, or ioc",
-        )?;
-        positive_decimal_string("sz", &self.sz)?;
-        optional_signed_decimal_string("px", self.px.as_deref())?;
-        Ok(())
     }
 }
 
@@ -185,27 +129,6 @@ impl AmendSpreadOrderRequest {
     }
 }
 
-impl ValidateRequest for AmendSpreadOrderRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        at_least_one(
-            "ordId, clOrdId",
-            &[self.ord_id.is_some(), self.cl_ord_id.is_some()],
-        )?;
-        optional_non_empty("ordId", self.ord_id.as_deref())?;
-        validate_client_request_id("clOrdId", self.cl_ord_id.as_deref())?;
-        validate_client_request_id("reqId", self.req_id.as_deref())?;
-        at_least_one(
-            "newSz, newPx",
-            &[self.new_sz.is_some(), self.new_px.is_some()],
-        )?;
-        if let Some(value) = self.new_sz.as_deref() {
-            positive_decimal_string("newSz", value)?;
-        }
-        optional_signed_decimal_string("newPx", self.new_px.as_deref())?;
-        Ok(())
-    }
-}
-
 /// Cancel-spread-order request body (`sprd-cancel-order`).
 ///
 /// Either `ordId` or `clOrdId` is required; when both are supplied OKX uses
@@ -242,18 +165,6 @@ impl CancelSpreadOrderRequest {
     }
 }
 
-impl ValidateRequest for CancelSpreadOrderRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        at_least_one(
-            "ordId, clOrdId",
-            &[self.ord_id.is_some(), self.cl_ord_id.is_some()],
-        )?;
-        optional_non_empty("ordId", self.ord_id.as_deref())?;
-        validate_client_request_id("clOrdId", self.cl_ord_id.as_deref())?;
-        Ok(())
-    }
-}
-
 /// Cancel-all-spread-orders request body (`sprd-mass-cancel`).
 ///
 /// When `sprdId` is omitted, OKX cancels pending orders across all spreads.
@@ -282,12 +193,6 @@ impl MassCancelSpreadOrdersRequest {
     }
 }
 
-impl ValidateRequest for MassCancelSpreadOrdersRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("sprdId", self.sprd_id.as_deref())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -297,34 +202,10 @@ mod tests {
         let request = PlaceSpreadOrderRequest::new("BTC-USDT_BTC-USDT-SWAP", "buy", "limit", "2")
             .client_order_id("b15")
             .price("2.15");
-        request.validate().unwrap();
         let value = serde_json::to_value(request).unwrap();
         assert_eq!(value["sprdId"], "BTC-USDT_BTC-USDT-SWAP");
         assert_eq!(value["ordType"], "limit");
         assert_eq!(value["px"], "2.15");
-    }
-
-    #[test]
-    fn rejects_incomplete_amend_request() {
-        let error = AmendSpreadOrderRequest::by_order_id("1")
-            .validate()
-            .unwrap_err();
-        assert!(matches!(
-            error,
-            RequestValidationError::AtLeastOneRequired { .. }
-        ));
-    }
-
-    #[test]
-    fn accepts_negative_spread_prices() {
-        PlaceSpreadOrderRequest::new("A_B", "sell", "limit", "1")
-            .price("-2.5")
-            .validate()
-            .unwrap();
-        AmendSpreadOrderRequest::by_order_id("1")
-            .new_price("-1.25")
-            .validate()
-            .unwrap();
     }
 
     #[test]

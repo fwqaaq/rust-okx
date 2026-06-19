@@ -67,11 +67,6 @@ impl MockTransport {
             .clone()
             .expect("no request was sent through the mock transport")
     }
-
-    /// Whether a request reached the transport.
-    pub fn was_called(&self) -> bool {
-        self.captured.lock().unwrap().is_some()
-    }
 }
 
 impl Transport for MockTransport {

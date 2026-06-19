@@ -1,9 +1,6 @@
 use serde::Serialize;
 
-use crate::model::{
-    InstType, RequestValidationError, TradeMode, ValidateRequest, optional_non_empty,
-    optional_one_of, optional_unsigned_integer_string, range_u64,
-};
+use crate::model::{InstType, TradeMode};
 
 /// Query parameters for account bills.
 #[derive(Debug, Clone, Default, Serialize)]
@@ -198,57 +195,5 @@ impl PositionsHistoryRequest {
     pub fn limit(mut self, limit: u32) -> Self {
         self.limit = Some(limit);
         self
-    }
-}
-
-fn validate_pagination(
-    after: Option<&str>,
-    before: Option<&str>,
-    limit: Option<u32>,
-) -> Result<(), RequestValidationError> {
-    optional_unsigned_integer_string("after", after)?;
-    optional_unsigned_integer_string("before", before)?;
-    if let Some(limit) = limit {
-        range_u64("limit", u64::from(limit), 1, 100)?;
-    }
-    Ok(())
-}
-
-impl ValidateRequest for BillsRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("ccy", self.ccy.as_deref())?;
-        optional_non_empty("ctType", self.ct_type.as_deref())?;
-        optional_unsigned_integer_string("type", self.bill_type.as_deref())?;
-        optional_unsigned_integer_string("subType", self.sub_type.as_deref())?;
-        validate_pagination(self.after.as_deref(), self.before.as_deref(), self.limit)
-    }
-}
-
-impl ValidateRequest for BillsArchiveRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        self.base.validate()?;
-        optional_unsigned_integer_string("begin", self.begin.as_deref())?;
-        optional_unsigned_integer_string("end", self.end.as_deref())?;
-        Ok(())
-    }
-}
-
-impl ValidateRequest for PositionsHistoryRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        if matches!(self.inst_type, Some(InstType::Spot)) {
-            return Err(RequestValidationError::InvalidFormat {
-                field: "instType",
-                expected: "MARGIN, SWAP, FUTURES, OPTION, or EVENTS",
-            });
-        }
-        optional_non_empty("instId", self.inst_id.as_deref())?;
-        optional_one_of(
-            "type",
-            self.close_type.as_deref(),
-            &["1", "2", "3", "4", "5", "6"],
-            "an integer from 1 through 6",
-        )?;
-        optional_non_empty("posId", self.pos_id.as_deref())?;
-        validate_pagination(self.after.as_deref(), self.before.as_deref(), self.limit)
     }
 }

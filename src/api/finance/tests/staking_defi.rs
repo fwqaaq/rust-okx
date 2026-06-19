@@ -1,6 +1,5 @@
 use http::Method;
 
-use crate::Error;
 use crate::test_util::MockTransport;
 
 use super::super::{
@@ -153,20 +152,4 @@ async fn get_orders_history_sends_signed_query() {
     assert_eq!(req.method, Method::GET);
     assert_eq!(req.query(), Some("protocolType=defi&limit=5"));
     assert!(req.is_signed());
-}
-
-#[tokio::test]
-async fn invalid_staking_defi_request_fails_before_transport() {
-    let mock = MockTransport::new(r#"{"code":"0","msg":"","data":[]}"#);
-    let client = signed_client(mock.clone());
-    let request = StakingDefiRedeemRequest::new("1", "unknown_type");
-
-    let error = client
-        .finance()
-        .staking_defi()
-        .redeem(&request)
-        .await
-        .unwrap_err();
-    assert!(matches!(error, Error::InvalidRequest(_)));
-    assert!(!mock.was_called());
 }

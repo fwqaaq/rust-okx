@@ -1,10 +1,5 @@
 use serde::Serialize;
 
-use crate::model::{
-    RequestValidationError, ValidateRequest, optional_non_empty, optional_unsigned_integer_string,
-    range_u64,
-};
-
 /// Common currency and cursor pagination query used by finance history endpoints.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct FinanceHistoryRequest {
@@ -46,17 +41,5 @@ impl FinanceHistoryRequest {
     pub fn limit(mut self, limit: u32) -> Self {
         self.limit = Some(limit);
         self
-    }
-}
-
-impl ValidateRequest for FinanceHistoryRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("ccy", self.ccy.as_deref())?;
-        optional_unsigned_integer_string("after", self.after.as_deref())?;
-        optional_unsigned_integer_string("before", self.before.as_deref())?;
-        if let Some(limit) = self.limit {
-            range_u64("limit", u64::from(limit), 1, 100)?;
-        }
-        Ok(())
     }
 }

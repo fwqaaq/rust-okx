@@ -1,10 +1,5 @@
 use serde::Serialize;
 
-use crate::model::{
-    RequestValidationError, ValidateRequest, at_least_one, non_empty, one_of, optional_non_empty,
-    optional_one_of, optional_unsigned_integer_string,
-};
-
 /// Query parameters for `GET /api/v5/public/opt-summary`.
 #[derive(Debug, Clone, Serialize)]
 pub struct OptionSummaryRequest {
@@ -30,13 +25,6 @@ impl OptionSummaryRequest {
     }
 }
 
-impl ValidateRequest for OptionSummaryRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        non_empty("instFamily", &self.inst_family)?;
-        optional_unsigned_integer_string("expTime", self.exp_time.as_deref())
-    }
-}
-
 /// Empty query for `GET /api/v5/public/interest-rate-loan-quota`.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct InterestRateLoanQuotaRequest {}
@@ -45,12 +33,6 @@ impl InterestRateLoanQuotaRequest {
     /// Create the parameterless query.
     pub fn new() -> Self {
         Self::default()
-    }
-}
-
-impl ValidateRequest for InterestRateLoanQuotaRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        Ok(())
     }
 }
 
@@ -70,17 +52,6 @@ impl InstrumentTickBandsRequest {
     }
 }
 
-impl ValidateRequest for InstrumentTickBandsRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        one_of(
-            "instType",
-            &self.inst_type,
-            &["FUTURES", "OPTION"],
-            "FUTURES or OPTION",
-        )
-    }
-}
-
 /// Query parameters for `GET /api/v5/public/underlying`.
 #[derive(Debug, Clone, Serialize)]
 pub struct UnderlyingRequest {
@@ -94,17 +65,6 @@ impl UnderlyingRequest {
         Self {
             inst_type: inst_type.into(),
         }
-    }
-}
-
-impl ValidateRequest for UnderlyingRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        one_of(
-            "instType",
-            &self.inst_type,
-            &["SWAP", "FUTURES", "OPTION"],
-            "SWAP, FUTURES, or OPTION",
-        )
     }
 }
 
@@ -141,23 +101,6 @@ impl PublicOptionTradesRequest {
     pub fn option_type(mut self, value: impl Into<String>) -> Self {
         self.option_type = Some(value.into());
         self
-    }
-}
-
-impl ValidateRequest for PublicOptionTradesRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("instId", self.inst_id.as_deref())?;
-        optional_non_empty("instFamily", self.inst_family.as_deref())?;
-        optional_one_of(
-            "optType",
-            self.option_type.as_deref(),
-            &["C", "P"],
-            "C or P",
-        )?;
-        at_least_one(
-            "instId, instFamily",
-            &[self.inst_id.is_some(), self.inst_family.is_some()],
-        )
     }
 }
 
@@ -221,23 +164,6 @@ impl MarketDataHistoryRequest {
     }
 }
 
-impl ValidateRequest for MarketDataHistoryRequest {
-    fn validate(&self) -> Result<(), RequestValidationError> {
-        optional_non_empty("module", self.module.as_deref())?;
-        optional_one_of(
-            "instType",
-            self.inst_type.as_deref(),
-            &["SPOT", "MARGIN", "SWAP", "FUTURES", "OPTION"],
-            "SPOT, MARGIN, SWAP, FUTURES, or OPTION",
-        )?;
-        optional_non_empty("instIdList", self.inst_id_list.as_deref())?;
-        optional_non_empty("dateAggrType", self.date_aggr_type.as_deref())?;
-        optional_unsigned_integer_string("begin", self.begin.as_deref())?;
-        optional_unsigned_integer_string("end", self.end.as_deref())?;
-        Ok(())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -249,15 +175,9 @@ mod tests {
             .inst_type("SPOT")
             .inst_id_list("BTC-USDT")
             .date_aggregation("daily");
-        request.validate().unwrap();
         let value = serde_json::to_value(request).unwrap();
         assert_eq!(value["instType"], "SPOT");
         assert_eq!(value["instIdList"], "BTC-USDT");
         assert_eq!(value["dateAggrType"], "daily");
-    }
-
-    #[test]
-    fn option_trades_requires_an_instrument_scope() {
-        assert!(PublicOptionTradesRequest::new().validate().is_err());
     }
 }
