@@ -44,9 +44,7 @@ fn example_region() -> Result<OkxRegion, Box<dyn std::error::Error>> {
         "global" => Ok(OkxRegion::Global),
         "us" | "au" => Ok(OkxRegion::Us),
         "eea" | "eu" => Ok(OkxRegion::Eea),
-        other => {
-            Err(format!("OKX_REGION must be global, us, au, eea, or eu; got {other}").into())
-        }
+        other => Err(format!("OKX_REGION must be global, us, au, eea, or eu; got {other}").into()),
     }
 }
 

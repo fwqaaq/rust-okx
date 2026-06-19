@@ -21,9 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         env::var("OKX_TRADE_INST_ID")?,
         parse_trade_mode(&env::var("OKX_TRADE_MODE").unwrap_or_else(|_| "cash".to_owned()))?,
         parse_side(&env::var("OKX_TRADE_SIDE")?)?,
-        parse_order_type(
-            &env::var("OKX_TRADE_ORDER_TYPE").unwrap_or_else(|_| "limit".to_owned()),
-        )?,
+        parse_order_type(&env::var("OKX_TRADE_ORDER_TYPE").unwrap_or_else(|_| "limit".to_owned()))?,
         env::var("OKX_TRADE_SIZE")?,
     )
     .price(env::var("OKX_TRADE_PRICE")?)
@@ -67,9 +65,7 @@ fn example_region() -> Result<OkxRegion, Box<dyn std::error::Error>> {
         "global" => Ok(OkxRegion::Global),
         "us" | "au" => Ok(OkxRegion::Us),
         "eea" | "eu" => Ok(OkxRegion::Eea),
-        other => {
-            Err(format!("OKX_REGION must be global, us, au, eea, or eu; got {other}").into())
-        }
+        other => Err(format!("OKX_REGION must be global, us, au, eea, or eu; got {other}").into()),
     }
 }
 

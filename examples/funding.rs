@@ -20,7 +20,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let deposit_addresses = client.funding().get_deposit_address(&currency).await?;
-    println!("{currency} deposit address rows: {}", deposit_addresses.len());
+    println!(
+        "{currency} deposit address rows: {}",
+        deposit_addresses.len()
+    );
 
     let valuation_ccy = env::var("OKX_EXAMPLE_VALUATION_CCY").unwrap_or_else(|_| "USD".to_owned());
     let valuation = client
@@ -61,9 +64,7 @@ fn example_region() -> Result<OkxRegion, Box<dyn std::error::Error>> {
         "global" => Ok(OkxRegion::Global),
         "us" | "au" => Ok(OkxRegion::Us),
         "eea" | "eu" => Ok(OkxRegion::Eea),
-        other => {
-            Err(format!("OKX_REGION must be global, us, au, eea, or eu; got {other}").into())
-        }
+        other => Err(format!("OKX_REGION must be global, us, au, eea, or eu; got {other}").into()),
     }
 }
 
