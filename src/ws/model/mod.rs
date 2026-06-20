@@ -64,8 +64,8 @@ pub use grid::{
     RecurringBuyAllocation, RecurringBuyOrderUpdate, TradingBotUpdate, TriggerParam,
 };
 pub use market::{
-    BookLevel, CallAuctionDetailsUpdate, CandleUpdate, OptionTradeUpdate, OrderBookUpdate,
-    TickerUpdate, TradeUpdate,
+    AllTradeUpdate, BookLevel, CallAuctionDetailsUpdate, CandleUpdate, OptionTradeUpdate,
+    OrderBookUpdate, TickerUpdate, TradeUpdate,
 };
 pub use public_data::{
     AdlWarningUpdate, EconomicCalendarUpdate, EstimatedPriceUpdate, EventContractMarketUpdate,

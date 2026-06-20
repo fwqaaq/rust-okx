@@ -7,11 +7,7 @@ use crate::signing;
 use crate::ws::channels;
 use crate::ws::client::login_payload;
 use crate::ws::event::parse_text_event;
-use crate::ws::model::{
-    AccountUpdate, AdvancedAlgoOrderUpdate, AlgoOrderUpdate, BlockQuoteUpdate, BlockRfqUpdate,
-    BlockTickerUpdate, DepositInfoUpdate, PublicBlockTradeUpdate, PublicStructureBlockTradeUpdate,
-    StatusUpdate, StructureBlockTradeUpdate, WithdrawalInfoUpdate,
-};
+use crate::ws::model::{AccountUpdate, AdvancedAlgoOrderUpdate, AlgoOrderUpdate, StatusUpdate};
 use crate::ws::ops::operation_payload_with_expiry;
 use crate::ws::request::{
     AmendSpreadOrderRequest, CancelSpreadOrderRequest, MassCancelRequest,
@@ -76,7 +72,7 @@ fn channel_helpers_build_expected_args() {
         Some("BTC-USD-260626-100000-C")
     );
 
-    let spot_grid = channels::grid::spot_grid_orders();
+    let spot_grid = channels::grid::spot_grid_orders("SPOT");
     assert_eq!(spot_grid.inst_type.as_deref(), Some("SPOT"));
 
     let grid_pos = channels::grid::grid_positions("449327675342323712");

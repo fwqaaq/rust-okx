@@ -30,8 +30,7 @@ pub fn all_trades(inst_id: impl Into<String>) -> Arg {
     Arg::new("trades-all").inst_id(inst_id)
 }
 
-/// Subscribe to an order-book channel such as `books`, `books5`, or
-/// `books-l2-tbt`.
+/// Subscribe to an order-book channel such as `books`, `books5`, `bbo-tbt`, `books50-l2-tbt`, `books-l2-tbt`
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-order-book-channel>
 pub fn order_book(channel: impl Into<String>, inst_id: impl Into<String>) -> Arg {
@@ -41,8 +40,19 @@ pub fn order_book(channel: impl Into<String>, inst_id: impl Into<String>) -> Arg
 /// Subscribe to `option-trades` for one instrument family.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-option-trades-channel>
-pub fn option_trades(inst_family: impl Into<String>) -> Arg {
-    Arg::new("option-trades").inst_family(inst_family)
+pub fn option_trades(
+    inst_type: impl Into<String>,
+    inst_id: Option<impl Into<String>>,
+    inst_family: Option<impl Into<String>>,
+) -> Arg {
+    let mut arg = Arg::new("option-trades").inst_type(inst_type);
+    if let Some(inst_id) = inst_id {
+        arg = arg.inst_id(inst_id);
+    }
+    if let Some(inst_family) = inst_family {
+        arg = arg.inst_family(inst_family)
+    }
+    arg
 }
 
 /// Subscribe to `call-auction-details` for one instrument.

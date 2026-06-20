@@ -4,16 +4,20 @@ use crate::ws::Arg;
 
 /// Subscribe to `grid-orders-spot`.
 ///
+/// Default value is only `SPOT` or `ANY` for `inst_type`.
+///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-bot-websocket-grid-orders-channel>
-pub fn spot_grid_orders() -> Arg {
-    Arg::new("grid-orders-spot").inst_type("SPOT")
+pub fn spot_grid_orders(inst_type: impl Into<String>) -> Arg {
+    Arg::new("grid-orders-spot").inst_type(inst_type)
 }
 
 /// Subscribe to `grid-orders-contract`.
 ///
+/// Default value is only `SWAP`, `FUTURES` or `ANY` for `inst_type`.
+///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-bot-websocket-grid-orders-channel>
-pub fn contract_grid_orders() -> Arg {
-    Arg::new("grid-orders-contract").inst_type("ANY")
+pub fn contract_grid_orders(inst_type: impl Into<String>) -> Arg {
+    Arg::new("grid-orders-contract").inst_type(inst_type)
 }
 
 /// Subscribe to `grid-positions` for one algo order.
@@ -31,6 +35,8 @@ pub fn grid_sub_orders(algo_id: impl Into<String>) -> Arg {
 }
 
 /// Subscribe to recurring-buy algo updates (`algo-recurring-buy`).
+///
+/// Default value is only `SPOT` or `ANY` for `inst_type`.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#trading-bot-websocket-recurring-buy-orders-channel>
 pub fn recurring_buy_orders(inst_type: impl Into<String>) -> Arg {
