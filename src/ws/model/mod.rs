@@ -60,8 +60,8 @@ pub use block::{
 };
 pub use funding::{DepositInfoUpdate, WithdrawalInfoUpdate};
 pub use grid::{
-    CopyTradingNotification, GridOrderUpdate, GridPositionUpdate, GridSubOrderUpdate,
-    RecurringBuyAllocation, RecurringBuyOrderUpdate, TradingBotUpdate,
+    CopyTradingNotification, GridOrderUpdate, GridPositionUpdate, GridSubOrderUpdate, RebateTrans,
+    RecurringBuyAllocation, RecurringBuyOrderUpdate, TradingBotUpdate, TriggerParam,
 };
 pub use market::{
     BookLevel, CallAuctionDetailsUpdate, CandleUpdate, OptionTradeUpdate, OrderBookUpdate,
