@@ -22,6 +22,9 @@ pub struct AccountConfig {
     /// Whether auto-borrow is enabled. OKX returns this as a JSON boolean.
     #[serde(default)]
     pub auto_loan: bool,
+    /// API key permissions, comma-separated (e.g. `"read_only,trade,withdraw"`).
+    #[serde(default)]
+    pub perm: String,
 }
 
 /// Result of setting position mode.
