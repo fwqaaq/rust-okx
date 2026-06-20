@@ -76,7 +76,7 @@ pub struct TickerUpdate {
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-candlesticks-channel>
 #[derive(Debug, Clone, Default, Deserialize)]
-#[serde(from = "Vec<NumberString>")]
+#[serde(from = "Vec<NumberString>", rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct CandleUpdate {
     /// Opening time of the candlestick (Unix milliseconds).
@@ -90,12 +90,12 @@ pub struct CandleUpdate {
     /// Close price.
     pub c: NumberString,
     /// Trading volume in contracts (derivatives) or base currency (SPOT/MARGIN).
-    pub volume: NumberString,
+    pub vol: NumberString,
     /// Trading volume in base currency (derivatives) or quote currency (SPOT/MARGIN).
-    pub volume_ccy: NumberString,
+    pub vol_ccy: NumberString,
     /// Trading volume in quote currency, e.g., `USDT` for `BTC-USDT` and `BTC-USDT-SWAP`,
     /// `USD` for `BTC-USD-SWAP`.
-    pub volume_quote: NumberString,
+    pub vol_ccy_quote: NumberString,
     /// Candlestick state: `0` incomplete (still forming), `1` completed.
     pub confirm: NumberString,
 }
@@ -108,15 +108,15 @@ impl From<Vec<NumberString>> for CandleUpdate {
             h: array_value(&values, 2),
             l: array_value(&values, 3),
             c: array_value(&values, 4),
-            volume: array_value(&values, 5),
-            volume_ccy: array_value(&values, 6),
-            volume_quote: array_value(&values, 7),
+            vol: array_value(&values, 5),
+            vol_ccy: array_value(&values, 6),
+            vol_ccy_quote: array_value(&values, 7),
             confirm: array_value(&values, 8),
         }
     }
 }
 
-/// `trades` and `trades-all` channel row.
+/// `trades` channel row.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-trades-channel>
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -146,9 +146,41 @@ pub struct TradeUpdate {
     /// Number of trades aggregated into this push (only applicable to the `trades` channel).
     #[serde(default)]
     pub count: NumberString,
-    /// Sequence ID of this message; monotonically increasing within a session.
+    /// Trade timestamp (Unix milliseconds).
     #[serde(default)]
-    pub seq_id: NumberString,
+    pub ts: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
+}
+
+/// `trades-all` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-all-trades-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct AllTradeUpdate {
+    /// Instrument ID, e.g., `BTC-USDT`.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Trade ID assigned by OKX.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Trade price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Trade size.
+    ///
+    /// For spot, the unit is base currency; for FUTURES/SWAP/OPTION, the unit is contract.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Trade side: `buy` or `sell`.
+    #[serde(default)]
+    pub side: String,
+    /// Order source: `"0"` = normal, `"1"` = Enhanced Liquidity Program order.
+    #[serde(default)]
+    pub source: String,
     /// Trade timestamp (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
@@ -275,7 +307,7 @@ pub struct OrderBookUpdate {
 
 /// A single four-value WebSocket order-book level.
 #[derive(Debug, Clone, Default, Deserialize)]
-#[serde(from = "Vec<NumberString>")]
+#[serde(from = "Vec<NumberString>", rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct BookLevel {
     /// The limit price of this order book level.
@@ -322,5 +354,29 @@ mod tests {
             serde_json::from_str(r#"["1","2","3","4","5","6","7","8","1"]"#).unwrap();
         assert_eq!(row.ts.as_str(), "1");
         assert_eq!(row.confirm.as_str(), "1");
+    }
+
+    #[test]
+    fn parses_all_trade_update() {
+        let row: AllTradeUpdate = serde_json::from_str(
+            r#"{"instId":"BTC-USDT","tradeId":"130639474","px":"42219.9","sz":"0.12060306","side":"buy","source":"0","ts":"1630048897897"}"#,
+        )
+        .unwrap();
+        assert_eq!(row.inst_id, "BTC-USDT");
+        assert_eq!(row.trade_id, "130639474");
+        assert_eq!(row.source, "0");
+        assert_eq!(row.ts.as_str(), "1630048897897");
+    }
+
+    #[test]
+    fn parses_option_trade_update() {
+        let row: OptionTradeUpdate = serde_json::from_str(
+            r#"{"fillVol":"0.5066007836914062","fwdPx":"16469.69928595038","idxPx":"16537.2","instFamily":"BTC-USD","instId":"BTC-USD-230224-18000-C","markPx":"0.04690107010619562","optType":"C","px":"0.045","side":"sell","sz":"2","tradeId":"38","ts":"1672286551080"}"#,
+        )
+        .unwrap();
+        assert_eq!(row.inst_id, "BTC-USD-230224-18000-C");
+        assert_eq!(row.inst_family, "BTC-USD");
+        assert_eq!(row.opt_type, "C");
+        assert_eq!(row.fill_vol.as_str(), "0.5066007836914062");
     }
 }

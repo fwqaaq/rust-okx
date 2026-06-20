@@ -10,8 +10,9 @@ use std::time::Duration;
 
 use rust_okx::ws::channels;
 use rust_okx::ws::model::{
-    BlockTickerUpdate, CandleUpdate, PublicBlockTradeUpdate, PublicStructureBlockTradeUpdate,
-    StatusUpdate, TickerUpdate,
+    AllTradeUpdate, BlockTickerUpdate, CandleUpdate, OptionTradeUpdate, OrderBookUpdate,
+    PublicBlockTradeUpdate, PublicStructureBlockTradeUpdate, StatusUpdate, TickerUpdate,
+    TradeUpdate,
 };
 use rust_okx::{OkxWs, WsEvent};
 
@@ -448,6 +449,329 @@ async fn business_candle_channel_pushes_typed_rows() {
                     }
                 }
 
+                if subscribed && pushed {
+                    break;
+                }
+            }
+        }
+    }
+
+    ws.unsubscribe(&[arg])
+        .await
+        .expect("unsubscribe should send");
+    ws.close().await.expect("close should send");
+}
+
+/// `WS / trades` — subscribe to aggregated `trades` for `BTC-USDT`, wait for
+/// an acknowledgement and at least one typed push, then unsubscribe and close.
+#[tokio::test]
+async fn public_trades_channel_pushes_typed_rows() {
+    let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::public().connect()).await;
+    let mut ws = match connect {
+        Ok(Ok(ws)) => ws,
+        Ok(Err(err)) => {
+            eprintln!("skipping public_trades_channel_pushes_typed_rows: connect failed: {err}");
+            return;
+        }
+        Err(_) => {
+            eprintln!("skipping public_trades_channel_pushes_typed_rows: connect timed out");
+            return;
+        }
+    };
+
+    let arg = channels::market::trades("BTC-USDT");
+    if let Err(err) = ws.subscribe(std::slice::from_ref(&arg)).await {
+        eprintln!("skipping public_trades_channel_pushes_typed_rows: subscribe failed: {err}");
+        return;
+    }
+
+    let mut subscribed = false;
+    let mut pushed = false;
+    let deadline = tokio::time::sleep(Duration::from_secs(20));
+    tokio::pin!(deadline);
+
+    loop {
+        tokio::select! {
+            _ = &mut deadline => {
+                eprintln!("skipping public_trades_channel_pushes_typed_rows: timed out waiting for push");
+                return;
+            }
+            event = ws.next_event() => {
+                match event {
+                    Ok(Some(WsEvent::Subscribed(ack)))
+                        if ack.channel == "trades"
+                            && ack.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        subscribed = true;
+                    }
+                    Ok(Some(WsEvent::Push(push)))
+                        if push.arg.channel == "trades"
+                            && push.arg.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        let rows: Vec<TradeUpdate> = push
+                            .parse()
+                            .expect("trades push should parse as Vec<TradeUpdate>");
+                        pushed = rows.iter().any(|r| r.inst_id == "BTC-USDT");
+                    }
+                    Ok(Some(WsEvent::Error { code, msg })) => {
+                        panic!("OKX WS error {code}: {msg}")
+                    }
+                    Ok(Some(_)) => {}
+                    Ok(None) => {
+                        eprintln!("skipping public_trades_channel_pushes_typed_rows: connection closed");
+                        return;
+                    }
+                    Err(err) => {
+                        eprintln!("skipping public_trades_channel_pushes_typed_rows: receive failed: {err}");
+                        return;
+                    }
+                }
+                if subscribed && pushed {
+                    break;
+                }
+            }
+        }
+    }
+
+    ws.unsubscribe(&[arg])
+        .await
+        .expect("unsubscribe should send");
+    ws.close().await.expect("close should send");
+}
+
+/// `WS / trades-all` — subscribe to unaggregated `trades-all` for `BTC-USDT`,
+/// wait for an acknowledgement and at least one typed push, then unsubscribe
+/// and close.
+#[tokio::test]
+async fn public_all_trades_channel_pushes_typed_rows() {
+    let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::public().connect()).await;
+    let mut ws = match connect {
+        Ok(Ok(ws)) => ws,
+        Ok(Err(err)) => {
+            eprintln!(
+                "skipping public_all_trades_channel_pushes_typed_rows: connect failed: {err}"
+            );
+            return;
+        }
+        Err(_) => {
+            eprintln!("skipping public_all_trades_channel_pushes_typed_rows: connect timed out");
+            return;
+        }
+    };
+
+    let arg = channels::market::all_trades("BTC-USDT");
+    if let Err(err) = ws.subscribe(std::slice::from_ref(&arg)).await {
+        eprintln!("skipping public_all_trades_channel_pushes_typed_rows: subscribe failed: {err}");
+        return;
+    }
+
+    let mut subscribed = false;
+    let mut pushed = false;
+    let deadline = tokio::time::sleep(Duration::from_secs(20));
+    tokio::pin!(deadline);
+
+    loop {
+        tokio::select! {
+            _ = &mut deadline => {
+                eprintln!(
+                    "skipping public_all_trades_channel_pushes_typed_rows: timed out waiting for push"
+                );
+                return;
+            }
+            event = ws.next_event() => {
+                match event {
+                    Ok(Some(WsEvent::Subscribed(ack)))
+                        if ack.channel == "trades-all"
+                            && ack.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        subscribed = true;
+                    }
+                    Ok(Some(WsEvent::Push(push)))
+                        if push.arg.channel == "trades-all"
+                            && push.arg.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        let rows: Vec<AllTradeUpdate> = push
+                            .parse()
+                            .expect("trades-all push should parse as Vec<AllTradeUpdate>");
+                        pushed = rows.iter().any(|r| r.inst_id == "BTC-USDT");
+                    }
+                    Ok(Some(WsEvent::Error { code, msg })) => {
+                        panic!("OKX WS error {code}: {msg}")
+                    }
+                    Ok(Some(_)) => {}
+                    Ok(None) => {
+                        eprintln!(
+                            "skipping public_all_trades_channel_pushes_typed_rows: connection closed"
+                        );
+                        return;
+                    }
+                    Err(err) => {
+                        eprintln!(
+                            "skipping public_all_trades_channel_pushes_typed_rows: receive failed: {err}"
+                        );
+                        return;
+                    }
+                }
+                if subscribed && pushed {
+                    break;
+                }
+            }
+        }
+    }
+
+    ws.unsubscribe(&[arg])
+        .await
+        .expect("unsubscribe should send");
+    ws.close().await.expect("close should send");
+}
+
+/// `WS / option-trades` — subscribe to the `option-trades` channel for
+/// `BTC-USD` and wait for an acknowledgement.
+///
+/// Option-trade pushes are sparse; any push that arrives is still parsed with
+/// [`OptionTradeUpdate`] to exercise the model.
+#[tokio::test]
+async fn public_option_trades_channel_subscribes() {
+    let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::public().connect()).await;
+    let mut ws = match connect {
+        Ok(Ok(ws)) => ws,
+        Ok(Err(err)) => {
+            eprintln!("skipping public_option_trades_channel_subscribes: connect failed: {err}");
+            return;
+        }
+        Err(_) => {
+            eprintln!("skipping public_option_trades_channel_subscribes: connect timed out");
+            return;
+        }
+    };
+
+    let arg = channels::market::option_trades("OPTION", None::<&str>, Some("BTC-USD"));
+    if let Err(err) = ws.subscribe(std::slice::from_ref(&arg)).await {
+        eprintln!("skipping public_option_trades_channel_subscribes: subscribe failed: {err}");
+        return;
+    }
+
+    let deadline = tokio::time::sleep(Duration::from_secs(20));
+    tokio::pin!(deadline);
+
+    loop {
+        tokio::select! {
+            _ = &mut deadline => {
+                eprintln!(
+                    "skipping public_option_trades_channel_subscribes: timed out waiting for ack"
+                );
+                return;
+            }
+            event = ws.next_event() => {
+                match event {
+                    Ok(Some(WsEvent::Subscribed(ack))) if ack.channel == "option-trades" => break,
+                    Ok(Some(WsEvent::Push(push))) if push.arg.channel == "option-trades" => {
+                        let _: Vec<OptionTradeUpdate> = push
+                            .parse()
+                            .expect("option-trades push should parse as Vec<OptionTradeUpdate>");
+                    }
+                    Ok(Some(WsEvent::Error { code, msg })) => {
+                        eprintln!(
+                            "skipping public_option_trades_channel_subscribes: OKX WS error {code}: {msg}"
+                        );
+                        return;
+                    }
+                    Ok(Some(_)) => {}
+                    Ok(None) => {
+                        eprintln!(
+                            "skipping public_option_trades_channel_subscribes: connection closed"
+                        );
+                        return;
+                    }
+                    Err(err) => {
+                        eprintln!(
+                            "skipping public_option_trades_channel_subscribes: receive failed: {err}"
+                        );
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    ws.unsubscribe(&[arg])
+        .await
+        .expect("unsubscribe should send");
+    ws.close().await.expect("close should send");
+}
+
+/// `WS / books5` — subscribe to `books5` for `BTC-USDT`, wait for an
+/// acknowledgement and at least one typed push, then unsubscribe and close.
+#[tokio::test]
+async fn public_order_book_channel_pushes_typed_rows() {
+    let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::public().connect()).await;
+    let mut ws = match connect {
+        Ok(Ok(ws)) => ws,
+        Ok(Err(err)) => {
+            eprintln!(
+                "skipping public_order_book_channel_pushes_typed_rows: connect failed: {err}"
+            );
+            return;
+        }
+        Err(_) => {
+            eprintln!("skipping public_order_book_channel_pushes_typed_rows: connect timed out");
+            return;
+        }
+    };
+
+    let arg = channels::market::order_book("books5", "BTC-USDT");
+    if let Err(err) = ws.subscribe(std::slice::from_ref(&arg)).await {
+        eprintln!("skipping public_order_book_channel_pushes_typed_rows: subscribe failed: {err}");
+        return;
+    }
+
+    let mut subscribed = false;
+    let mut pushed = false;
+    let deadline = tokio::time::sleep(Duration::from_secs(20));
+    tokio::pin!(deadline);
+
+    loop {
+        tokio::select! {
+            _ = &mut deadline => {
+                eprintln!(
+                    "skipping public_order_book_channel_pushes_typed_rows: timed out waiting for push"
+                );
+                return;
+            }
+            event = ws.next_event() => {
+                match event {
+                    Ok(Some(WsEvent::Subscribed(ack)))
+                        if ack.channel == "books5"
+                            && ack.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        subscribed = true;
+                    }
+                    Ok(Some(WsEvent::Push(push)))
+                        if push.arg.channel == "books5"
+                            && push.arg.inst_id.as_deref() == Some("BTC-USDT") =>
+                    {
+                        let rows: Vec<OrderBookUpdate> = push
+                            .parse()
+                            .expect("books5 push should parse as Vec<OrderBookUpdate>");
+                        pushed = rows.iter().any(|r| !r.asks.is_empty() && !r.bids.is_empty());
+                    }
+                    Ok(Some(WsEvent::Error { code, msg })) => {
+                        panic!("OKX WS error {code}: {msg}")
+                    }
+                    Ok(Some(_)) => {}
+                    Ok(None) => {
+                        eprintln!(
+                            "skipping public_order_book_channel_pushes_typed_rows: connection closed"
+                        );
+                        return;
+                    }
+                    Err(err) => {
+                        eprintln!(
+                            "skipping public_order_book_channel_pushes_typed_rows: receive failed: {err}"
+                        );
+                        return;
+                    }
+                }
                 if subscribed && pushed {
                     break;
                 }
