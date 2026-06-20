@@ -78,7 +78,10 @@ pub use spread::{
     SpreadPlaceOrderResult, SpreadTradeLeg, SpreadTradeUpdate,
 };
 pub use status::StatusUpdate;
-pub use trade::{FillUpdate, MassCancelOperationResult, OrderOperationResult, OrderUpdate};
+pub use trade::{
+    AmendOrderResult, CancelOrderResult, FillUpdate, MassCancelOperationResult, OrderUpdate,
+    PlaceOrderResult,
+};
 
 #[cfg(test)]
 mod compile_checks;

@@ -544,7 +544,7 @@ async fn public_trades_channel_pushes_typed_rows() {
 /// and close.
 #[tokio::test]
 async fn public_all_trades_channel_pushes_typed_rows() {
-    let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::public().connect()).await;
+    let connect = tokio::time::timeout(Duration::from_secs(10), OkxWs::business().connect()).await;
     let mut ws = match connect {
         Ok(Ok(ws)) => ws,
         Ok(Err(err)) => {

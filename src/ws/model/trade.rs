@@ -45,10 +45,13 @@ pub struct OrderUpdate {
     /// Order size.
     #[serde(default)]
     pub sz: NumberString,
+    /// Estimated notional value of the order in USD.
+    #[serde(default)]
+    pub notional_usd: NumberString,
     /// Order type.
     ///
     /// Documented values: `market`, `limit`, `post_only`, `fok`, `ioc`,
-    /// `optimal_limit_ioc`, `mmp`, `mmp_and_post_only`, `op_fok`.
+    /// `optimal_limit_ioc`, `mmp`, `mmp_and_post_only`, `op_fok`, `elp`.
     #[serde(default)]
     pub ord_type: String,
     /// Order side: `buy` or `sell`.
@@ -84,6 +87,27 @@ pub struct OrderUpdate {
     /// Fee currency for the most recent fill.
     #[serde(default)]
     pub fill_fee_ccy: String,
+    /// Filled notional value in USD for the most recent fill.
+    #[serde(default)]
+    pub fill_notional_usd: NumberString,
+    /// Implied volatility at fill (options only).
+    #[serde(default)]
+    pub fill_px_vol: NumberString,
+    /// USD-denominated option price at fill (options only).
+    #[serde(default)]
+    pub fill_px_usd: NumberString,
+    /// Mark implied volatility at fill (options only).
+    #[serde(default)]
+    pub fill_mark_vol: NumberString,
+    /// Forward price at fill (options only).
+    #[serde(default)]
+    pub fill_fwd_px: NumberString,
+    /// Mark price at fill (FUTURES, SWAP, OPTION).
+    #[serde(default)]
+    pub fill_mark_px: NumberString,
+    /// Index price at fill.
+    #[serde(default)]
+    pub fill_idx_px: NumberString,
     /// Liquidity role for the most recent fill: `T` (taker) or `M` (maker).
     #[serde(default)]
     pub exec_type: String,
@@ -92,7 +116,7 @@ pub struct OrderUpdate {
     pub avg_px: NumberString,
     /// Order state.
     ///
-    /// Documented values: `live`, `partially_filled`, `filled`, `canceled`.
+    /// Documented values: `live`, `partially_filled`, `filled`, `canceled`, `mmp_canceled`.
     #[serde(default)]
     pub state: String,
     /// Leverage.
@@ -140,21 +164,18 @@ pub struct OrderUpdate {
     /// Order category.
     ///
     /// Documented values: `normal`, `twap`, `adl`, `full_liquidation`,
-    /// `partial_liquidation`, `delivery`, `ddh`.
+    /// `partial_liquidation`, `delivery`, `ddh`, `auto_conversion`.
     #[serde(default)]
     pub category: String,
     /// Whether this is a reduce-only order: `"true"` or `"false"`.
     #[serde(default)]
     pub reduce_only: String,
+    /// Whether this is a TP limit order: `"true"` or `"false"`.
+    #[serde(default)]
+    pub is_tp_limit: String,
     /// Source that triggered the cancellation.
     #[serde(default)]
     pub cancel_source: String,
-    /// Human-readable reason for the cancellation.
-    #[serde(default)]
-    pub cancel_source_reason: String,
-    /// Quick-margin type: `manual`, `auto_borrow`, or `auto_repay`.
-    #[serde(default)]
-    pub quick_mgn_type: String,
     /// Client-supplied algo order ID that triggered this order.
     #[serde(default)]
     pub algo_cl_ord_id: String,
@@ -164,6 +185,11 @@ pub struct OrderUpdate {
     /// Source of the last amendment.
     #[serde(default)]
     pub amend_source: String,
+    /// Result of the last amendment.
+    ///
+    /// `-1`: failure, `0`: success, `1`: auto-canceled, `2`: auto-amended (options only).
+    #[serde(default)]
+    pub amend_result: String,
     /// Client-supplied request ID, echoed from the operation that caused this push.
     #[serde(default)]
     pub req_id: String,
@@ -188,30 +214,24 @@ pub struct OrderUpdate {
     /// Attached algo orders (TP/SL orders attached to this order).
     #[serde(default)]
     pub attach_algo_ords: Vec<Value>,
-    /// Self-trade prevention group ID.
-    #[serde(default)]
-    pub stp_id: String,
     /// Self-trade prevention mode: `cancel_maker`, `cancel_taker`, or `cancel_both`.
     #[serde(default)]
     pub stp_mode: String,
     /// Quote currency used for the trade (event contracts only).
     #[serde(default)]
     pub trade_quote_ccy: String,
-    /// Settlement outcome (event contracts only).
+    /// Last price at the time of the push.
+    #[serde(default)]
+    pub last_px: NumberString,
+    /// Settlement outcome (event contracts only): `yes` or `no`.
     #[serde(default)]
     pub outcome: String,
-    /// Whether this order accessed the Enhanced Liquidity Provider (ELP) pool.
-    #[serde(default)]
-    pub is_elp_taker_access: bool,
     /// Order creation time (Unix milliseconds).
     #[serde(default)]
     pub c_time: NumberString,
     /// Last update time (Unix milliseconds).
     #[serde(default)]
     pub u_time: NumberString,
-    /// Push time (Unix milliseconds).
-    #[serde(default)]
-    pub p_time: NumberString,
     /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,
@@ -224,93 +244,48 @@ pub struct OrderUpdate {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct FillUpdate {
-    /// Instrument ID, e.g., `BTC-USDT`.
+    /// Instrument ID, e.g., `BTC-USDT-SWAP`.
     #[serde(default)]
     pub inst_id: String,
-    /// Instrument type, e.g., `SPOT`, `SWAP`, `FUTURES`, `OPTION`.
+    /// Filled quantity; aggregated when `count > 1`.
     #[serde(default)]
-    pub inst_type: String,
-    /// Trade ID assigned by OKX.
+    pub fill_sz: NumberString,
+    /// Last filled price.
     #[serde(default)]
-    pub trade_id: String,
+    pub fill_px: NumberString,
+    /// Trade direction: `buy` or `sell`.
+    #[serde(default)]
+    pub side: String,
+    /// Filled time (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
     /// OKX-assigned order ID.
     #[serde(default)]
     pub ord_id: String,
     /// Client-supplied order ID.
     #[serde(default)]
     pub cl_ord_id: String,
-    /// Bill ID associated with this fill.
+    /// The last trade ID in the trades aggregation.
     #[serde(default)]
-    pub bill_id: String,
-    /// Order tag.
-    #[serde(default)]
-    pub tag: String,
-    /// Fill price.
-    #[serde(default)]
-    pub fill_px: NumberString,
-    /// Fill size.
-    #[serde(default)]
-    pub fill_sz: NumberString,
-    /// Fill side: `buy` or `sell`.
-    #[serde(default)]
-    pub side: String,
-    /// Position side: `long`, `short`, or `net`.
-    #[serde(default)]
-    pub pos_side: String,
+    pub trade_id: String,
     /// Liquidity role: `T` (taker) or `M` (maker).
     #[serde(default)]
     pub exec_type: String,
-    /// Fee amount; negative means deducted.
+    /// Number of trades aggregated into this push.
     #[serde(default)]
-    pub fee: NumberString,
-    /// Fee currency.
-    #[serde(default)]
-    pub fee_ccy: String,
-    /// Fee rate applied to this fill.
-    #[serde(default)]
-    pub fee_rate: NumberString,
-    /// Fill profit and loss (for closing fills).
-    #[serde(default)]
-    pub fill_pnl: NumberString,
-    /// Implied volatility at the fill price (options only).
-    #[serde(default)]
-    pub fill_px_vol: NumberString,
-    /// USD-denominated option price at fill (options only).
-    #[serde(default)]
-    pub fill_px_usd: NumberString,
-    /// Mark implied volatility at fill time (options only).
-    #[serde(default)]
-    pub fill_mark_vol: NumberString,
-    /// Forward price at fill time (options only).
-    #[serde(default)]
-    pub fill_fwd_px: NumberString,
-    /// Mark price at fill time.
-    #[serde(default)]
-    pub fill_mark_px: NumberString,
-    /// Index price at fill time.
-    #[serde(default)]
-    pub fill_idx_px: NumberString,
-    /// Quote currency used for the trade (event contracts only).
-    #[serde(default)]
-    pub trade_quote_ccy: String,
-    /// Fill timestamp (Unix milliseconds).
-    #[serde(default)]
-    pub fill_time: NumberString,
-    /// Push time (Unix milliseconds).
-    #[serde(default)]
-    pub ts: NumberString,
+    pub count: NumberString,
     /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,
 }
 
-/// Result row returned by regular order place/cancel/amend operations.
+/// Result row returned by `order` and `batch-orders`.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-place-order>
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
-pub struct OrderOperationResult {
+pub struct PlaceOrderResult {
     /// OKX-assigned order ID; empty on failure.
     #[serde(default)]
     pub ord_id: String,
@@ -320,10 +295,67 @@ pub struct OrderOperationResult {
     /// Order tag.
     #[serde(default)]
     pub tag: String,
-    /// Operation timestamp (Unix milliseconds).
+    /// Timestamp when request processing finished (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
-    /// Client-supplied request ID, echoed from the operation.
+    /// Per-order status code; `"0"` on success.
+    #[serde(default)]
+    pub s_code: String,
+    /// Per-order status message; empty on success.
+    #[serde(default)]
+    pub s_msg: String,
+    /// Sub-code when `s_code` is non-zero; `""` on success.
+    #[serde(default)]
+    pub sub_code: String,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
+}
+
+/// Result row returned by `cancel-order` and `batch-cancel-orders`.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-cancel-order>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct CancelOrderResult {
+    /// OKX-assigned order ID.
+    #[serde(default)]
+    pub ord_id: String,
+    /// Client-supplied order ID.
+    #[serde(default)]
+    pub cl_ord_id: String,
+    /// Timestamp when request processing finished (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Per-order status code; `"0"` on success.
+    #[serde(default)]
+    pub s_code: String,
+    /// Per-order status message; empty on success.
+    #[serde(default)]
+    pub s_msg: String,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
+}
+
+/// Result row returned by `amend-order` and `batch-amend-orders`.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-amend-order>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct AmendOrderResult {
+    /// OKX-assigned order ID.
+    #[serde(default)]
+    pub ord_id: String,
+    /// Client-supplied order ID.
+    #[serde(default)]
+    pub cl_ord_id: String,
+    /// Timestamp when request processing finished (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Client-supplied request ID, echoed from the amend request.
     #[serde(default)]
     pub req_id: String,
     /// Per-order status code; `"0"` on success.
@@ -332,7 +364,7 @@ pub struct OrderOperationResult {
     /// Per-order status message; empty on success.
     #[serde(default)]
     pub s_msg: String,
-    /// Sub-error code when `s_code` is non-zero; provides more detail.
+    /// Sub-code when `s_code` is non-zero; `""` on success.
     #[serde(default)]
     pub sub_code: String,
     /// Unrecognized fields retained for forward compatibility.
@@ -340,7 +372,7 @@ pub struct OrderOperationResult {
     pub extra: ExtraFields,
 }
 
-/// Result row returned by `mass-cancel` and `sprd-mass-cancel`.
+/// Result row returned by `mass-cancel`.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-mass-cancel-order>
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -353,4 +385,88 @@ pub struct MassCancelOperationResult {
     /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_order_update() {
+        let row: OrderUpdate = serde_json::from_str(
+            r#"{
+            "accFillSz":"0.001","algoClOrdId":"","algoId":"","amendResult":"","amendSource":"",
+            "avgPx":"31527.1","cancelSource":"","category":"normal","ccy":"","clOrdId":"",
+            "code":"0","cTime":"1654084334977","execType":"M","fee":"-0.02522168","feeCcy":"USDT",
+            "fillFee":"-0.02522168","fillFeeCcy":"USDT","fillNotionalUsd":"31.50818374",
+            "fillPx":"31527.1","fillSz":"0.001","fillPnl":"0.01","fillTime":"1654084353263",
+            "fillPxVol":"","fillPxUsd":"","fillMarkVol":"","fillFwdPx":"","fillMarkPx":"",
+            "fillIdxPx":"","instId":"BTC-USDT","instType":"SPOT","lever":"0","msg":"",
+            "notionalUsd":"31.50818374","ordId":"452197707845865472","ordType":"limit","pnl":"0",
+            "posSide":"","px":"31527.1","pxUsd":"","pxVol":"","pxType":"","quickMgnType":"",
+            "rebate":"0","rebateCcy":"BTC","reduceOnly":"false","reqId":"","side":"sell",
+            "attachAlgoClOrdId":"","slOrdPx":"","slTriggerPx":"","slTriggerPxType":"last",
+            "source":"","state":"filled","stpId":"","stpMode":"","sz":"0.001","tag":"",
+            "tdMode":"cash","tgtCcy":"","tpOrdPx":"","tpTriggerPx":"","tpTriggerPxType":"last",
+            "attachAlgoOrds":[],"tradeId":"242589207","tradeQuoteCcy":"USDT","lastPx":"38892.2",
+            "uTime":"1654084353264","isTpLimit":"false","linkedAlgoOrd":{"algoId":""}
+        }"#,
+        )
+        .unwrap();
+        assert_eq!(row.ord_id, "452197707845865472");
+        assert_eq!(row.state, "filled");
+        assert_eq!(row.fill_notional_usd.as_str(), "31.50818374");
+        assert_eq!(row.last_px.as_str(), "38892.2");
+        assert_eq!(row.is_tp_limit, "false");
+        // deprecated fields fall through to extra
+        assert!(row.extra.contains_key("stpId"));
+        assert!(row.extra.contains_key("quickMgnType"));
+    }
+
+    #[test]
+    fn parses_fill_update() {
+        let row: FillUpdate = serde_json::from_str(
+            r#"{
+            "instId":"BTC-USDT-SWAP","fillSz":"100","fillPx":"70000","side":"buy",
+            "ts":"1705449605015","ordId":"680800019749904384","clOrdId":"1234567890",
+            "tradeId":"12345","execType":"T","count":"10"
+        }"#,
+        )
+        .unwrap();
+        assert_eq!(row.inst_id, "BTC-USDT-SWAP");
+        assert_eq!(row.exec_type, "T");
+        assert_eq!(row.count.as_str(), "10");
+    }
+
+    #[test]
+    fn parses_place_order_result() {
+        let row: PlaceOrderResult = serde_json::from_str(
+            r#"{"clOrdId":"","ordId":"12345689","tag":"","ts":"1695190491421","sCode":"0","sMsg":"","subCode":""}"#,
+        )
+        .unwrap();
+        assert_eq!(row.ord_id, "12345689");
+        assert_eq!(row.s_code, "0");
+        assert_eq!(row.ts.as_str(), "1695190491421");
+    }
+
+    #[test]
+    fn parses_cancel_order_result() {
+        let row: CancelOrderResult = serde_json::from_str(
+            r#"{"clOrdId":"","ordId":"2510789768709120","ts":"1695190491421","sCode":"0","sMsg":""}"#,
+        )
+        .unwrap();
+        assert_eq!(row.ord_id, "2510789768709120");
+        assert_eq!(row.s_code, "0");
+    }
+
+    #[test]
+    fn parses_amend_order_result() {
+        let row: AmendOrderResult = serde_json::from_str(
+            r#"{"clOrdId":"","ordId":"2510789768709120","ts":"1695190491421","reqId":"b12344","sCode":"0","sMsg":"","subCode":""}"#,
+        )
+        .unwrap();
+        assert_eq!(row.ord_id, "2510789768709120");
+        assert_eq!(row.req_id, "b12344");
+        assert_eq!(row.s_code, "0");
+    }
 }
