@@ -7,6 +7,7 @@ mod acknowledgement;
 mod operation;
 mod push;
 mod spread;
+mod trade;
 
 use std::collections::BTreeMap;
 
@@ -23,6 +24,9 @@ pub use push::PushResponse;
 pub use spread::{
     AmendSpreadOrderResponse, CancelSpreadOrderResponse, MassCancelSpreadOrdersResponse,
     PlaceSpreadOrderResponse,
+};
+pub use trade::{
+    AmendOrderResponse, CancelOrderResponse, MassCancelOrdersResponse, PlaceOrderResponse,
 };
 
 #[cfg(test)]

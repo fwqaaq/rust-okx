@@ -49,7 +49,9 @@ fn all_exported_websocket_models_are_deserializable() {
 
     assert_deserializable::<FillUpdate>();
     assert_deserializable::<MassCancelOperationResult>();
-    assert_deserializable::<OrderOperationResult>();
+    assert_deserializable::<PlaceOrderResult>();
+    assert_deserializable::<CancelOrderResult>();
+    assert_deserializable::<AmendOrderResult>();
     assert_deserializable::<OrderUpdate>();
     assert_deserializable::<AdvancedAlgoOrderUpdate>();
     assert_deserializable::<AlgoOrderUpdate>();
