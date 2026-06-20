@@ -78,8 +78,24 @@ fn channel_helpers_build_expected_args() {
 
     let spot_grid = channels::grid::spot_grid_orders();
     assert_eq!(spot_grid.inst_type.as_deref(), Some("SPOT"));
-    let recurring = channels::grid::recurring_buy_orders();
+
+    let grid_pos = channels::grid::grid_positions("449327675342323712");
+    assert_eq!(grid_pos.channel, "grid-positions");
+    assert_eq!(
+        grid_pos.extra.get("algoId").map(String::as_str),
+        Some("449327675342323712")
+    );
+
+    let grid_sub = channels::grid::grid_sub_orders("449327675342323712");
+    assert_eq!(grid_sub.channel, "grid-sub-orders");
+
+    let recurring = channels::grid::recurring_buy_orders("SPOT");
     assert_eq!(recurring.channel, "algo-recurring-buy");
+    assert_eq!(recurring.inst_type.as_deref(), Some("SPOT"));
+
+    let copy_notif = channels::grid::copytrading_lead_notification();
+    assert_eq!(copy_notif.channel, "copytrading-lead-notification");
+    assert_eq!(copy_notif.inst_type.as_deref(), Some("SWAP"));
 
     let account = channels::account::account_by_currency("USDT", None);
     assert_eq!(account.channel, "account");

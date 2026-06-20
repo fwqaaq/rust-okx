@@ -59,9 +59,11 @@ fn all_exported_websocket_models_are_deserializable() {
     assert_deserializable::<GridOrderUpdate>();
     assert_deserializable::<GridPositionUpdate>();
     assert_deserializable::<GridSubOrderUpdate>();
+    assert_deserializable::<RebateTrans>();
     assert_deserializable::<RecurringBuyAllocation>();
     assert_deserializable::<RecurringBuyOrderUpdate>();
     assert_deserializable::<TradingBotUpdate>();
+    assert_deserializable::<TriggerParam>();
 
     assert_deserializable::<BlockLeg>();
     assert_deserializable::<BlockQuoteUpdate>();
