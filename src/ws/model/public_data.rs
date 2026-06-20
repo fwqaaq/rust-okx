@@ -733,36 +733,7 @@ impl From<Vec<NumberString>> for IndexCandleUpdate {
 /// OKX pushes a 6-element array `[ts, o, h, l, c, confirm]` — no volume fields.
 ///
 /// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-public-data-ws-mark-price-candlesticks-channel>
-#[derive(Debug, Clone, Default, Deserialize)]
-#[serde(from = "Vec<NumberString>")]
-#[non_exhaustive]
-pub struct MarkPriceCandleUpdate {
-    /// Opening time of the candlestick (Unix milliseconds).
-    pub ts: NumberString,
-    /// Open price.
-    pub o: NumberString,
-    /// Highest price.
-    pub h: NumberString,
-    /// Lowest price.
-    pub l: NumberString,
-    /// Close price.
-    pub c: NumberString,
-    /// Candlestick state: `0` incomplete (still forming), `1` completed.
-    pub confirm: NumberString,
-}
-
-impl From<Vec<NumberString>> for MarkPriceCandleUpdate {
-    fn from(values: Vec<NumberString>) -> Self {
-        Self {
-            ts: array_value(&values, 0),
-            o: array_value(&values, 1),
-            h: array_value(&values, 2),
-            l: array_value(&values, 3),
-            c: array_value(&values, 4),
-            confirm: array_value(&values, 5),
-        }
-    }
-}
+pub type MarkPriceCandleUpdate = IndexCandleUpdate;
 
 #[cfg(test)]
 mod tests {
