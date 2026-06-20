@@ -15,10 +15,19 @@ use crate::model::NumberString;
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct DepositInfoUpdate {
+    /// User identifier of the message producer.
+    #[serde(default)]
+    pub uid: String,
+    /// Sub-account name; empty string for the master account.
+    #[serde(default)]
+    pub sub_acct: String,
+    /// Push time (Unix milliseconds).
+    #[serde(default)]
+    pub p_time: NumberString,
     /// Currency being deposited, e.g., `USDT`.
     #[serde(default)]
     pub ccy: String,
-    /// Chain identifier for the deposit, e.g., `USDT-ERC20`.
+    /// Chain identifier for the deposit, e.g., `USDT-TRC20`.
     #[serde(default)]
     pub chain: String,
     /// Deposit amount.
@@ -36,26 +45,26 @@ pub struct DepositInfoUpdate {
     /// On-chain transaction hash; empty before broadcast.
     #[serde(default)]
     pub tx_id: String,
-    /// OKX-assigned deposit ID.
+    /// Event timestamp when the deposit record was created (Unix milliseconds).
     #[serde(default)]
-    pub dep_id: String,
-    /// Withdrawal ID of the originating transfer (internal transfers only).
-    #[serde(default)]
-    pub from_wd_id: String,
+    pub ts: NumberString,
     /// Deposit state.
     ///
     /// Documented values: `0` waiting for confirmation, `1` deposit credited,
-    /// `2` deposit successful, `8` pending review, `11` match the address blacklist,
-    /// `12` account or deposit is frozen, `13` sub-account deposit interception,
+    /// `2` deposit successful, `8` pending review, `11` address blacklist,
+    /// `12` account or deposit frozen, `13` sub-account deposit interception,
     /// `14` KYC limit.
     #[serde(default)]
     pub state: String,
+    /// OKX-assigned deposit ID.
+    #[serde(default)]
+    pub dep_id: String,
+    /// Withdrawal ID of the originating internal transfer; empty otherwise.
+    #[serde(default)]
+    pub from_wd_id: String,
     /// Number of on-chain confirmations received so far.
     #[serde(default)]
     pub actual_dep_blk_confirm: NumberString,
-    /// Event timestamp (Unix milliseconds).
-    #[serde(default)]
-    pub ts: NumberString,
     /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,
@@ -68,24 +77,30 @@ pub struct DepositInfoUpdate {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct WithdrawalInfoUpdate {
+    /// User identifier of the message producer.
+    #[serde(default)]
+    pub uid: String,
+    /// Sub-account name; empty string for the master account.
+    #[serde(default)]
+    pub sub_acct: String,
+    /// Push time (Unix milliseconds).
+    #[serde(default)]
+    pub p_time: NumberString,
     /// Currency being withdrawn, e.g., `USDT`.
     #[serde(default)]
     pub ccy: String,
-    /// Chain identifier for the withdrawal, e.g., `USDT-ERC20`.
+    /// Chain identifier for the withdrawal, e.g., `USDT-TRC20`.
     #[serde(default)]
     pub chain: String,
-    /// Whether this currency is non-tradable (tradable only via withdrawal/deposit).
+    /// Whether this currency is non-tradable.
     #[serde(default)]
     pub non_tradable_asset: bool,
     /// Withdrawal amount.
     #[serde(default)]
     pub amt: NumberString,
-    /// Network fee charged for the withdrawal.
+    /// Event timestamp when the withdrawal request was submitted (Unix milliseconds).
     #[serde(default)]
-    pub fee: NumberString,
-    /// Fee currency.
-    #[serde(default)]
-    pub fee_ccy: String,
+    pub ts: NumberString,
     /// Source address or account; may be empty for internal transfers.
     #[serde(default)]
     pub from: String,
@@ -98,7 +113,10 @@ pub struct WithdrawalInfoUpdate {
     /// Country calling code for the destination address (phone-number withdrawals only).
     #[serde(default)]
     pub area_code_to: String,
-    /// Address tag (for currencies that require a tag/memo, e.g., XRP).
+    /// Address type: `1` wallet/email/phone/login, `2` UID.
+    #[serde(default)]
+    pub to_addr_type: String,
+    /// Address tag (for currencies that require a tag, e.g., XRP).
     #[serde(default)]
     pub tag: String,
     /// Payment ID (for currencies that use a payment ID, e.g., Monero).
@@ -107,28 +125,36 @@ pub struct WithdrawalInfoUpdate {
     /// Memo (for currencies that use a memo, e.g., EOS).
     #[serde(default)]
     pub memo: String,
-    /// Extended address metadata (JSON object; structure varies by chain).
+    /// Withdrawal address attachment (structure varies by chain; `null` when absent).
     #[serde(default)]
-    pub addr_ext: Value,
-    /// On-chain transaction hash; empty before broadcast.
+    pub addr_ex: Value,
+    /// On-chain transaction hash; empty before broadcast or for internal transfers.
     #[serde(default)]
     pub tx_id: String,
+    /// Network fee charged for the withdrawal.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Fee currency.
+    #[serde(default)]
+    pub fee_ccy: String,
+    /// Withdrawal state.
+    ///
+    /// Documented values: `17` pending Travel Rule, `10` waiting transfer,
+    /// `0` waiting withdrawal, `4`/`5`/`6`/`8`/`9`/`12` waiting manual review,
+    /// `7` approved, `1` broadcasting to chain, `15` pending validation,
+    /// `16` may take up to 24 h, `-3` canceling, `-2` canceled, `-1` failed,
+    /// `2` success.
+    #[serde(default)]
+    pub state: String,
     /// OKX-assigned withdrawal ID.
     #[serde(default)]
     pub wd_id: String,
-    /// Withdrawal state.
-    ///
-    /// Documented values: `-3` canceling, `-2` canceled, `-1` failed,
-    /// `0` waiting withdrawal, `1` withdrawing, `2` withdrawal success,
-    /// `7` approved, `10` waiting transfer, `4` waiting manual review.
-    #[serde(default)]
-    pub state: String,
     /// Client-supplied withdrawal ID, if any.
     #[serde(default)]
     pub client_id: String,
-    /// Event timestamp (Unix milliseconds).
+    /// Withdrawal note.
     #[serde(default)]
-    pub ts: NumberString,
+    pub note: String,
     /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,

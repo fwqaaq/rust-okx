@@ -53,6 +53,7 @@ fn all_exported_websocket_models_are_deserializable() {
     assert_deserializable::<OrderUpdate>();
     assert_deserializable::<AdvancedAlgoOrderUpdate>();
     assert_deserializable::<AlgoOrderUpdate>();
+    assert_deserializable::<LinkedOrder>();
 
     assert_deserializable::<CopyTradingNotification>();
     assert_deserializable::<GridOrderUpdate>();

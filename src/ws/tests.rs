@@ -7,7 +7,11 @@ use crate::signing;
 use crate::ws::channels;
 use crate::ws::client::login_payload;
 use crate::ws::event::parse_text_event;
-use crate::ws::model::{AccountUpdate, StatusUpdate};
+use crate::ws::model::{
+    AccountUpdate, AdvancedAlgoOrderUpdate, AlgoOrderUpdate, BlockQuoteUpdate, BlockRfqUpdate,
+    BlockTickerUpdate, DepositInfoUpdate, PublicBlockTradeUpdate, PublicStructureBlockTradeUpdate,
+    StatusUpdate, StructureBlockTradeUpdate, WithdrawalInfoUpdate,
+};
 use crate::ws::ops::operation_payload_with_expiry;
 use crate::ws::request::{
     AmendSpreadOrderRequest, CancelSpreadOrderRequest, MassCancelRequest,
@@ -308,6 +312,172 @@ fn operation_payload_serializes_expiry_and_typed_ws_requests() {
     let cancel_all = MassCancelSpreadOrdersRequest::all();
     let value = serde_json::to_value(cancel_all).unwrap();
     assert_eq!(value, serde_json::json!({}));
+}
+
+#[test]
+fn parse_algo_order_push() {
+    let json = r#"{
+        "arg": {
+            "channel": "orders-algo",
+            "uid": "77982378738415879",
+            "instType": "FUTURES",
+            "instId": "BTC-USD-200329"
+        },
+        "data": [{
+            "actualPx": "0",
+            "actualSide": "",
+            "actualSz": "0",
+            "algoClOrdId": "",
+            "algoId": "581878926302093312",
+            "attachAlgoOrds": [],
+            "amendResult": "",
+            "cTime": "1685002746818",
+            "uTime": "1708679675245",
+            "ccy": "",
+            "clOrdId": "",
+            "closeFraction": "",
+            "failCode": "",
+            "instId": "BTC-USDC",
+            "instType": "SPOT",
+            "last": "26174.8",
+            "lever": "0",
+            "notionalUsd": "11.0",
+            "ordId": "",
+            "ordIdList": [],
+            "ordPx": "",
+            "ordType": "conditional",
+            "posSide": "",
+            "quickMgnType": "",
+            "reduceOnly": "false",
+            "reqId": "",
+            "side": "buy",
+            "slOrdPx": "",
+            "slTriggerPx": "",
+            "slTriggerPxType": "",
+            "state": "live",
+            "sz": "11",
+            "tag": "",
+            "tdMode": "cross",
+            "tgtCcy": "quote_ccy",
+            "tpOrdPx": "-1",
+            "tpTriggerPx": "1",
+            "tpTriggerPxType": "last",
+            "triggerPx": "",
+            "triggerTime": "",
+            "tradeQuoteCcy": "USDT",
+            "amendPxOnTriggerType": "0",
+            "linkedOrd": {"ordId": "98192973880283"},
+            "isTradeBorrowMode": ""
+        }]
+    }"#;
+
+    let event = parse_text_event(json).unwrap().unwrap();
+    let WsEvent::Push(push) = event else {
+        panic!("expected Push, got {:?}", event);
+    };
+    assert_eq!(push.arg.channel, "orders-algo");
+
+    let rows: Vec<AlgoOrderUpdate> = push.parse().unwrap();
+    assert_eq!(rows.len(), 1);
+    let row = &rows[0];
+    assert_eq!(row.inst_id, "BTC-USDC");
+    assert_eq!(row.algo_id, "581878926302093312");
+    assert_eq!(row.ord_type, "conditional");
+    assert_eq!(row.state, "live");
+    assert_eq!(row.tp_trigger_px.as_str(), "1");
+    assert_eq!(row.tp_trigger_px_type, "last");
+    assert_eq!(row.last.as_str(), "26174.8");
+    assert_eq!(row.notional_usd.as_str(), "11.0");
+    assert!(row.ord_id_list.is_empty());
+    assert!(row.attach_algo_ords.is_empty());
+    assert_eq!(row.trade_quote_ccy, "USDT");
+    let linked = row
+        .linked_ord
+        .as_ref()
+        .expect("linkedOrd should be present");
+    assert_eq!(linked.ord_id, "98192973880283");
+    assert_eq!(row.c_time.as_str(), "1685002746818");
+    assert_eq!(row.u_time.as_str(), "1708679675245");
+    assert!(row.extra.is_empty());
+}
+
+#[test]
+fn parse_advanced_algo_order_push() {
+    let json = r#"{
+        "arg": {
+            "channel": "algo-advance",
+            "uid": "77982378738415879",
+            "instType": "SPOT",
+            "instId": "BTC-USDT"
+        },
+        "data": [{
+            "actualPx": "",
+            "actualSide": "",
+            "actualSz": "0",
+            "algoId": "355056228680335360",
+            "cTime": "1630924001545",
+            "ccy": "",
+            "clOrdId": "",
+            "count": "1",
+            "instId": "BTC-USDT",
+            "instType": "SPOT",
+            "lever": "0",
+            "notionalUsd": "",
+            "ordPx": "",
+            "ordType": "iceberg",
+            "pTime": "1630924295204",
+            "posSide": "net",
+            "pxLimit": "10",
+            "pxSpread": "1",
+            "pxVar": "",
+            "side": "buy",
+            "slOrdPx": "",
+            "slTriggerPx": "",
+            "state": "pause",
+            "sz": "0.1",
+            "szLimit": "0.1",
+            "tdMode": "cash",
+            "timeInterval": "",
+            "tpOrdPx": "",
+            "tpTriggerPx": "",
+            "tag": "adadadadad",
+            "triggerPx": "",
+            "triggerTime": "",
+            "tradeQuoteCcy": "USDT",
+            "callbackRatio": "",
+            "callbackSpread": "",
+            "activePx": "",
+            "moveTriggerPx": "",
+            "failCode": "",
+            "algoClOrdId": "",
+            "reduceOnly": "",
+            "isTradeBorrowMode": true
+        }]
+    }"#;
+
+    let event = parse_text_event(json).unwrap().unwrap();
+    let WsEvent::Push(push) = event else {
+        panic!("expected Push, got {:?}", event);
+    };
+    assert_eq!(push.arg.channel, "algo-advance");
+
+    let rows: Vec<AdvancedAlgoOrderUpdate> = push.parse().unwrap();
+    assert_eq!(rows.len(), 1);
+    let row = &rows[0];
+    assert_eq!(row.inst_id, "BTC-USDT");
+    assert_eq!(row.algo_id, "355056228680335360");
+    assert_eq!(row.ord_type, "iceberg");
+    assert_eq!(row.state, "pause");
+    assert_eq!(row.px_limit.as_str(), "10");
+    assert_eq!(row.px_spread.as_str(), "1");
+    assert_eq!(row.sz_limit.as_str(), "0.1");
+    assert_eq!(row.count.as_str(), "1");
+    assert_eq!(row.tag, "adadadadad");
+    assert_eq!(row.trade_quote_ccy, "USDT");
+    assert_eq!(row.is_trade_borrow_mode, serde_json::Value::Bool(true));
+    assert_eq!(row.p_time.as_str(), "1630924295204");
+    assert_eq!(row.c_time.as_str(), "1630924001545");
+    assert!(row.extra.is_empty());
 }
 
 #[test]
