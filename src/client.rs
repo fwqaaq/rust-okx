@@ -302,6 +302,7 @@ impl<T> OkxClientBuilder<T> {
 
 #[cfg(test)]
 mod tests {
+    use crate::api::market::InstIdRequest;
     use crate::error::{Error, RestError};
     use crate::test_util::MockTransport;
     use crate::{OkxClient, OkxRegion};
@@ -313,7 +314,8 @@ mod tests {
     async fn non_zero_code_is_api_error() {
         let mock = MockTransport::new(r#"{"code":"51000","msg":"Parameter error","data":[]}"#);
         let client = OkxClient::with_transport(mock).build();
-        let err = client.market().get_ticker("BAD").await.unwrap_err();
+        let request = InstIdRequest { inst_id: "BAD" };
+        let err = client.market().get_ticker(&request).await.unwrap_err();
         match err {
             Error::Rest(RestError::Okx { code, message, .. }) => {
                 assert_eq!(code, "51000");
@@ -337,7 +339,10 @@ mod tests {
             .region(OkxRegion::Us)
             .build();
 
-        client.market().get_ticker("BTC-USDT").await.unwrap();
+        let request = InstIdRequest {
+            inst_id: "BTC-USDT",
+        };
+        client.market().get_ticker(&request).await.unwrap();
 
         let req = mock.captured();
         assert!(
@@ -356,7 +361,10 @@ mod tests {
             .base_url("https://example.test")
             .build();
 
-        client.market().get_ticker("BTC-USDT").await.unwrap();
+        let request = InstIdRequest {
+            inst_id: "BTC-USDT",
+        };
+        client.market().get_ticker(&request).await.unwrap();
 
         let req = mock.captured();
         assert!(

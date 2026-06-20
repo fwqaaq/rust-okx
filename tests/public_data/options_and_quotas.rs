@@ -1,6 +1,6 @@
 use crate::common::public_client;
 use rust_okx::api::public_data::{
-    InstrumentTickBandsRequest, OptionSummaryRequest, PublicOptionTradesRequest,
+    CurrencyRequest, InstrumentTickBandsRequest, OptionSummaryRequest, PublicOptionTradesRequest,
 };
 
 #[tokio::test]
@@ -40,7 +40,7 @@ async fn public_loan_quota_endpoints_accept_empty_array_wire_values() {
     // STATUS: LIVE — public; regression for arrays returned as "".
     client
         .public_data()
-        .get_discount_rate_interest_free_quota(Some("USDT"))
+        .get_discount_rate_interest_free_quota(&CurrencyRequest { ccy: Some("USDT") })
         .await
         .expect("public/discount-rate-interest-free-quota");
 

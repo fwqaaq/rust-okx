@@ -14,17 +14,22 @@
 //! ```no_run
 //! # #[cfg(feature = "reqwest")]
 //! # async fn run() -> Result<(), rust_okx::Error> {
-//! use rust_okx::{Credentials, OkxClient};
+//! use rust_okx::{Credentials, OkxClient, api::market::InstIdRequest};
 //!
 //! // Public, unauthenticated client.
 //! let client = OkxClient::builder().build();
-//! let ticker = client.market().get_ticker("BTC-USDT").await?;
+//! let ticker = client
+//!     .market()
+//!     .get_ticker(&InstIdRequest {
+//!         inst_id: "BTC-USDT",
+//!     })
+//!     .await?;
 //! println!("last price: {}", ticker[0].last.as_str());
 //!
 //! // Authenticated client.
 //! let creds = Credentials::new("key", "secret", "passphrase");
 //! let client = OkxClient::builder().credentials(creds).build();
-//! let balance = client.account().get_balance(None).await?;
+//! let balance = client.account().get_balance(rust_okx::api::account::BalanceRequest::default()).await?;
 //! # Ok(())
 //! # }
 //! # #[cfg(not(feature = "reqwest"))]

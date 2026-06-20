@@ -2,8 +2,9 @@ use crate::model::TradeMode;
 use crate::test_util::MockTransport;
 
 use super::super::{
-    InterestAccruedRequest, InterestLimitsRequest, MaxLoanRequest, SetAutoEarnRequest,
-    SetAutoRepayRequest, SpotBorrowRepayHistoryRequest, SpotManualBorrowRepayRequest,
+    BalanceRequest, InterestAccruedRequest, InterestLimitsRequest, MaxLoanRequest,
+    SetAutoEarnRequest, SetAutoLoanRequest, SetAutoRepayRequest, SpotBorrowRepayHistoryRequest,
+    SpotManualBorrowRepayRequest,
 };
 use super::signed_client;
 
@@ -57,7 +58,7 @@ async fn get_interest_rate_queries_currency() {
 
     let result = client
         .account()
-        .get_interest_rate(Some("BTC"))
+        .get_interest_rate(BalanceRequest { ccy: Some("BTC") })
         .await
         .unwrap();
     assert_eq!(result[0].ccy, "BTC");
@@ -154,7 +155,11 @@ async fn set_auto_loan_posts_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let result = client.account().set_auto_loan(true).await.unwrap();
+    let result = client
+        .account()
+        .set_auto_loan(&SetAutoLoanRequest { auto_loan: true })
+        .await
+        .unwrap();
     assert_eq!(result[0].auto_loan, "true");
 
     let req = mock.captured();

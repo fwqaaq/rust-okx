@@ -3,7 +3,7 @@ use http::Method;
 use crate::OkxClient;
 use crate::test_util::MockTransport;
 
-use super::super::FinanceHistoryRequest;
+use super::super::{AmountRequest, ApyHistoryRequest, CancelRedeemRequest, FinanceHistoryRequest};
 use super::signed_client;
 
 #[tokio::test]
@@ -37,10 +37,11 @@ async fn eth_purchase_posts_signed_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
+    let request = AmountRequest { amt: "0.1" };
     let rows = client
         .finance()
         .eth_staking()
-        .purchase("0.1")
+        .purchase(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].ord_id, "123");
@@ -63,7 +64,13 @@ async fn eth_redeem_posts_signed_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client.finance().eth_staking().redeem("0.1").await.unwrap();
+    let request = AmountRequest { amt: "0.1" };
+    let rows = client
+        .finance()
+        .eth_staking()
+        .redeem(&request)
+        .await
+        .unwrap();
     assert_eq!(rows[0].ord_id, "456");
 
     let req = mock.captured();
@@ -79,10 +86,13 @@ async fn eth_cancel_redeem() {
     let mock = MockTransport::new(r#"{"code":"0","data":[{"ordId":"1234567890"}],"msg":""}"#);
     let client = signed_client(mock.clone());
 
+    let request = CancelRedeemRequest {
+        ord_id: "1234567890",
+    };
     let rows = client
         .finance()
         .eth_staking()
-        .cancel_redeem("1234567890")
+        .cancel_redeem(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].ord_id, "1234567890");
@@ -147,10 +157,11 @@ async fn eth_apy_history_is_not_signed() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
+    let request = ApyHistoryRequest { days: "30" };
     let rows = client
         .finance()
         .eth_staking()
-        .apy_history("30")
+        .apy_history(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].ccy, "ETH");

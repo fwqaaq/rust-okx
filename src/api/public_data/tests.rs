@@ -2,6 +2,8 @@ use crate::OkxClient;
 use crate::model::InstType;
 use crate::test_util::MockTransport;
 
+use super::{CurrencyRequest, InstIdRequest, InstrumentsRequest};
+
 #[tokio::test]
 async fn get_instruments_builds_request_and_parses() {
     let body = r#"{"code":"0","msg":"","data":[{
@@ -23,9 +25,13 @@ async fn get_instruments_builds_request_and_parses() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
+    let request = InstrumentsRequest {
+        inst_type: &InstType::Spot,
+        inst_family: None,
+    };
     let instruments = client
         .public_data()
-        .get_instruments(InstType::Spot, None)
+        .get_instruments(&request)
         .await
         .unwrap();
 
@@ -86,9 +92,12 @@ async fn get_funding_rate_queries_instrument() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
+    let request = InstIdRequest {
+        inst_id: "BTC-USDT-SWAP",
+    };
     let rows = client
         .public_data()
-        .get_funding_rate("BTC-USDT-SWAP")
+        .get_funding_rate(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].funding_rate.as_str(), "0.0001");
@@ -133,9 +142,12 @@ async fn get_price_limit_queries_instrument() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
+    let request = InstIdRequest {
+        inst_id: "BTC-USDT-SWAP",
+    };
     let rows = client
         .public_data()
-        .get_price_limit("BTC-USDT-SWAP")
+        .get_price_limit(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].buy_lmt.as_str(), "17057.9");
@@ -298,9 +310,12 @@ async fn get_estimated_price_queries_inst_id() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
+    let request = InstIdRequest {
+        inst_id: "BTC-USD-240628",
+    };
     let rows = client
         .public_data()
-        .get_estimated_price("BTC-USD-240628")
+        .get_estimated_price(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].settle_px.as_str(), "200");
@@ -321,7 +336,7 @@ async fn get_discount_rate_interest_free_quota_omits_currency() {
 
     let rows = client
         .public_data()
-        .get_discount_rate_interest_free_quota(None)
+        .get_discount_rate_interest_free_quota(&CurrencyRequest::default())
         .await
         .unwrap();
     assert_eq!(rows[0].ccy, "BTC");

@@ -1,7 +1,9 @@
 use crate::model::{InstType, OrderSide, OrderState};
 use crate::test_util::MockTransport;
 
-use super::super::{FillHistoryRequest, FillsRequest, OrderHistoryRequest, OrderListRequest};
+use super::super::{
+    FillHistoryRequest, FillsRequest, GetOrderRequest, OrderHistoryRequest, OrderListRequest,
+};
 use super::signed_client;
 
 #[tokio::test]
@@ -20,11 +22,11 @@ async fn get_order_queries_and_parses() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let orders = client
-        .trade()
-        .get_order("BTC-USDT", "312269865356374016")
-        .await
-        .unwrap();
+    let request = GetOrderRequest {
+        inst_id: "BTC-USDT",
+        ord_id: "312269865356374016",
+    };
+    let orders = client.trade().get_order(&request).await.unwrap();
     assert_eq!(orders[0].ord_id, "312269865356374016");
     assert_eq!(orders[0].state, OrderState::Filled);
     assert_eq!(orders[0].side, OrderSide::Buy);

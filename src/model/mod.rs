@@ -6,6 +6,9 @@ use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
+#[derive(Serialize)]
+pub(crate) struct EmptyRequest {}
+
 /// Deserialize an OKX array field that may be encoded as an empty string when
 /// no entries are available.
 ///

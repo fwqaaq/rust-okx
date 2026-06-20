@@ -1,3 +1,4 @@
+use crate::api::account::BalanceRequest;
 use crate::model::InstType;
 use crate::test_util::MockTransport;
 
@@ -15,7 +16,11 @@ async fn get_greeks_queries_currency() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let result = client.account().get_greeks(Some("BTC")).await.unwrap();
+    let result = client
+        .account()
+        .get_greeks(BalanceRequest { ccy: Some("BTC") })
+        .await
+        .unwrap();
     assert_eq!(result[0].delta_pa.as_str(), "0.91");
 
     let req = mock.captured();

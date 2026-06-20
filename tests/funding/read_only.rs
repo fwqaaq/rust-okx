@@ -1,7 +1,7 @@
 use crate::common::{env_non_empty, live_client_or_skip};
 use rust_okx::api::funding::{
-    DepositHistoryRequest, DepositWithdrawStatusRequest, FundingBillsRequest,
-    WithdrawalHistoryRequest,
+    CurrencyRequest, DepositAddressRequest, DepositHistoryRequest, DepositWithdrawStatusRequest,
+    FundingBillsRequest, TransferStateRequest, WithdrawalHistoryRequest,
 };
 
 #[tokio::test]
@@ -14,7 +14,7 @@ async fn funding_currency_and_balance_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     let currencies = client
         .funding()
-        .get_currencies(Some("USDT"))
+        .get_currencies(&CurrencyRequest { ccy: Some("USDT") })
         .await
         .expect("asset/currencies");
     assert!(currencies.iter().any(|row| row.ccy == "USDT"));
@@ -23,7 +23,7 @@ async fn funding_currency_and_balance_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     let balances = client
         .funding()
-        .get_balances(None)
+        .get_balances(&CurrencyRequest::default())
         .await
         .expect("asset/balances");
     assert!(balances.iter().all(|row| !row.ccy.is_empty()));
@@ -32,7 +32,7 @@ async fn funding_currency_and_balance_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     let assets = client
         .funding()
-        .get_non_tradable_assets(None)
+        .get_non_tradable_assets(&CurrencyRequest::default())
         .await
         .expect("asset/non-tradable-assets");
     assert!(assets.iter().all(|row| !row.ccy.is_empty()));
@@ -41,7 +41,7 @@ async fn funding_currency_and_balance_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     let valuation = client
         .funding()
-        .get_asset_valuation(Some("USD"))
+        .get_asset_valuation(&CurrencyRequest { ccy: Some("USD") })
         .await
         .expect("asset/asset-valuation");
     assert!(valuation.len() <= 1);
@@ -58,7 +58,7 @@ async fn funding_address_and_history_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     let addresses = client
         .funding()
-        .get_deposit_address(&ccy)
+        .get_deposit_address(&DepositAddressRequest { ccy: &ccy })
         .await
         .expect("asset/deposit-address");
     assert!(addresses.iter().all(|row| row.ccy == ccy));
@@ -105,9 +105,13 @@ async fn funding_transfer_state_parses_when_id_is_configured() {
 
     // API: GET /api/v5/asset/transfer-state
     // STATUS: LIVE/ENV — read-only but requires a real transfer ID.
+    let request = TransferStateRequest {
+        trans_id: &trans_id,
+        transfer_type: transfer_type.as_deref(),
+    };
     let rows = client
         .funding()
-        .transfer_state(&trans_id, transfer_type.as_deref())
+        .transfer_state(&request)
         .await
         .expect("asset/transfer-state");
     assert!(!rows.is_empty());

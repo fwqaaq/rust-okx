@@ -1,6 +1,9 @@
 use std::env;
 
-use rust_okx::{Credentials, OkxClient, OkxRegion};
+use rust_okx::{
+    Credentials, OkxClient, OkxRegion,
+    api::funding::{CurrencyRequest, DepositAddressRequest},
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -8,10 +11,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = authenticated_client()?;
     let currency = env::var("OKX_EXAMPLE_FUNDING_CCY").unwrap_or_else(|_| "USDT".to_owned());
 
-    let currencies = client.funding().get_currencies(Some(&currency)).await?;
+    let currency_request = CurrencyRequest {
+        ccy: Some(&currency),
+    };
+    let currencies = client.funding().get_currencies(&currency_request).await?;
     println!("{currency} currency metadata rows: {}", currencies.len());
 
-    let balances = client.funding().get_balances(Some(&currency)).await?;
+    let balances = client.funding().get_balances(&currency_request).await?;
     for balance in &balances {
         println!(
             "funding balance: ccy={} bal={} availBal={}",
@@ -19,7 +25,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
     }
 
-    let deposit_addresses = client.funding().get_deposit_address(&currency).await?;
+    let deposit_addresses = client
+        .funding()
+        .get_deposit_address(&DepositAddressRequest { ccy: &currency })
+        .await?;
     println!(
         "{currency} deposit address rows: {}",
         deposit_addresses.len()
@@ -28,7 +37,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let valuation_ccy = env::var("OKX_EXAMPLE_VALUATION_CCY").unwrap_or_else(|_| "USD".to_owned());
     let valuation = client
         .funding()
-        .get_asset_valuation(Some(&valuation_ccy))
+        .get_asset_valuation(&CurrencyRequest {
+            ccy: Some(&valuation_ccy),
+        })
         .await?;
     if let Some(row) = valuation.first() {
         println!("asset valuation in {valuation_ccy}: {}", row.total_bal);

@@ -1,7 +1,7 @@
 use crate::common::{demo_client, live_client};
 use rust_okx::api::account::{
-    AccountInstrumentsRequest, BillsRequest, FeeRatesRequest, LeverageRequest,
-    MaxAvailableSizeRequest,
+    AccountInstrumentsRequest, BalanceRequest, BillsRequest, FeeRatesRequest, LeverageRequest,
+    MaxAvailableSizeRequest, PositionRiskRequest, PositionsRequest,
 };
 use rust_okx::model::{InstType, TradeMode};
 use rust_okx::{Error, OkxClient};
@@ -41,7 +41,10 @@ async fn read_only_suite(client: &OkxClient, label: &str) {
 
     // API: GET /api/v5/account/balance
     // STATUS: LIVE — authenticated, read-only.
-    let balance = live!(client.account().get_balance(None), "account/balance");
+    let balance = live!(
+        client.account().get_balance(BalanceRequest::default()),
+        "account/balance"
+    );
     assert!(
         !balance.is_empty(),
         "[{label}] balance should return one row"
@@ -50,14 +53,16 @@ async fn read_only_suite(client: &OkxClient, label: &str) {
     // API: GET /api/v5/account/positions
     // STATUS: LIVE — authenticated, read-only; an empty response is valid.
     live!(
-        client.account().get_positions(None, None),
+        client.account().get_positions(&PositionsRequest::default()),
         "account/positions"
     );
 
     // API: GET /api/v5/account/account-position-risk
     // STATUS: LIVE — authenticated, read-only.
     live!(
-        client.account().get_position_risk(None),
+        client
+            .account()
+            .get_position_risk(&PositionRiskRequest::default()),
         "account/account-position-risk"
     );
 
@@ -90,7 +95,10 @@ async fn read_only_suite(client: &OkxClient, label: &str) {
 
     // API: GET /api/v5/account/greeks
     // STATUS: LIVE/MODE-TODO — read-only but options/PM-mode dependent.
-    live_or_mode_todo!(client.account().get_greeks(None), "account/greeks");
+    live_or_mode_todo!(
+        client.account().get_greeks(BalanceRequest::default()),
+        "account/greeks"
+    );
 
     // API: GET /api/v5/account/bills
     // STATUS: LIVE — authenticated, read-only.

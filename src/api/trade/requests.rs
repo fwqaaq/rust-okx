@@ -2,6 +2,17 @@ use serde::Serialize;
 
 use crate::model::{OrderSide, OrderState, OrderType, PositionSide, TradeMode};
 
+/// Request for [`get_order`](crate::api::trade::Trade::get_order).
+#[derive(Debug, Clone, Serialize)]
+pub struct GetOrderRequest<'a> {
+    /// Instrument ID, e.g. `"BTC-USDT"`.
+    #[serde(rename = "instId")]
+    pub inst_id: &'a str,
+    /// OKX order ID.
+    #[serde(rename = "ordId")]
+    pub ord_id: &'a str,
+}
+
 mod advanced;
 mod algo;
 

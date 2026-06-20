@@ -2,6 +2,7 @@ use http::Method;
 
 use crate::test_util::MockTransport;
 
+use super::super::{CurrencyRequest, DepositAddressRequest};
 use super::signed_client;
 
 #[tokio::test]
@@ -13,7 +14,8 @@ async fn get_currencies_sends_signed_get() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client.funding().get_currencies(Some("BTC")).await.unwrap();
+    let request = CurrencyRequest { ccy: Some("BTC") };
+    let rows = client.funding().get_currencies(&request).await.unwrap();
     assert_eq!(rows[0].ccy, "BTC");
     assert_eq!(rows[0].name, "Bitcoin");
     assert!(rows[0].can_dep);
@@ -30,7 +32,11 @@ async fn get_currencies_omits_ccy_when_absent() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    client.funding().get_currencies(None).await.unwrap();
+    client
+        .funding()
+        .get_currencies(&CurrencyRequest::default())
+        .await
+        .unwrap();
 
     let req = mock.captured();
     assert_eq!(req.query(), None);
@@ -44,7 +50,8 @@ async fn get_balances_sends_signed_get() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client.funding().get_balances(Some("USDT")).await.unwrap();
+    let request = CurrencyRequest { ccy: Some("USDT") };
+    let rows = client.funding().get_balances(&request).await.unwrap();
     assert_eq!(rows[0].ccy, "USDT");
     assert_eq!(rows[0].bal.as_str(), "1000");
     assert_eq!(rows[0].avail_bal.as_str(), "1000");
@@ -63,7 +70,7 @@ async fn get_non_tradable_assets_sends_signed_get() {
 
     let rows = client
         .funding()
-        .get_non_tradable_assets(None)
+        .get_non_tradable_assets(&CurrencyRequest::default())
         .await
         .unwrap();
     assert_eq!(rows[0].ccy, "OKB");
@@ -84,7 +91,12 @@ async fn get_deposit_address_queries_required_currency() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client.funding().get_deposit_address("USDT").await.unwrap();
+    let request = DepositAddressRequest { ccy: "USDT" };
+    let rows = client
+        .funding()
+        .get_deposit_address(&request)
+        .await
+        .unwrap();
     assert_eq!(rows[0].ccy, "USDT");
     assert_eq!(rows[0].chain, "USDT-TRC20");
     assert!(rows[0].selected);
@@ -103,7 +115,11 @@ async fn get_asset_valuation_omits_currency_when_absent() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client.funding().get_asset_valuation(None).await.unwrap();
+    let rows = client
+        .funding()
+        .get_asset_valuation(&CurrencyRequest::default())
+        .await
+        .unwrap();
     assert_eq!(rows[0].total_bal.as_str(), "1700");
     assert_eq!(rows[0].details.funding.as_str(), "500");
 

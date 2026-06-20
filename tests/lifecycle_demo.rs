@@ -9,7 +9,8 @@ mod common;
 
 use common::{demo_client, ok_or_skip};
 use rust_okx::api::account::{LeverageRequest, SetLeverageRequest};
-use rust_okx::api::trade::PlaceOrderRequest;
+use rust_okx::api::market::InstIdRequest;
+use rust_okx::api::trade::{CancelOrderRequest, GetOrderRequest, PlaceOrderRequest};
 use rust_okx::model::{OrderSide, OrderState, OrderType, TradeMode};
 
 /// Full order lifecycle on the demo account:
@@ -27,7 +28,11 @@ async fn demo_place_get_cancel_order() {
 
     // API: GET /api/v5/market/ticker
     // STATUS: DEMO — public price lookup used by the simulated lifecycle.
-    let Some(ticker) = ok_or_skip(client.market().get_ticker("BTC-USDT").await, "ticker") else {
+    let ticker_request = InstIdRequest {
+        inst_id: "BTC-USDT",
+    };
+    let Some(ticker) = ok_or_skip(client.market().get_ticker(&ticker_request).await, "ticker")
+    else {
         return;
     };
     let last: f64 = ticker[0].last.parse().expect("price is numeric");
@@ -57,18 +62,20 @@ async fn demo_place_get_cancel_order() {
 
     // API: GET /api/v5/trade/order
     // STATUS: DEMO — reads the simulated order created above.
-    let Some(live) = ok_or_skip(
-        client.trade().get_order("BTC-USDT", &ord_id).await,
-        "get_order",
-    ) else {
+    let get_request = GetOrderRequest {
+        inst_id: "BTC-USDT",
+        ord_id: &ord_id,
+    };
+    let Some(live) = ok_or_skip(client.trade().get_order(&get_request).await, "get_order") else {
         return;
     };
     assert_eq!(live[0].state, OrderState::Live);
 
     // API: POST /api/v5/trade/cancel-order
     // STATUS: DEMO — cancels only the simulated order created above.
+    let cancel_request = CancelOrderRequest::by_order_id("BTC-USDT", &ord_id);
     let Some(cancelled) = ok_or_skip(
-        client.trade().cancel_order("BTC-USDT", &ord_id).await,
+        client.trade().cancel_order(&cancel_request).await,
         "cancel_order",
     ) else {
         return;
@@ -80,7 +87,7 @@ async fn demo_place_get_cancel_order() {
     );
 
     let Some(after) = ok_or_skip(
-        client.trade().get_order("BTC-USDT", &ord_id).await,
+        client.trade().get_order(&get_request).await,
         "get_order after cancel",
     ) else {
         return;

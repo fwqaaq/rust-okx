@@ -2,7 +2,6 @@
 
 mod api;
 mod endpoints;
-mod internal;
 mod requests;
 mod responses;
 

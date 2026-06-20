@@ -1,5 +1,44 @@
 use serde::Serialize;
 
+/// Request for [`get_saving_balance`](crate::api::finance::Savings::get_saving_balance).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct CurrencyRequest<'a> {
+    /// Currency filter, e.g. `Some("USDT")`. `None` returns all currencies.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ccy: Option<&'a str>,
+}
+
+/// Request for [`set_lending_rate`](crate::api::finance::Savings::set_lending_rate).
+#[derive(Debug, Clone, Serialize)]
+pub struct SetLendingRateRequest<'a> {
+    /// Currency.
+    pub ccy: &'a str,
+    /// Lending rate.
+    pub rate: &'a str,
+}
+
+/// Request for purchase/redeem operations on staking products.
+#[derive(Debug, Clone, Serialize)]
+pub struct AmountRequest<'a> {
+    /// Amount.
+    pub amt: &'a str,
+}
+
+/// Request for [`cancel_redeem`] on staking products.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CancelRedeemRequest<'a> {
+    /// Order ID to cancel.
+    pub ord_id: &'a str,
+}
+
+/// Request for [`apy_history`] on staking products.
+#[derive(Debug, Clone, Serialize)]
+pub struct ApyHistoryRequest<'a> {
+    /// Number of days of history, e.g. `"7"` or `"30"`.
+    pub days: &'a str,
+}
+
 /// Common currency and cursor pagination query used by finance history endpoints.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct FinanceHistoryRequest {

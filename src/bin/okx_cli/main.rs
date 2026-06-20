@@ -10,6 +10,8 @@ use crossterm::terminal::{
 };
 use futures_util::StreamExt;
 use ratatui::prelude::*;
+use rust_okx::api::account::BalanceRequest;
+use rust_okx::api::market::CandlesRequest;
 use tokio::sync::mpsc;
 
 mod app;
@@ -33,7 +35,11 @@ async fn main() -> Result<()> {
         .credentials(creds.clone())
         .build();
 
-    let balances = rest.account().get_balance(None).await.unwrap_or_default();
+    let balances = rest
+        .account()
+        .get_balance(BalanceRequest::default())
+        .await
+        .unwrap_or_default();
 
     let config = rest
         .account()
@@ -44,7 +50,11 @@ async fn main() -> Result<()> {
 
     let raw_candles = rest
         .market()
-        .get_candlesticks(&inst_id, Some(&bar), Some(100))
+        .get_candlesticks(&CandlesRequest {
+            inst_id: &inst_id,
+            bar: Some(&bar),
+            limit: Some(100),
+        })
         .await
         .unwrap_or_default();
 

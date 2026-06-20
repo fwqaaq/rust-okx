@@ -1,5 +1,42 @@
 use serde::Serialize;
 
+/// Request for [`get_currencies`](crate::api::funding::Funding::get_currencies),
+/// [`get_balances`](crate::api::funding::Funding::get_balances),
+/// [`get_non_tradable_assets`](crate::api::funding::Funding::get_non_tradable_assets), and
+/// [`get_asset_valuation`](crate::api::funding::Funding::get_asset_valuation).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct CurrencyRequest<'a> {
+    /// Currency filter, e.g. `Some("BTC")`. `None` returns all currencies.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ccy: Option<&'a str>,
+}
+
+/// Request for [`get_deposit_address`](crate::api::funding::Funding::get_deposit_address).
+#[derive(Debug, Clone, Serialize)]
+pub struct DepositAddressRequest<'a> {
+    /// Currency, e.g. `"USDT"`.
+    pub ccy: &'a str,
+}
+
+/// Request for [`transfer_state`](crate::api::funding::Funding::transfer_state).
+#[derive(Debug, Clone, Serialize)]
+pub struct TransferStateRequest<'a> {
+    /// Transfer ID.
+    #[serde(rename = "transId")]
+    pub trans_id: &'a str,
+    /// Transfer type (optional).
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    pub transfer_type: Option<&'a str>,
+}
+
+/// Request for [`cancel_withdrawal`](crate::api::funding::Funding::cancel_withdrawal).
+#[derive(Debug, Clone, Serialize)]
+pub struct CancelWithdrawalRequest<'a> {
+    /// Withdrawal ID.
+    #[serde(rename = "wdId")]
+    pub wd_id: &'a str,
+}
+
 /// Request body for [`Funding::funds_transfer`].
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]

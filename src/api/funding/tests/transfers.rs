@@ -2,7 +2,7 @@ use http::Method;
 
 use crate::test_util::MockTransport;
 
-use super::super::FundsTransferRequest;
+use super::super::{FundsTransferRequest, TransferStateRequest};
 use super::signed_client;
 
 #[tokio::test]
@@ -37,11 +37,11 @@ async fn transfer_state_queries_trans_id() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client
-        .funding()
-        .transfer_state("754147", None)
-        .await
-        .unwrap();
+    let request = TransferStateRequest {
+        trans_id: "754147",
+        transfer_type: None,
+    };
+    let rows = client.funding().transfer_state(&request).await.unwrap();
     assert_eq!(rows[0].trans_id, "754147");
     assert_eq!(rows[0].state, "success");
     assert_eq!(rows[0].from_account, "6");
@@ -58,11 +58,11 @@ async fn transfer_state_includes_type_when_set() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    client
-        .funding()
-        .transfer_state("754147", Some("1"))
-        .await
-        .unwrap();
+    let request = TransferStateRequest {
+        trans_id: "754147",
+        transfer_type: Some("1"),
+    };
+    client.funding().transfer_state(&request).await.unwrap();
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("transId=754147&type=1"));
