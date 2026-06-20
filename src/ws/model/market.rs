@@ -353,6 +353,7 @@ mod tests {
         let row: CandleUpdate =
             serde_json::from_str(r#"["1","2","3","4","5","6","7","8","1"]"#).unwrap();
         assert_eq!(row.ts.as_str(), "1");
+        assert_eq!(row.vol.as_str(), "6");
         assert_eq!(row.confirm.as_str(), "1");
     }
 

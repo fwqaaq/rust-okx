@@ -69,9 +69,9 @@ pub use market::{
 };
 pub use public_data::{
     AdlWarningUpdate, EconomicCalendarUpdate, EstimatedPriceUpdate, EventContractMarketUpdate,
-    FundingRateUpdate, IndexTickerUpdate, InstrumentUpcomingParamChange, InstrumentUpdate,
-    LiquidationOrderDetail, LiquidationOrderUpdate, MarkPriceUpdate, OpenInterestUpdate,
-    OptionSummaryUpdate, PriceLimitUpdate,
+    FundingRateUpdate, IndexCandleUpdate, IndexTickerUpdate, InstrumentUpcomingParamChange,
+    InstrumentUpdate, LiquidationOrderDetail, LiquidationOrderUpdate, MarkPriceCandleUpdate,
+    MarkPriceUpdate, OpenInterestUpdate, OptionSummaryUpdate, PriceLimitUpdate,
 };
 pub use spread::{
     SpreadAmendOrderResult, SpreadCancelOrderResult, SpreadMassCancelResult, SpreadOrderUpdate,

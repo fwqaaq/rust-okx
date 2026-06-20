@@ -7,6 +7,10 @@ use serde::Deserialize;
 use super::ExtraFields;
 use crate::model::NumberString;
 
+fn array_value(values: &[NumberString], i: usize) -> NumberString {
+    values.get(i).cloned().unwrap_or_default()
+}
+
 /// Upcoming instrument-parameter change nested in [`InstrumentUpdate`].
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -268,6 +272,9 @@ pub struct OpenInterestUpdate {
     /// Open interest in coin/currency units.
     #[serde(default)]
     pub oi_ccy: NumberString,
+    /// Open interest in USD.
+    #[serde(default)]
+    pub oi_usd: NumberString,
     /// Push time (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
@@ -343,6 +350,9 @@ pub struct FundingRateUpdate {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct PriceLimitUpdate {
+    /// Instrument type, e.g., `FUTURES`, `SWAP`, `OPTION`.
+    #[serde(default)]
+    pub inst_type: String,
     /// Instrument ID, e.g., `BTC-USD-SWAP`.
     #[serde(default)]
     pub inst_id: String,
@@ -380,29 +390,28 @@ pub struct OptionSummaryUpdate {
     #[serde(default)]
     pub uly: String,
     /// Black-Scholes delta.
-    #[serde(default)]
+    #[serde(default, rename = "deltaBS")]
     pub delta_bs: NumberString,
     /// Portfolio-adjusted delta.
-    #[serde(default)]
-    pub delta_pa: NumberString,
+    pub delta: NumberString,
     /// Black-Scholes gamma.
-    #[serde(default)]
+    #[serde(default, rename = "gammaBS")]
     pub gamma_bs: NumberString,
     /// Portfolio-adjusted gamma.
-    #[serde(default)]
+    #[serde(default, rename = "gamma")]
     pub gamma_pa: NumberString,
     /// Black-Scholes vega.
-    #[serde(default)]
+    #[serde(default, rename = "vegaBS")]
     pub vega_bs: NumberString,
     /// Portfolio-adjusted vega.
-    #[serde(default)]
+    #[serde(default, rename = "vega")]
     pub vega_pa: NumberString,
     /// Black-Scholes theta.
-    #[serde(default)]
+    #[serde(default, rename = "thetaBS")]
     pub theta_bs: NumberString,
     /// Portfolio-adjusted theta.
-    #[serde(default)]
-    pub theta_pa: NumberString,
+    #[serde(default, rename = "theta")]
+    pub theta: NumberString,
     /// Leverage (delta / price).
     #[serde(default)]
     pub lever: NumberString,
@@ -639,19 +648,16 @@ pub struct EconomicCalendarUpdate {
     /// Unique calendar event ID.
     #[serde(default)]
     pub calendar_id: String,
-    /// Event date in `YYYY-MM-DD` format.
+    /// Estimated release time (Unix milliseconds).
     #[serde(default)]
     pub date: String,
-    /// Event time in `HH:MM` format (local to the reporting region).
-    #[serde(default)]
-    pub time: String,
     /// Reporting region or country, e.g., `United States`.
     #[serde(default)]
     pub region: String,
-    /// Event category, e.g., `Employment`.
+    /// Event category, e.g., `Manufacturing PMI`.
     #[serde(default)]
     pub category: String,
-    /// Event name, e.g., `Non-Farm Payrolls`.
+    /// Event name, e.g., `S&P Global Manufacturing PMI Final`.
     #[serde(default)]
     pub event: String,
     /// Reference date for the data point (may differ from the release date).
@@ -672,22 +678,13 @@ pub struct EconomicCalendarUpdate {
     /// Unit of the reported value, e.g., `%`, `K`.
     #[serde(default)]
     pub unit: String,
-    /// Reporting currency for the event (may differ from `ccy`).
-    #[serde(default)]
-    pub currency: String,
     /// Crypto-market relevant currency associated with the event, e.g., `BTC`.
     #[serde(default)]
     pub ccy: String,
-    /// Whether the event spans multiple days: `1` yes, `0` no.
-    #[serde(default)]
-    pub date_span: String,
     /// Preliminary/initial value before revision (empty if not revised).
     #[serde(default)]
     pub prev_initial: String,
-    /// Last update time (Unix milliseconds).
-    #[serde(default)]
-    pub u_time: NumberString,
-    /// Push time (Unix milliseconds).
+    /// Push time / last update time (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
     /// Unrecognized fields retained for forward compatibility.
@@ -695,9 +692,129 @@ pub struct EconomicCalendarUpdate {
     pub extra: ExtraFields,
 }
 
+/// `index-candle*` channel row.
+///
+/// OKX pushes a 6-element array `[ts, o, h, l, c, confirm]` — no volume fields.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-public-data-ws-index-candlesticks-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(from = "Vec<NumberString>")]
+#[non_exhaustive]
+pub struct IndexCandleUpdate {
+    /// Opening time of the candlestick (Unix milliseconds).
+    pub ts: NumberString,
+    /// Open price.
+    pub o: NumberString,
+    /// Highest price.
+    pub h: NumberString,
+    /// Lowest price.
+    pub l: NumberString,
+    /// Close price.
+    pub c: NumberString,
+    /// Candlestick state: `0` incomplete (still forming), `1` completed.
+    pub confirm: NumberString,
+}
+
+impl From<Vec<NumberString>> for IndexCandleUpdate {
+    fn from(values: Vec<NumberString>) -> Self {
+        Self {
+            ts: array_value(&values, 0),
+            o: array_value(&values, 1),
+            h: array_value(&values, 2),
+            l: array_value(&values, 3),
+            c: array_value(&values, 4),
+            confirm: array_value(&values, 5),
+        }
+    }
+}
+
+/// `mark-price-candle*` channel row.
+///
+/// OKX pushes a 6-element array `[ts, o, h, l, c, confirm]` — no volume fields.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#order-book-trading-public-data-ws-mark-price-candlesticks-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(from = "Vec<NumberString>")]
+#[non_exhaustive]
+pub struct MarkPriceCandleUpdate {
+    /// Opening time of the candlestick (Unix milliseconds).
+    pub ts: NumberString,
+    /// Open price.
+    pub o: NumberString,
+    /// Highest price.
+    pub h: NumberString,
+    /// Lowest price.
+    pub l: NumberString,
+    /// Close price.
+    pub c: NumberString,
+    /// Candlestick state: `0` incomplete (still forming), `1` completed.
+    pub confirm: NumberString,
+}
+
+impl From<Vec<NumberString>> for MarkPriceCandleUpdate {
+    fn from(values: Vec<NumberString>) -> Self {
+        Self {
+            ts: array_value(&values, 0),
+            o: array_value(&values, 1),
+            h: array_value(&values, 2),
+            l: array_value(&values, 3),
+            c: array_value(&values, 4),
+            confirm: array_value(&values, 5),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn option_summary_greek_fields_deserialize_from_okx_json_keys() {
+        let row: OptionSummaryUpdate = serde_json::from_str(
+            r#"{
+                "instType":"OPTION","instId":"BTC-USD-241013-70000-P","uly":"BTC-USD",
+                "delta":"-1.1180902625","deltaBS":"-0.9999672034",
+                "gamma":"2.2361957091","gammaBS":"0.0000000002",
+                "vega":"0.0000000001","vegaBS":"0.0000114332",
+                "theta":"0.0000032334","thetaBS":"28.2649858387",
+                "lever":"8.465747567","markVol":"0.3675503331","bidVol":"0",
+                "askVol":"1.1669998535","realVol":"","volLv":"0.2044711229",
+                "fwdPx":"62604.6993093463","ts":"1728703155650"
+            }"#,
+        )
+        .unwrap();
+        assert_eq!(row.delta.as_str(), "-1.1180902625");
+        assert_eq!(row.delta_bs.as_str(), "-0.9999672034");
+        assert_eq!(row.gamma_pa.as_str(), "2.2361957091");
+        assert_eq!(row.gamma_bs.as_str(), "0.0000000002");
+        assert_eq!(row.vega_pa.as_str(), "0.0000000001");
+        assert_eq!(row.vega_bs.as_str(), "0.0000114332");
+        assert_eq!(row.theta.as_str(), "0.0000032334");
+        assert_eq!(row.theta_bs.as_str(), "28.2649858387");
+    }
+
+    #[test]
+    fn index_candle_parses_6_element_array() {
+        let row: IndexCandleUpdate = serde_json::from_str(
+            r#"["1597026383085","3811.31","3811.31","3811.31","3811.31","0"]"#,
+        )
+        .unwrap();
+        assert_eq!(row.ts.as_str(), "1597026383085");
+        assert_eq!(row.o.as_str(), "3811.31");
+        assert_eq!(row.c.as_str(), "3811.31");
+        assert_eq!(row.confirm.as_str(), "0");
+    }
+
+    #[test]
+    fn mark_price_candle_parses_6_element_array() {
+        let row: MarkPriceCandleUpdate =
+            serde_json::from_str(r#"["1597026383085","3.721","3.743","3.677","3.708","1"]"#)
+                .unwrap();
+        assert_eq!(row.ts.as_str(), "1597026383085");
+        assert_eq!(row.o.as_str(), "3.721");
+        assert_eq!(row.c.as_str(), "3.708");
+        assert_eq!(row.confirm.as_str(), "1");
+    }
 
     #[test]
     fn parses_current_instrument_and_estimated_price_fields() {
