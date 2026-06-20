@@ -1,6 +1,6 @@
 [package]
 name = "rust-okx"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2024"
 rust-version = "1.85"
 description = "Async Rust client for the OKX v5 REST API"
@@ -48,13 +48,23 @@ ratatui = { version = "0.29", optional = true }
 crossterm = { version = "0.28", features = ["event-stream"], optional = true }
 anyhow = { version = "1", optional = true }
 dotenvy = { version = "0.15", optional = true }
+clap = { version = "4", features = ["derive"], optional = true }
+toml = { version = "0.8", optional = true }
 
 [features]
 default = ["reqwest"]
 reqwest = ["dep:reqwest"]
 rust-decimal = ["dep:rust_decimal"]
 websocket = ["dep:tokio-tungstenite", "dep:futures-util", "dep:tokio"]
-cli = ["websocket", "dep:ratatui", "dep:crossterm", "dep:anyhow", "dep:dotenvy"]
+cli = [
+  "websocket",
+  "dep:ratatui",
+  "dep:crossterm",
+  "dep:anyhow",
+  "dep:dotenvy",
+  "dep:clap",
+  "dep:toml",
+]
 
 [dev-dependencies]
 tokio = { version = "1", features = [
