@@ -80,6 +80,8 @@ fn all_exported_websocket_models_are_deserializable() {
     assert_deserializable::<SpreadMassCancelResult>();
     assert_deserializable::<SpreadOrderUpdate>();
     assert_deserializable::<SpreadPlaceOrderResult>();
+    assert_deserializable::<SpreadPublicTradeUpdate>();
+    assert_deserializable::<SpreadTickerUpdate>();
     assert_deserializable::<SpreadTradeLeg>();
     assert_deserializable::<SpreadTradeUpdate>();
 

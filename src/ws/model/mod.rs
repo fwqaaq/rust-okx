@@ -75,7 +75,8 @@ pub use public_data::{
 };
 pub use spread::{
     SpreadAmendOrderResult, SpreadCancelOrderResult, SpreadMassCancelResult, SpreadOrderUpdate,
-    SpreadPlaceOrderResult, SpreadTradeLeg, SpreadTradeUpdate,
+    SpreadPlaceOrderResult, SpreadPublicTradeUpdate, SpreadTickerUpdate, SpreadTradeLeg,
+    SpreadTradeUpdate,
 };
 pub use status::StatusUpdate;
 pub use trade::{

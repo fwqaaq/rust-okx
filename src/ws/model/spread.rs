@@ -17,9 +17,6 @@ pub struct SpreadOrderUpdate {
     /// Spread ID, e.g., `BTC-USDT_BTC-USDT-SWAP`.
     #[serde(default)]
     pub sprd_id: String,
-    /// Instrument ID of the spread.
-    #[serde(default)]
-    pub inst_id: String,
     /// OKX-assigned order ID.
     #[serde(default)]
     pub ord_id: String,
@@ -76,6 +73,9 @@ pub struct SpreadOrderUpdate {
     /// Client-supplied request ID, echoed from the original operation request.
     #[serde(default)]
     pub req_id: String,
+    /// Result of the last amendment: `-1` failure, `0` success, `""` no amendment.
+    #[serde(default)]
+    pub amend_result: String,
     /// Error code; `"0"` on success.
     #[serde(default)]
     pub code: String,
@@ -88,9 +88,6 @@ pub struct SpreadOrderUpdate {
     /// Last update time (Unix milliseconds).
     #[serde(default)]
     pub u_time: NumberString,
-    /// Push time (Unix milliseconds).
-    #[serde(default)]
-    pub p_time: NumberString,
     /// Unrecognized fields retained for forward compatibility.
     #[serde(flatten, default)]
     pub extra: ExtraFields,
@@ -113,6 +110,9 @@ pub struct SpreadTradeLeg {
     /// Leg side: `buy` or `sell`.
     #[serde(default)]
     pub side: String,
+    /// Fill PnL for this leg (for closing fills; `""` otherwise).
+    #[serde(default)]
+    pub fill_pnl: NumberString,
     /// Fee charged for this leg.
     #[serde(default)]
     pub fee: NumberString,
@@ -152,12 +152,6 @@ pub struct SpreadTradeUpdate {
     /// Order tag.
     #[serde(default)]
     pub tag: String,
-    /// Order price.
-    #[serde(default)]
-    pub px: NumberString,
-    /// Order size.
-    #[serde(default)]
-    pub sz: NumberString,
     /// Fill price of this trade.
     #[serde(default)]
     pub fill_px: NumberString,
@@ -167,18 +161,100 @@ pub struct SpreadTradeUpdate {
     /// Trade side: `buy` or `sell`.
     #[serde(default)]
     pub side: String,
-    /// Order state after this fill.
-    ///
-    /// Documented values: `live`, `partially_filled`, `filled`, `canceled`.
+    /// Trade state: `filled` or `rejected`.
     #[serde(default)]
     pub state: String,
     /// Liquidity role of this fill: `T` (taker) or `M` (maker).
     #[serde(default)]
     pub exec_type: String,
+    /// Trade timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
     /// Per-leg execution details for this trade.
     #[serde(default)]
     pub legs: Vec<SpreadTradeLeg>,
-    /// Trade timestamp (Unix milliseconds).
+    /// Error code; `"0"` on success.
+    #[serde(default)]
+    pub code: String,
+    /// Error message; empty on success.
+    #[serde(default)]
+    pub msg: String,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
+}
+
+/// Public `sprd-public-trades` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#spread-trading-websocket-sprd-public-trades-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SpreadPublicTradeUpdate {
+    /// Spread ID, e.g., `BTC-USDT_BTC-USDT-SWAP`.
+    #[serde(default)]
+    pub sprd_id: String,
+    /// Trade ID assigned by OKX.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Trade price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Trade size.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Trade direction: `buy` or `sell`.
+    #[serde(default)]
+    pub side: String,
+    /// Filled time (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Unrecognized fields retained for forward compatibility.
+    #[serde(flatten, default)]
+    pub extra: ExtraFields,
+}
+
+/// `sprd-tickers` channel row.
+///
+/// OKX docs: <https://www.okx.com/docs-v5/en/#spread-trading-websocket-sprd-tickers-channel>
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SpreadTickerUpdate {
+    /// Spread ID, e.g., `BTC-USDT_BTC-USDT-SWAP`.
+    #[serde(default)]
+    pub sprd_id: String,
+    /// Last traded price.
+    #[serde(default)]
+    pub last: NumberString,
+    /// Last traded size.
+    #[serde(default)]
+    pub last_sz: NumberString,
+    /// Best ask price.
+    #[serde(default)]
+    pub ask_px: NumberString,
+    /// Best ask size.
+    #[serde(default)]
+    pub ask_sz: NumberString,
+    /// Best bid price.
+    #[serde(default)]
+    pub bid_px: NumberString,
+    /// Best bid size.
+    #[serde(default)]
+    pub bid_sz: NumberString,
+    /// Open price over the past 24 hours.
+    #[serde(default)]
+    pub open24h: NumberString,
+    /// Highest price over the past 24 hours.
+    #[serde(default)]
+    pub high24h: NumberString,
+    /// Lowest price over the past 24 hours.
+    #[serde(default)]
+    pub low24h: NumberString,
+    /// 24-hour trading volume in base currency (spot-USDT spreads) or USD (coin-margined spreads).
+    #[serde(default)]
+    pub vol24h: NumberString,
+    /// Ticker data generation time (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
     /// Unrecognized fields retained for forward compatibility.
@@ -290,5 +366,65 @@ mod tests {
         )
         .unwrap();
         assert_eq!(row.s_code, "0");
+    }
+
+    #[test]
+    fn parses_spread_order_update() {
+        let row: SpreadOrderUpdate = serde_json::from_str(
+            r#"{
+            "sprdId":"BTC-USDT_BTC-USDT-SWAP","ordId":"312269865356374016","clOrdId":"b1",
+            "tag":"","px":"999","sz":"3","ordType":"limit","side":"buy","fillSz":"0",
+            "fillPx":"","tradeId":"","accFillSz":"0","pendingFillSz":"2","pendingSettleSz":"1",
+            "canceledSz":"1","state":"live","avgPx":"0","cancelSource":"","uTime":"1597026383085",
+            "cTime":"1597026383085","code":"0","msg":"","reqId":"","amendResult":"",
+            "instId":"ignored","pTime":"ignored"
+        }"#,
+        )
+        .unwrap();
+        assert_eq!(row.sprd_id, "BTC-USDT_BTC-USDT-SWAP");
+        assert_eq!(row.amend_result, "");
+        assert!(row.extra.contains_key("instId"));
+        assert!(row.extra.contains_key("pTime"));
+    }
+
+    #[test]
+    fn parses_spread_trade_update() {
+        let row: SpreadTradeUpdate = serde_json::from_str(
+            r#"{
+            "sprdId":"BTC-USDT-SWAP_BTC-USDT-200329","tradeId":"123","ordId":"123445",
+            "clOrdId":"b16","tag":"","fillPx":"999","fillSz":"3","state":"filled","side":"buy",
+            "execType":"M","ts":"1597026383085","legs":[],"code":"","msg":""
+        }"#,
+        )
+        .unwrap();
+        assert_eq!(row.sprd_id, "BTC-USDT-SWAP_BTC-USDT-200329");
+        assert_eq!(row.exec_type, "M");
+        assert_eq!(row.code, "");
+        assert_eq!(row.msg, "");
+    }
+
+    #[test]
+    fn parses_spread_public_trade_update() {
+        let row: SpreadPublicTradeUpdate = serde_json::from_str(
+            r#"{"sprdId":"BTC-USDT_BTC-USDT-SWAP","tradeId":"2499206329160695808","px":"-10","sz":"0.001","side":"sell","ts":"1726801105519"}"#,
+        ).unwrap();
+        assert_eq!(row.sprd_id, "BTC-USDT_BTC-USDT-SWAP");
+        assert_eq!(row.px.as_str(), "-10");
+        assert_eq!(row.sz.as_str(), "0.001");
+    }
+
+    #[test]
+    fn parses_spread_ticker_update() {
+        let row: SpreadTickerUpdate = serde_json::from_str(
+            r#"{
+            "sprdId":"BTC-USDT_BTC-USDT-SWAP","last":"4","lastSz":"0.01","askPx":"19.7",
+            "askSz":"5.79","bidPx":"5.9","bidSz":"5.79","open24h":"-7","high24h":"19.6",
+            "low24h":"-7","vol24h":"9.87","ts":"1715247061026"
+        }"#,
+        )
+        .unwrap();
+        assert_eq!(row.sprd_id, "BTC-USDT_BTC-USDT-SWAP");
+        assert_eq!(row.last.as_str(), "4");
+        assert_eq!(row.ts.as_str(), "1715247061026");
     }
 }
