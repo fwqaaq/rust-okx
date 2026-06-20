@@ -3,7 +3,9 @@ use http::Method;
 use crate::OkxClient;
 use crate::test_util::MockTransport;
 
-use super::super::{FinanceHistoryRequest, SavingsPurchaseRedemptionRequest};
+use super::super::{
+    CurrencyRequest, FinanceHistoryRequest, SavingsPurchaseRedemptionRequest, SetLendingRateRequest,
+};
 use super::signed_client;
 
 #[tokio::test]
@@ -12,10 +14,11 @@ async fn savings_balance_sends_signed_query() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
+    let request = CurrencyRequest { ccy: Some("USDT") };
     let rows = client
         .finance()
         .savings()
-        .get_saving_balance(Some("USDT"))
+        .get_saving_balance(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].ccy, "USDT");
@@ -66,10 +69,14 @@ async fn set_lending_rate_posts_signed_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
+    let request = SetLendingRateRequest {
+        ccy: "USDT",
+        rate: "0.02",
+    };
     let rows = client
         .finance()
         .savings()
-        .set_lending_rate("USDT", "0.02")
+        .set_lending_rate(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].ccy, "USDT");
@@ -140,7 +147,7 @@ async fn get_public_borrow_info_omits_currency_when_absent() {
     let rows = client
         .finance()
         .savings()
-        .get_public_borrow_info(None)
+        .get_public_borrow_info(&CurrencyRequest::default())
         .await
         .unwrap();
     assert_eq!(rows[0].ccy, "USDT");

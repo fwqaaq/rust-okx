@@ -17,7 +17,11 @@ fn signed_client(mock: MockTransport) -> OkxClient<MockTransport> {
 async fn missing_credentials_is_configuration_error() {
     let mock = MockTransport::new(r#"{}"#);
     let client = OkxClient::with_transport(mock).build();
-    let err = client.account().get_balance(None).await.unwrap_err();
+    let err = client
+        .account()
+        .get_balance(crate::api::account::BalanceRequest::default())
+        .await
+        .unwrap_err();
     assert!(matches!(
         err,
         crate::Error::Rest(crate::RestError::Configuration(_))

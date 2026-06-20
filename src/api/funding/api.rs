@@ -3,7 +3,6 @@ use crate::error::Error;
 use crate::transport::Transport;
 
 use super::endpoints::*;
-use super::internal::*;
 use super::requests::*;
 use super::responses::*;
 
@@ -29,9 +28,11 @@ impl<'a, T: Transport> Funding<'a, T> {
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a
     /// non-zero OKX code, or transport/decode errors.
-    pub async fn get_currencies(&self, ccy: Option<&str>) -> Result<Vec<Currency>, Error> {
-        let query = CcyQuery { ccy };
-        self.client.get(CURRENCIES, &query, true).await
+    pub async fn get_currencies(
+        &self,
+        request: &CurrencyRequest<'_>,
+    ) -> Result<Vec<Currency>, Error> {
+        self.client.get(CURRENCIES, request, true).await
     }
 
     /// Retrieve funding-account balances.
@@ -41,9 +42,11 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// # Errors
     ///
     /// See [`get_currencies`](Self::get_currencies).
-    pub async fn get_balances(&self, ccy: Option<&str>) -> Result<Vec<FundingBalance>, Error> {
-        let query = CcyQuery { ccy };
-        self.client.get(BALANCES, &query, true).await
+    pub async fn get_balances(
+        &self,
+        request: &CurrencyRequest<'_>,
+    ) -> Result<Vec<FundingBalance>, Error> {
+        self.client.get(BALANCES, request, true).await
     }
 
     /// Retrieve non-tradable assets.
@@ -55,10 +58,9 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn get_non_tradable_assets(
         &self,
-        ccy: Option<&str>,
+        request: &CurrencyRequest<'_>,
     ) -> Result<Vec<NonTradableAsset>, Error> {
-        let query = CcyQuery { ccy };
-        self.client.get(NON_TRADABLE_ASSETS, &query, true).await
+        self.client.get(NON_TRADABLE_ASSETS, request, true).await
     }
 
     /// Retrieve deposit addresses for a currency.
@@ -68,9 +70,11 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// # Errors
     ///
     /// See [`get_currencies`](Self::get_currencies).
-    pub async fn get_deposit_address(&self, ccy: &str) -> Result<Vec<DepositAddress>, Error> {
-        let query = RequiredCcyQuery { ccy };
-        self.client.get(DEPOSIT_ADDRESS, &query, true).await
+    pub async fn get_deposit_address(
+        &self,
+        request: &DepositAddressRequest<'_>,
+    ) -> Result<Vec<DepositAddress>, Error> {
+        self.client.get(DEPOSIT_ADDRESS, request, true).await
     }
 
     /// Transfer funds between OKX account types.
@@ -96,14 +100,9 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn transfer_state(
         &self,
-        trans_id: &str,
-        transfer_type: Option<&str>,
+        request: &TransferStateRequest<'_>,
     ) -> Result<Vec<TransferState>, Error> {
-        let query = TransferStateQuery {
-            trans_id,
-            transfer_type,
-        };
-        self.client.get(TRANSFER_STATE, &query, true).await
+        self.client.get(TRANSFER_STATE, request, true).await
     }
 
     /// Withdraw funds from OKX.
@@ -185,9 +184,11 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// # Errors
     ///
     /// See [`get_currencies`](Self::get_currencies).
-    pub async fn cancel_withdrawal(&self, wd_id: &str) -> Result<Vec<WithdrawalResult>, Error> {
-        let body = WithdrawalIdBody { wd_id };
-        self.client.post(CANCEL_WITHDRAWAL, &body, true).await
+    pub async fn cancel_withdrawal(
+        &self,
+        request: &CancelWithdrawalRequest<'_>,
+    ) -> Result<Vec<WithdrawalResult>, Error> {
+        self.client.post(CANCEL_WITHDRAWAL, request, true).await
     }
 
     /// Retrieve total asset valuation.
@@ -199,10 +200,9 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn get_asset_valuation(
         &self,
-        ccy: Option<&str>,
+        request: &CurrencyRequest<'_>,
     ) -> Result<Vec<AssetValuation>, Error> {
-        let query = CcyQuery { ccy };
-        self.client.get(ASSET_VALUATION, &query, true).await
+        self.client.get(ASSET_VALUATION, request, true).await
     }
 
     /// Retrieve deposit/withdrawal status.

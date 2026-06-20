@@ -1,4 +1,5 @@
 use crate::common::public_client;
+use rust_okx::api::market::{CandlesRequest, InstIdRequest, TradesRequest};
 
 #[tokio::test]
 async fn market_ticker_parses() {
@@ -8,7 +9,9 @@ async fn market_ticker_parses() {
     // STATUS: LIVE — public, read-only.
     let tickers = client
         .market()
-        .get_ticker("BTC-USDT")
+        .get_ticker(&InstIdRequest {
+            inst_id: "BTC-USDT",
+        })
         .await
         .expect("market/ticker");
 
@@ -29,7 +32,11 @@ async fn market_candles_and_trades_parse() {
     // STATUS: LIVE — public, read-only.
     let candles = client
         .market()
-        .get_candlesticks("BTC-USDT", Some("1H"), Some(10))
+        .get_candlesticks(&CandlesRequest {
+            inst_id: "BTC-USDT",
+            bar: Some("1H"),
+            limit: Some(10),
+        })
         .await
         .expect("market/candles");
     assert!(!candles.is_empty());
@@ -41,7 +48,10 @@ async fn market_candles_and_trades_parse() {
     // STATUS: LIVE — public, read-only.
     client
         .market()
-        .get_trades("BTC-USDT", Some(10))
+        .get_trades(&TradesRequest {
+            inst_id: "BTC-USDT",
+            limit: Some(10),
+        })
         .await
         .expect("market/trades");
 }

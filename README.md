@@ -13,21 +13,21 @@
   <img alt="Edition" src="https://img.shields.io/badge/edition-2024-blue">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
   <img alt="HTTP" src="https://img.shields.io/badge/default%20HTTP-reqwest-green">
-  <img alt="Status" src="https://img.shields.io/badge/status-early%200.5.x-orange">
+  <img alt="Status" src="https://img.shields.io/badge/status-early%200.6.x-orange">
 </p>
 
 `rust-okx` is an unofficial OKX client focused on typed request/response models,
 clear error handling, demo trading support, regional API hosts, and optional
 WebSocket streams.
 
-> Status: early `0.5.x`. The REST surface is usable and still expanding. Public
+> Status: early `0.6.x`. The REST surface is usable and still expanding. Public
 > API details may change before `1.0`.
 
 ## Installation
 
 ```toml
 [dependencies]
-rust-okx = "0.5"
+rust-okx = "0.6.0"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 ```
 
@@ -36,14 +36,14 @@ features only when you provide your own `Transport` implementation.
 
 ```toml
 [dependencies]
-rust-okx = { version = "0.5", default-features = false }
+rust-okx = { version = "0.6.0", default-features = false }
 ```
 
 Enable optional WebSocket support when you need streaming market, business, or
 private account channels.
 
 ```toml
-rust-okx = { version = "0.5", features = ["websocket"] }
+rust-okx = { version = "0.6.0", features = ["websocket"] }
 ```
 
 ## Quick start
@@ -51,13 +51,18 @@ rust-okx = { version = "0.5", features = ["websocket"] }
 Public market data does not require credentials.
 
 ```rust
-use rust_okx::OkxClient;
+use rust_okx::{OkxClient, api::market::InstIdRequest};
 
 #[tokio::main]
 async fn main() -> Result<(), rust_okx::Error> {
     let client = OkxClient::builder().build();
 
-    let ticker = client.market().get_ticker("BTC-USDT").await?;
+    let ticker = client
+        .market()
+        .get_ticker(&InstIdRequest {
+            inst_id: "BTC-USDT",
+        })
+        .await?;
     println!("BTC-USDT last price: {}", ticker[0].last.as_str());
 
     Ok(())
@@ -69,14 +74,14 @@ async fn main() -> Result<(), rust_okx::Error> {
 Authenticated endpoints require an OKX API key, secret, and passphrase.
 
 ```rust
-use rust_okx::{Credentials, OkxClient};
+use rust_okx::{Credentials, OkxClient, api::account::BalanceRequest};
 
 #[tokio::main]
 async fn main() -> Result<(), rust_okx::Error> {
     let credentials = Credentials::new("api-key", "api-secret", "passphrase");
     let client = OkxClient::builder().credentials(credentials).build();
 
-    let balances = client.account().get_balance(None).await?;
+    let balances = client.account().get_balance(BalanceRequest::default()).await?;
     println!("total equity: {}", balances[0].total_eq.as_str());
 
     Ok(())

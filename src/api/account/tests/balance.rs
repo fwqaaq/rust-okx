@@ -1,3 +1,4 @@
+use crate::api::account::{BalanceRequest, PositionRiskRequest, PositionsRequest};
 use crate::model::{InstType, PositionSide};
 use crate::test_util::MockTransport;
 
@@ -20,7 +21,11 @@ async fn get_balance_signs_request_and_parses() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let balances = client.account().get_balance(None).await.unwrap();
+    let balances = client
+        .account()
+        .get_balance(BalanceRequest::default())
+        .await
+        .unwrap();
     assert_eq!(balances[0].total_eq.as_str(), "11827.8008");
     assert_eq!(balances[0].details[0].ccy, "BTC");
     assert_eq!(balances[0].details[0].avail_bal.as_str(), "9000");
@@ -52,7 +57,10 @@ async fn get_positions_passes_filters() {
 
     let positions = client
         .account()
-        .get_positions(Some(InstType::Futures), Some("ETH-USD-210430"))
+        .get_positions(&PositionsRequest {
+            inst_type: Some(&InstType::Futures),
+            inst_id: Some("ETH-USD-210430"),
+        })
         .await
         .unwrap();
     assert_eq!(positions[0].inst_id, "ETH-USD-210430");
@@ -77,7 +85,9 @@ async fn get_position_risk_signs_and_parses() {
 
     let risk = client
         .account()
-        .get_position_risk(Some(InstType::Futures))
+        .get_position_risk(&PositionRiskRequest {
+            inst_type: Some(&InstType::Futures),
+        })
         .await
         .unwrap();
     assert_eq!(risk[0].adj_eq.as_str(), "9850");

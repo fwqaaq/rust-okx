@@ -3,7 +3,7 @@ use http::Method;
 use crate::OkxClient;
 use crate::test_util::MockTransport;
 
-use super::super::FinanceHistoryRequest;
+use super::super::{AmountRequest, ApyHistoryRequest, FinanceHistoryRequest};
 use super::signed_client;
 
 #[tokio::test]
@@ -38,7 +38,13 @@ async fn sol_purchase_posts_signed_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client.finance().sol_staking().purchase("1").await.unwrap();
+    let request = AmountRequest { amt: "1" };
+    let rows = client
+        .finance()
+        .sol_staking()
+        .purchase(&request)
+        .await
+        .unwrap();
     assert_eq!(rows[0].ord_id, "789");
     assert_eq!(rows[0].ccy, "SOL");
 
@@ -59,7 +65,13 @@ async fn sol_redeem_posts_signed_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client.finance().sol_staking().redeem("1").await.unwrap();
+    let request = AmountRequest { amt: "1" };
+    let rows = client
+        .finance()
+        .sol_staking()
+        .redeem(&request)
+        .await
+        .unwrap();
     assert_eq!(rows[0].ord_id, "790");
 
     let req = mock.captured();
@@ -119,10 +131,11 @@ async fn sol_apy_history_is_not_signed() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
+    let request = ApyHistoryRequest { days: "7" };
     let rows = client
         .finance()
         .sol_staking()
-        .apy_history("7")
+        .apy_history(&request)
         .await
         .unwrap();
     assert_eq!(rows[0].ccy, "SOL");

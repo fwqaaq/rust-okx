@@ -1,5 +1,90 @@
 use serde::Serialize;
 
+use crate::model::InstType;
+
+/// Request for [`get_ticker`](crate::api::market::Market::get_ticker) and
+/// [`get_block_ticker`](crate::api::market::Market::get_block_ticker).
+#[derive(Debug, Clone, Serialize)]
+pub struct InstIdRequest<'a> {
+    /// Instrument ID, e.g. `"BTC-USDT"`.
+    #[serde(rename = "instId")]
+    pub inst_id: &'a str,
+}
+
+/// Request for [`get_tickers`](crate::api::market::Market::get_tickers) and
+/// [`get_block_tickers`](crate::api::market::Market::get_block_tickers).
+#[derive(Debug, Clone, Serialize)]
+pub struct TickersRequest<'a> {
+    /// Instrument type.
+    #[serde(rename = "instType")]
+    pub inst_type: &'a InstType,
+    /// Instrument family filter (optional).
+    #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
+    pub inst_family: Option<&'a str>,
+}
+
+/// Request for [`get_index_tickers`](crate::api::market::Market::get_index_tickers).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct IndexTickersRequest<'a> {
+    /// Quote currency filter, e.g. `Some("USD")`.
+    #[serde(rename = "quoteCcy", skip_serializing_if = "Option::is_none")]
+    pub quote_ccy: Option<&'a str>,
+    /// Index instrument ID filter.
+    #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
+    pub inst_id: Option<&'a str>,
+}
+
+/// Request for [`get_orderbook`](crate::api::market::Market::get_orderbook).
+#[derive(Debug, Clone, Serialize)]
+pub struct OrderBookRequest<'a> {
+    /// Instrument ID.
+    #[serde(rename = "instId")]
+    pub inst_id: &'a str,
+    /// Depth (number of price levels per side). OKX default 1, max 400.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sz: Option<u32>,
+}
+
+/// Request for [`get_candlesticks`](crate::api::market::Market::get_candlesticks).
+#[derive(Debug, Clone, Serialize)]
+pub struct CandlesRequest<'a> {
+    /// Instrument ID.
+    #[serde(rename = "instId")]
+    pub inst_id: &'a str,
+    /// Bar size, e.g. `"1m"`, `"1H"`, `"1D"`. OKX default `"1m"`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bar: Option<&'a str>,
+    /// Maximum number of bars (max 300).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+}
+
+/// Request for [`get_trades`](crate::api::market::Market::get_trades).
+#[derive(Debug, Clone, Serialize)]
+pub struct TradesRequest<'a> {
+    /// Instrument ID.
+    #[serde(rename = "instId")]
+    pub inst_id: &'a str,
+    /// Maximum number of trades to return.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+}
+
+/// Request for [`get_option_instrument_family_trades`](crate::api::market::Market::get_option_instrument_family_trades).
+#[derive(Debug, Clone, Serialize)]
+pub struct InstFamilyRequest<'a> {
+    /// Instrument family, e.g. `"BTC-USD"`.
+    #[serde(rename = "instFamily")]
+    pub inst_family: &'a str,
+}
+
+/// Request for [`get_index_components`](crate::api::market::Market::get_index_components).
+#[derive(Debug, Clone, Serialize)]
+pub struct IndexRequest<'a> {
+    /// Index symbol, e.g. `"BTC-USD"`.
+    pub index: &'a str,
+}
+
 /// Query parameters for historical/index/mark-price candlestick endpoints.
 #[derive(Debug, Clone, Serialize)]
 pub struct CandlesticksRequest {

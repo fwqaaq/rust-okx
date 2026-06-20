@@ -1,12 +1,11 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::InstType;
 use crate::transport::Transport;
 
 use super::endpoints::*;
-use super::internal::*;
 use super::requests::*;
 use super::responses::*;
+use crate::model::EmptyRequest;
 
 /// Accessor for the authenticated account endpoints.
 ///
@@ -24,23 +23,22 @@ impl<'a, T: Transport> Account<'a, T> {
 
     /// Retrieve the trading-account balance.
     ///
-    /// `GET /api/v5/account/balance`. Authenticated. Pass `ccy` to filter to one
-    /// or more comma-separated currencies (e.g. `Some("BTC,USDT")`). The result
-    /// is a single [`AccountBalance`].
+    /// `GET /api/v5/account/balance`. Authenticated.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn get_balance(&self, ccy: Option<&str>) -> Result<Vec<AccountBalance>, Error> {
-        let query = BalanceQuery { ccy };
-        self.client.get(BALANCE, &query, true).await
+    pub async fn get_balance(
+        &self,
+        request: BalanceRequest<'_>,
+    ) -> Result<Vec<AccountBalance>, Error> {
+        self.client.get(BALANCE, &request, true).await
     }
 
     /// Retrieve open positions.
     ///
-    /// `GET /api/v5/account/positions`. Authenticated. Both filters are
-    /// optional; omit them to return all positions.
+    /// `GET /api/v5/account/positions`. Authenticated.
     ///
     /// # Errors
     ///
@@ -48,14 +46,9 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_positions(
         &self,
-        inst_type: Option<InstType>,
-        inst_id: Option<&str>,
+        request: &PositionsRequest<'_>,
     ) -> Result<Vec<Position>, Error> {
-        let query = PositionsQuery {
-            inst_type: inst_type.as_ref(),
-            inst_id,
-        };
-        self.client.get(POSITIONS, &query, true).await
+        self.client.get(POSITIONS, request, true).await
     }
 
     /// Retrieve account position risk.
@@ -68,12 +61,9 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_position_risk(
         &self,
-        inst_type: Option<InstType>,
+        request: &PositionRiskRequest<'_>,
     ) -> Result<Vec<PositionRisk>, Error> {
-        let query = PositionRiskQuery {
-            inst_type: inst_type.as_ref(),
-        };
-        self.client.get(POSITION_RISK, &query, true).await
+        self.client.get(POSITION_RISK, request, true).await
     }
 
     /// Retrieve account configuration.
@@ -85,7 +75,9 @@ impl<'a, T: Transport> Account<'a, T> {
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_config(&self) -> Result<Vec<AccountConfig>, Error> {
-        self.client.get(ACCOUNT_CONFIG, &NoQuery, true).await
+        self.client
+            .get(ACCOUNT_CONFIG, &EmptyRequest {}, true)
+            .await
     }
 
     /// Retrieve recent account bills.
@@ -130,10 +122,9 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_position_mode(
         &self,
-        pos_mode: &str,
+        request: &SetPositionModeRequest<'_>,
     ) -> Result<Vec<SetPositionModeResult>, Error> {
-        let body = SetPositionModeBody { pos_mode };
-        self.client.post(SET_POSITION_MODE, &body, true).await
+        self.client.post(SET_POSITION_MODE, request, true).await
     }
 
     /// Set leverage for an instrument or currency.
@@ -282,9 +273,11 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn get_interest_rate(&self, ccy: Option<&str>) -> Result<Vec<InterestRate>, Error> {
-        let query = BalanceQuery { ccy };
-        self.client.get(INTEREST_RATE, &query, true).await
+    pub async fn get_interest_rate(
+        &self,
+        request: BalanceRequest<'_>,
+    ) -> Result<Vec<InterestRate>, Error> {
+        self.client.get(INTEREST_RATE, &request, true).await
     }
 
     /// Set the greeks display type.
@@ -295,9 +288,11 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn set_greeks(&self, greeks_type: &str) -> Result<Vec<SetGreeksResult>, Error> {
-        let body = SetGreeksBody { greeks_type };
-        self.client.post(SET_GREEKS, &body, true).await
+    pub async fn set_greeks(
+        &self,
+        request: &SetGreeksRequest<'_>,
+    ) -> Result<Vec<SetGreeksResult>, Error> {
+        self.client.post(SET_GREEKS, request, true).await
     }
 
     /// Set isolated margin transfer mode.
@@ -310,14 +305,9 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_isolated_mode(
         &self,
-        iso_mode: &str,
-        mode_type: &str,
+        request: &SetIsolatedModeRequest<'_>,
     ) -> Result<Vec<SetIsolatedModeResult>, Error> {
-        let body = SetIsolatedModeBody {
-            iso_mode,
-            mode_type,
-        };
-        self.client.post(SET_ISOLATED_MODE, &body, true).await
+        self.client.post(SET_ISOLATED_MODE, request, true).await
     }
 
     /// Retrieve maximum withdrawal amounts.
@@ -328,9 +318,11 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn get_max_withdrawal(&self, ccy: Option<&str>) -> Result<Vec<MaxWithdrawal>, Error> {
-        let query = BalanceQuery { ccy };
-        self.client.get(MAX_WITHDRAWAL, &query, true).await
+    pub async fn get_max_withdrawal(
+        &self,
+        request: BalanceRequest<'_>,
+    ) -> Result<Vec<MaxWithdrawal>, Error> {
+        self.client.get(MAX_WITHDRAWAL, &request, true).await
     }
 
     /// Retrieve borrowing rate and limit information.
@@ -351,9 +343,7 @@ impl<'a, T: Transport> Account<'a, T> {
 
     /// Calculate simulated margin information.
     ///
-    /// `POST /api/v5/account/simulated_margin`. Authenticated. This is separate
-    /// from [`OkxClientBuilder::demo_trading`](crate::OkxClientBuilder::demo_trading),
-    /// which only toggles the OKX simulated-trading header.
+    /// `POST /api/v5/account/simulated_margin`. Authenticated.
     ///
     /// # Errors
     ///
@@ -375,9 +365,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn get_greeks(&self, ccy: Option<&str>) -> Result<Vec<Greek>, Error> {
-        let query = BalanceQuery { ccy };
-        self.client.get(GREEKS, &query, true).await
+    pub async fn get_greeks(&self, request: BalanceRequest<'_>) -> Result<Vec<Greek>, Error> {
+        self.client.get(GREEKS, &request, true).await
     }
 
     /// Retrieve position history.
@@ -421,7 +410,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_risk_state(&self) -> Result<Vec<RiskState>, Error> {
-        self.client.get(RISK_STATE, &NoQuery, true).await
+        self.client.get(RISK_STATE, &EmptyRequest {}, true).await
     }
 
     /// Set account auto-loan mode.
@@ -432,9 +421,11 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn set_auto_loan(&self, auto_loan: bool) -> Result<Vec<SetAutoLoanResult>, Error> {
-        let body = SetAutoLoanBody { auto_loan };
-        self.client.post(SET_AUTO_LOAN, &body, true).await
+    pub async fn set_auto_loan(
+        &self,
+        request: &SetAutoLoanRequest,
+    ) -> Result<Vec<SetAutoLoanResult>, Error> {
+        self.client.post(SET_AUTO_LOAN, request, true).await
     }
 
     /// Set the account level.
@@ -447,10 +438,9 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn set_account_level(
         &self,
-        acct_lv: &str,
+        request: &SetAccountLevelRequest<'_>,
     ) -> Result<Vec<SetAccountLevelResult>, Error> {
-        let body = SetAccountLevelBody { acct_lv };
-        self.client.post(SET_ACCOUNT_LEVEL, &body, true).await
+        self.client.post(SET_ACCOUNT_LEVEL, request, true).await
     }
 
     /// Activate option trading.
@@ -462,7 +452,9 @@ impl<'a, T: Transport> Account<'a, T> {
     /// Returns [`Error::Configuration`] if no credentials are set,
     /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn activate_option(&self) -> Result<Vec<ActivateOptionResult>, Error> {
-        self.client.post(ACTIVATE_OPTION, &EmptyBody {}, true).await
+        self.client
+            .post(ACTIVATE_OPTION, &EmptyRequest {}, true)
+            .await
     }
 
     /// Build simulated positions and equity.

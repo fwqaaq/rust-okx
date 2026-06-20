@@ -1,5 +1,5 @@
 use crate::common::{expect_ok_or_api_unavailable, live_client_or_skip};
-use rust_okx::api::finance::{FinanceHistoryRequest, StakingDefiOffersRequest};
+use rust_okx::api::finance::{CurrencyRequest, FinanceHistoryRequest, StakingDefiOffersRequest};
 
 #[tokio::test]
 async fn finance_read_only_endpoints_parse_when_eligible() {
@@ -14,7 +14,7 @@ async fn finance_read_only_endpoints_parse_when_eligible() {
         client
             .finance()
             .savings()
-            .get_public_borrow_info(None)
+            .get_public_borrow_info(&CurrencyRequest::default())
             .await,
         "finance/savings/lending-rate-summary",
     );

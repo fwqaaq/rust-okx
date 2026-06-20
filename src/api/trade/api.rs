@@ -1,9 +1,9 @@
 use crate::client::OkxClient;
 use crate::error::Error;
+use crate::model::EmptyRequest;
 use crate::transport::Transport;
 
 use super::endpoints::*;
-use super::internal::*;
 use super::requests::*;
 use super::responses::*;
 
@@ -61,11 +61,9 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn cancel_order(
         &self,
-        inst_id: &str,
-        ord_id: &str,
+        request: &CancelOrderRequest,
     ) -> Result<Vec<CancelOrderResult>, Error> {
-        let body = CancelOrderBody { inst_id, ord_id };
-        self.client.post(CANCEL_ORDER, &body, true).await
+        self.client.post(CANCEL_ORDER, request, true).await
     }
 
     /// Cancel multiple orders.
@@ -131,9 +129,8 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// # Errors
     ///
     /// See [`place_order`](Self::place_order).
-    pub async fn get_order(&self, inst_id: &str, ord_id: &str) -> Result<Vec<Order>, Error> {
-        let query = GetOrderQuery { inst_id, ord_id };
-        self.client.get(ORDER, &query, true).await
+    pub async fn get_order(&self, request: &GetOrderRequest<'_>) -> Result<Vec<Order>, Error> {
+        self.client.get(ORDER, request, true).await
     }
 
     /// Retrieve pending orders.
@@ -293,7 +290,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_easy_convert_currency_list(&self) -> Result<Vec<EasyConvertCurrency>, Error> {
         self.client
-            .get(EASY_CONVERT_CURRENCY_LIST, &NoQuery, true)
+            .get(EASY_CONVERT_CURRENCY_LIST, &EmptyRequest {}, true)
             .await
     }
 

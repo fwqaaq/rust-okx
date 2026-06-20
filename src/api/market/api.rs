@@ -1,10 +1,9 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::InstType;
+use crate::model::EmptyRequest;
 use crate::transport::Transport;
 
 use super::endpoints::*;
-use super::internal::*;
 use super::requests::*;
 use super::responses::*;
 
@@ -29,9 +28,8 @@ impl<'a, T: Transport> Market<'a, T> {
     ///
     /// Returns [`Error::Api`] on a non-zero OKX code, or
     /// [`Error::Transport`]/[`Error::Decode`] on transport/parsing failure.
-    pub async fn get_ticker(&self, inst_id: &str) -> Result<Vec<Ticker>, Error> {
-        let query = InstIdQuery { inst_id };
-        self.client.get(TICKER, &query, false).await
+    pub async fn get_ticker(&self, request: &InstIdRequest<'_>) -> Result<Vec<Ticker>, Error> {
+        self.client.get(TICKER, request, false).await
     }
 
     /// Retrieve tickers for an instrument type.
@@ -42,16 +40,8 @@ impl<'a, T: Transport> Market<'a, T> {
     /// # Errors
     ///
     /// See [`get_ticker`](Self::get_ticker).
-    pub async fn get_tickers(
-        &self,
-        inst_type: InstType,
-        inst_family: Option<&str>,
-    ) -> Result<Vec<Ticker>, Error> {
-        let query = TickersQuery {
-            inst_type: &inst_type,
-            inst_family,
-        };
-        self.client.get(TICKERS, &query, false).await
+    pub async fn get_tickers(&self, request: &TickersRequest<'_>) -> Result<Vec<Ticker>, Error> {
+        self.client.get(TICKERS, request, false).await
     }
 
     /// Retrieve index tickers.
@@ -64,11 +54,9 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_index_tickers(
         &self,
-        quote_ccy: Option<&str>,
-        inst_id: Option<&str>,
+        request: &IndexTickersRequest<'_>,
     ) -> Result<Vec<IndexTicker>, Error> {
-        let query = IndexTickersQuery { quote_ccy, inst_id };
-        self.client.get(INDEX_TICKERS, &query, false).await
+        self.client.get(INDEX_TICKERS, request, false).await
     }
 
     /// Retrieve the order book for an instrument.
@@ -81,11 +69,9 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_orderbook(
         &self,
-        inst_id: &str,
-        depth: Option<u32>,
+        request: &OrderBookRequest<'_>,
     ) -> Result<Vec<OrderBook>, Error> {
-        let query = OrderBookQuery { inst_id, sz: depth };
-        self.client.get(BOOKS, &query, false).await
+        self.client.get(BOOKS, request, false).await
     }
 
     /// Retrieve candlestick (OHLCV) data.
@@ -99,16 +85,9 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_candlesticks(
         &self,
-        inst_id: &str,
-        bar: Option<&str>,
-        limit: Option<u32>,
+        request: &CandlesRequest<'_>,
     ) -> Result<Vec<Candle>, Error> {
-        let query = CandlesQuery {
-            inst_id,
-            bar,
-            limit,
-        };
-        self.client.get(CANDLES, &query, false).await
+        self.client.get(CANDLES, request, false).await
     }
 
     /// Retrieve historical candlestick data for top currencies.
@@ -160,13 +139,8 @@ impl<'a, T: Transport> Market<'a, T> {
     /// # Errors
     ///
     /// See [`get_ticker`](Self::get_ticker).
-    pub async fn get_trades(
-        &self,
-        inst_id: &str,
-        limit: Option<u32>,
-    ) -> Result<Vec<MarketTrade>, Error> {
-        let query = TradesQuery { inst_id, limit };
-        self.client.get(TRADES, &query, false).await
+    pub async fn get_trades(&self, request: &TradesRequest<'_>) -> Result<Vec<MarketTrade>, Error> {
+        self.client.get(TRADES, request, false).await
     }
 
     /// Retrieve historical trades for an instrument.
@@ -191,7 +165,9 @@ impl<'a, T: Transport> Market<'a, T> {
     ///
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_platform_24_volume(&self) -> Result<Vec<PlatformVolume>, Error> {
-        self.client.get(PLATFORM_24_VOLUME, &NoQuery, false).await
+        self.client
+            .get(PLATFORM_24_VOLUME, &EmptyRequest {}, false)
+            .await
     }
 
     /// Retrieve index components.
@@ -201,9 +177,11 @@ impl<'a, T: Transport> Market<'a, T> {
     /// # Errors
     ///
     /// See [`get_ticker`](Self::get_ticker).
-    pub async fn get_index_components(&self, index: &str) -> Result<Vec<IndexComponents>, Error> {
-        let query = IndexComponentsQuery { index };
-        self.client.get(INDEX_COMPONENTS, &query, false).await
+    pub async fn get_index_components(
+        &self,
+        request: &IndexRequest<'_>,
+    ) -> Result<Vec<IndexComponents>, Error> {
+        self.client.get(INDEX_COMPONENTS, request, false).await
     }
 
     /// Retrieve the USD/CNY exchange rate used by OKX.
@@ -214,7 +192,9 @@ impl<'a, T: Transport> Market<'a, T> {
     ///
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_exchange_rate(&self) -> Result<Vec<ExchangeRate>, Error> {
-        self.client.get(EXCHANGE_RATE, &NoQuery, false).await
+        self.client
+            .get(EXCHANGE_RATE, &EmptyRequest {}, false)
+            .await
     }
 
     /// Retrieve a block-trading ticker for a single instrument.
@@ -224,9 +204,11 @@ impl<'a, T: Transport> Market<'a, T> {
     /// # Errors
     ///
     /// See [`get_ticker`](Self::get_ticker).
-    pub async fn get_block_ticker(&self, inst_id: &str) -> Result<Vec<BlockTicker>, Error> {
-        let query = InstIdQuery { inst_id };
-        self.client.get(BLOCK_TICKER, &query, false).await
+    pub async fn get_block_ticker(
+        &self,
+        request: &InstIdRequest<'_>,
+    ) -> Result<Vec<BlockTicker>, Error> {
+        self.client.get(BLOCK_TICKER, request, false).await
     }
 
     /// Retrieve block-trading tickers for an instrument type.
@@ -238,14 +220,9 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_block_tickers(
         &self,
-        inst_type: InstType,
-        inst_family: Option<&str>,
+        request: &TickersRequest<'_>,
     ) -> Result<Vec<BlockTicker>, Error> {
-        let query = TickersQuery {
-            inst_type: &inst_type,
-            inst_family,
-        };
-        self.client.get(BLOCK_TICKERS, &query, false).await
+        self.client.get(BLOCK_TICKERS, request, false).await
     }
 
     /// Retrieve option trades aggregated by instrument family.
@@ -257,11 +234,10 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_option_instrument_family_trades(
         &self,
-        inst_family: &str,
+        request: &InstFamilyRequest<'_>,
     ) -> Result<Vec<OptionFamilyTradeGroup>, Error> {
-        let query = InstFamilyQuery { inst_family };
         self.client
-            .get(OPTION_INSTRUMENT_FAMILY_TRADES, &query, false)
+            .get(OPTION_INSTRUMENT_FAMILY_TRADES, request, false)
             .await
     }
 }

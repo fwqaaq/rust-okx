@@ -96,12 +96,9 @@ async fn cancel_order_posts_ids() {
         "inTime":"1695190491421339","outTime":"1695190491423240"}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
+    let request = CancelOrderRequest::by_order_id("BTC-USDT", "312269865356374016");
 
-    let result = client
-        .trade()
-        .cancel_order("BTC-USDT", "312269865356374016")
-        .await
-        .unwrap();
+    let result = client.trade().cancel_order(&request).await.unwrap();
     assert_eq!(result[0].ord_id, "12345689");
 
     let req = mock.captured();

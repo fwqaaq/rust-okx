@@ -1,6 +1,9 @@
 use std::env;
 
-use rust_okx::{Credentials, OkxClient, OkxRegion};
+use rust_okx::{
+    Credentials, OkxClient, OkxRegion,
+    api::{account::BalanceRequest, funding::CurrencyRequest},
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -10,10 +13,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let account_config = client.account().get_account_config().await?;
     println!("account config rows: {}", account_config.len());
 
-    let trading_balances = client.account().get_balance(None).await?;
+    let trading_balances = client
+        .account()
+        .get_balance(BalanceRequest::default())
+        .await?;
     println!("trading account balance rows: {}", trading_balances.len());
 
-    let funding_balances = client.funding().get_balances(None).await?;
+    let funding_balances = client
+        .funding()
+        .get_balances(&CurrencyRequest::default())
+        .await?;
     println!("funding account balance rows: {}", funding_balances.len());
 
     Ok(())

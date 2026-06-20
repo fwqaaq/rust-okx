@@ -2,7 +2,10 @@ use http::Method;
 
 use crate::test_util::MockTransport;
 
-use super::super::{WithdrawalHistoryRequest, WithdrawalLightningRequest, WithdrawalRequest};
+use super::super::{
+    CancelWithdrawalRequest, WithdrawalHistoryRequest, WithdrawalLightningRequest,
+    WithdrawalRequest,
+};
 use super::signed_client;
 
 #[tokio::test]
@@ -64,7 +67,8 @@ async fn cancel_withdrawal_posts_wd_id() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let rows = client.funding().cancel_withdrawal("58700").await.unwrap();
+    let request = CancelWithdrawalRequest { wd_id: "58700" };
+    let rows = client.funding().cancel_withdrawal(&request).await.unwrap();
     assert_eq!(rows[0].wd_id, "58700");
 
     let req = mock.captured();

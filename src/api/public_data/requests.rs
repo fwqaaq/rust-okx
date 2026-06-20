@@ -2,6 +2,35 @@ use serde::Serialize;
 
 use crate::model::InstType;
 
+/// Request for [`get_instruments`](crate::api::public_data::PublicData::get_instruments).
+#[derive(Debug, Clone, Serialize)]
+pub struct InstrumentsRequest<'a> {
+    /// Instrument type.
+    #[serde(rename = "instType")]
+    pub inst_type: &'a InstType,
+    /// Instrument family filter (optional, for derivatives).
+    #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
+    pub inst_family: Option<&'a str>,
+}
+
+/// Request for [`get_funding_rate`](crate::api::public_data::PublicData::get_funding_rate),
+/// [`get_price_limit`](crate::api::public_data::PublicData::get_price_limit), and
+/// [`get_estimated_price`](crate::api::public_data::PublicData::get_estimated_price).
+#[derive(Debug, Clone, Serialize)]
+pub struct InstIdRequest<'a> {
+    /// Instrument ID, e.g. `"BTC-USDT-SWAP"`.
+    #[serde(rename = "instId")]
+    pub inst_id: &'a str,
+}
+
+/// Request for [`get_discount_rate_interest_free_quota`](crate::api::public_data::PublicData::get_discount_rate_interest_free_quota).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct CurrencyRequest<'a> {
+    /// Currency filter, e.g. `Some("BTC")`. `None` returns all currencies.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ccy: Option<&'a str>,
+}
+
 mod edge;
 
 pub use edge::*;

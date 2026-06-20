@@ -39,7 +39,10 @@ Every public method on an accessor type must follow this template exactly.
 /// # Errors
 ///
 /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-pub async fn get_funding_rate(&self, inst_id: &str) -> Result<Vec<FundingRate>, Error> {}
+pub async fn get_funding_rate(
+    &self,
+    request: &InstIdRequest<'_>,
+) -> Result<Vec<FundingRate>, Error> {}
 ```
 
 ## Response types
@@ -164,9 +167,13 @@ async fn public_instruments_and_time_parse() {
     let client = public_client();
 
     // API: GET /api/v5/public/instruments
+    let request = InstrumentsRequest {
+        inst_type: &InstType::Spot,
+        inst_family: None,
+    };
     let instruments = client
         .public_data()
-        .get_instruments(InstType::Spot, None)
+        .get_instruments(&request)
         .await
         .expect("public/instruments");
     assert!(instruments.iter().any(|row| row.inst_id == "BTC-USDT"));
@@ -195,7 +202,7 @@ async fn funding_currency_and_balance_endpoints_parse() {
     // API: GET /api/v5/asset/currencies
     let currencies = client
         .funding()
-        .get_currencies(Some("USDT"))
+        .get_currencies(&CurrencyRequest { ccy: Some("USDT") })
         .await
         .expect("asset/currencies");
     assert!(currencies.iter().any(|row| row.ccy == "USDT"));
@@ -203,7 +210,7 @@ async fn funding_currency_and_balance_endpoints_parse() {
     // API: GET /api/v5/asset/balances
     let balances = client
         .funding()
-        .get_balances(None)
+        .get_balances(&CurrencyRequest::default())
         .await
         .expect("asset/balances");
     assert!(balances.iter().all(|row| !row.ccy.is_empty()));

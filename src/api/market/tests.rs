@@ -2,6 +2,11 @@ use crate::OkxClient;
 use crate::model::InstType;
 use crate::test_util::MockTransport;
 
+use super::{
+    CandlesRequest, IndexRequest, IndexTickersRequest, InstFamilyRequest, InstIdRequest,
+    OrderBookRequest, TickersRequest, TradesRequest,
+};
+
 #[tokio::test]
 async fn get_ticker_builds_request_and_parses() {
     let body = r#"{"code":"0","msg":"","data":[
@@ -12,7 +17,10 @@ async fn get_ticker_builds_request_and_parses() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let tickers = client.market().get_ticker("BTC-USDT").await.unwrap();
+    let request = InstIdRequest {
+        inst_id: "BTC-USDT",
+    };
+    let tickers = client.market().get_ticker(&request).await.unwrap();
     assert_eq!(tickers[0].inst_id, "BTC-USD-SWAP");
     assert_eq!(tickers[0].last.as_str(), "9999.99");
     assert_eq!(tickers[0].bid_px.parse::<f64>().unwrap(), 8888.88);
@@ -37,11 +45,11 @@ async fn get_tickers_builds_request_and_parses() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let tickers = client
-        .market()
-        .get_tickers(crate::model::InstType::Swap, Some("BTC-USDT"))
-        .await
-        .unwrap();
+    let request = TickersRequest {
+        inst_type: &crate::model::InstType::Swap,
+        inst_family: Some("BTC-USDT"),
+    };
+    let tickers = client.market().get_tickers(&request).await.unwrap();
     assert_eq!(tickers[0].inst_id, "LTC-USD-SWAP");
 
     let req = mock.captured();
@@ -59,11 +67,11 @@ async fn get_index_tickers_builds_request_and_parses() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let tickers = client
-        .market()
-        .get_index_tickers(Some("USD"), None)
-        .await
-        .unwrap();
+    let request = IndexTickersRequest {
+        quote_ccy: Some("USD"),
+        inst_id: None,
+    };
+    let tickers = client.market().get_index_tickers(&request).await.unwrap();
     assert_eq!(tickers[0].inst_id, "BTC-USDT");
     assert_eq!(tickers[0].idx_px.as_str(), "43350");
 
@@ -80,11 +88,11 @@ async fn get_orderbook_parses_levels_and_passes_depth() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let books = client
-        .market()
-        .get_orderbook("BTC-USDT", Some(5))
-        .await
-        .unwrap();
+    let request = OrderBookRequest {
+        inst_id: "BTC-USDT",
+        sz: Some(5),
+    };
+    let books = client.market().get_orderbook(&request).await.unwrap();
     let book = &books[0];
     assert_eq!(book.asks[0].price.as_str(), "41006.8");
     assert_eq!(book.asks[0].order_count.as_str(), "1");
@@ -103,11 +111,12 @@ async fn get_candlesticks_parses_array_rows() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let candles = client
-        .market()
-        .get_candlesticks("BTC-USDT", Some("1H"), Some(1))
-        .await
-        .unwrap();
+    let request = CandlesRequest {
+        inst_id: "BTC-USDT",
+        bar: Some("1H"),
+        limit: Some(1),
+    };
+    let candles = client.market().get_candlesticks(&request).await.unwrap();
     assert_eq!(candles[0].open.as_str(), "3.721");
     assert_eq!(candles[0].close.as_str(), "3.708");
     assert_eq!(candles[0].confirm.as_str(), "0");
@@ -191,11 +200,11 @@ async fn get_trades_builds_request_and_parses() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let trades = client
-        .market()
-        .get_trades("BTC-USDT", Some(1))
-        .await
-        .unwrap();
+    let request = TradesRequest {
+        inst_id: "BTC-USDT",
+        limit: Some(1),
+    };
+    let trades = client.market().get_trades(&request).await.unwrap();
     assert_eq!(trades[0].trade_id, "242720720");
     assert_eq!(trades[0].px.as_str(), "29963.2");
 
@@ -251,9 +260,10 @@ async fn get_index_components_builds_request_and_parses() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
+    let request = IndexRequest { index: "BTC-USD" };
     let components = client
         .market()
-        .get_index_components("BTC-USD")
+        .get_index_components(&request)
         .await
         .unwrap();
     assert_eq!(components[0].components[0].symbol, "BTC-USDT");
@@ -288,7 +298,10 @@ async fn get_block_ticker_builds_query() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let ticker = client.market().get_block_ticker("BTC-USDT").await.unwrap();
+    let request = InstIdRequest {
+        inst_id: "BTC-USDT",
+    };
+    let ticker = client.market().get_block_ticker(&request).await.unwrap();
     assert_eq!(ticker[0].inst_id, "BTC-USD-SWAP");
 
     let req = mock.captured();
@@ -313,11 +326,11 @@ async fn get_block_tickers_builds_filter_query() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let ticker = client
-        .market()
-        .get_block_tickers(InstType::Swap, Some("BTC-USDT"))
-        .await
-        .unwrap();
+    let request = TickersRequest {
+        inst_type: &InstType::Swap,
+        inst_family: Some("BTC-USDT"),
+    };
+    let ticker = client.market().get_block_tickers(&request).await.unwrap();
     assert_eq!(ticker[0].inst_id, "LTC-USD-SWAP");
     assert_eq!(ticker[0].last.as_str(), "9999.99");
 
@@ -340,9 +353,12 @@ async fn get_option_instrument_family_trades_builds_query() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
+    let request = InstFamilyRequest {
+        inst_family: "BTC-USD",
+    };
     let trades = client
         .market()
-        .get_option_instrument_family_trades("BTC-USD")
+        .get_option_instrument_family_trades(&request)
         .await
         .unwrap();
     assert_eq!(trades[0].opt_type, "C");

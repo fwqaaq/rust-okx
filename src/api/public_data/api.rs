@@ -1,10 +1,9 @@
 use crate::client::OkxClient;
 use crate::error::Error;
-use crate::model::InstType;
+use crate::model::EmptyRequest;
 use crate::transport::Transport;
 
 use super::endpoints::*;
-use super::internal::*;
 use super::requests::*;
 use super::responses::*;
 
@@ -32,14 +31,9 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// [`Error::Transport`]/[`Error::Decode`] on transport/parsing failure.
     pub async fn get_instruments(
         &self,
-        inst_type: InstType,
-        inst_family: Option<&str>,
+        request: &InstrumentsRequest<'_>,
     ) -> Result<Vec<Instrument>, Error> {
-        let query = InstrumentsQuery {
-            inst_type: &inst_type,
-            inst_family,
-        };
-        self.client.get(INSTRUMENTS, &query, false).await
+        self.client.get(INSTRUMENTS, request, false).await
     }
 
     /// Retrieve OKX system time.
@@ -51,7 +45,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// Returns [`Error::Api`] if OKX rejects the request, or transport/decode
     /// errors.
     pub async fn get_system_time(&self) -> Result<Vec<SystemTime>, Error> {
-        self.client.get(SYSTEM_TIME, &NoQuery, false).await
+        self.client.get(SYSTEM_TIME, &EmptyRequest {}, false).await
     }
 
     /// Retrieve open interest.
@@ -75,9 +69,11 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// # Errors
     ///
     /// See [`get_system_time`](Self::get_system_time).
-    pub async fn get_funding_rate(&self, inst_id: &str) -> Result<Vec<FundingRate>, Error> {
-        let query = InstIdQuery { inst_id };
-        self.client.get(FUNDING_RATE, &query, false).await
+    pub async fn get_funding_rate(
+        &self,
+        request: &InstIdRequest<'_>,
+    ) -> Result<Vec<FundingRate>, Error> {
+        self.client.get(FUNDING_RATE, request, false).await
     }
 
     /// Retrieve historical funding rates.
@@ -101,9 +97,11 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// # Errors
     ///
     /// See [`get_system_time`](Self::get_system_time).
-    pub async fn get_price_limit(&self, inst_id: &str) -> Result<Vec<PriceLimit>, Error> {
-        let query = InstIdQuery { inst_id };
-        self.client.get(PRICE_LIMIT, &query, false).await
+    pub async fn get_price_limit(
+        &self,
+        request: &InstIdRequest<'_>,
+    ) -> Result<Vec<PriceLimit>, Error> {
+        self.client.get(PRICE_LIMIT, request, false).await
     }
 
     /// Retrieve mark prices.
@@ -213,9 +211,11 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// # Errors
     ///
     /// See [`get_system_time`](Self::get_system_time).
-    pub async fn get_estimated_price(&self, inst_id: &str) -> Result<Vec<EstimatedPrice>, Error> {
-        let query = InstIdQuery { inst_id };
-        self.client.get(ESTIMATED_PRICE, &query, false).await
+    pub async fn get_estimated_price(
+        &self,
+        request: &InstIdRequest<'_>,
+    ) -> Result<Vec<EstimatedPrice>, Error> {
+        self.client.get(ESTIMATED_PRICE, request, false).await
     }
 
     /// Retrieve discount-rate and interest-free quota data.
@@ -227,11 +227,10 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_discount_rate_interest_free_quota(
         &self,
-        ccy: Option<&str>,
+        request: &CurrencyRequest<'_>,
     ) -> Result<Vec<DiscountRateInterestFreeQuota>, Error> {
-        let query = CurrencyQuery { ccy };
         self.client
-            .get(DISCOUNT_RATE_INTEREST_FREE_QUOTA, &query, false)
+            .get(DISCOUNT_RATE_INTEREST_FREE_QUOTA, request, false)
             .await
     }
 

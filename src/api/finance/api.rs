@@ -1,10 +1,9 @@
-use crate::api::finance::internal::CancelRedeemBody;
 use crate::client::OkxClient;
 use crate::error::Error;
+use crate::model::EmptyRequest;
 use crate::transport::Transport;
 
 use super::endpoints::*;
-use super::internal::{AmountBody, DaysQuery, NoParams, SetLendingRateBody, optional_ccy};
 use super::requests::*;
 use super::responses::*;
 /// Accessor for OKX finance endpoint groups.
@@ -69,9 +68,11 @@ impl<T: Transport> Savings<'_, T> {
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
     /// OKX code, or transport/decode errors.
-    pub async fn get_saving_balance(&self, ccy: Option<&str>) -> Result<Vec<SavingBalance>, Error> {
-        let query = optional_ccy(ccy);
-        self.client.get(SAVINGS_BALANCE, &query, true).await
+    pub async fn get_saving_balance(
+        &self,
+        request: &CurrencyRequest<'_>,
+    ) -> Result<Vec<SavingBalance>, Error> {
+        self.client.get(SAVINGS_BALANCE, request, true).await
     }
 
     /// Purchase or redeem savings.
@@ -101,12 +102,10 @@ impl<T: Transport> Savings<'_, T> {
     /// OKX code, or transport/decode errors.
     pub async fn set_lending_rate(
         &self,
-        ccy: &str,
-        rate: &str,
+        request: &SetLendingRateRequest<'_>,
     ) -> Result<Vec<SetLendingRateResult>, Error> {
-        let body = SetLendingRateBody { ccy, rate };
         self.client
-            .post(SAVINGS_SET_LENDING_RATE, &body, true)
+            .post(SAVINGS_SET_LENDING_RATE, request, true)
             .await
     }
 
@@ -152,11 +151,10 @@ impl<T: Transport> Savings<'_, T> {
     /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn get_public_borrow_info(
         &self,
-        ccy: Option<&str>,
+        request: &CurrencyRequest<'_>,
     ) -> Result<Vec<PublicBorrowInfo>, Error> {
-        let query = optional_ccy(ccy);
         self.client
-            .get(SAVINGS_PUBLIC_BORROW_INFO, &query, false)
+            .get(SAVINGS_PUBLIC_BORROW_INFO, request, false)
             .await
     }
 }
@@ -270,7 +268,9 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn product_info(&self) -> Result<Vec<StakingProductInfo>, Error> {
-        self.client.get(ETH_PRODUCT_INFO, &NoParams {}, true).await
+        self.client
+            .get(ETH_PRODUCT_INFO, &EmptyRequest {}, true)
+            .await
     }
 
     /// Purchase ETH staking.
@@ -280,9 +280,8 @@ impl<T: Transport> EthStaking<'_, T> {
     /// # Errors
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn purchase(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
-        let body = AmountBody { amt };
-        self.client.post(ETH_PURCHASE, &body, true).await
+    pub async fn purchase(&self, request: &AmountRequest<'_>) -> Result<Vec<StakingOrder>, Error> {
+        self.client.post(ETH_PURCHASE, request, true).await
     }
 
     /// Redeem ETH staking.
@@ -292,9 +291,8 @@ impl<T: Transport> EthStaking<'_, T> {
     /// # Errors
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn redeem(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
-        let body = AmountBody { amt };
-        self.client.post(ETH_REDEEM, &body, true).await
+    pub async fn redeem(&self, request: &AmountRequest<'_>) -> Result<Vec<StakingOrder>, Error> {
+        self.client.post(ETH_REDEEM, request, true).await
     }
 
     /// Cancel redeem ETH staking.
@@ -304,9 +302,11 @@ impl<T: Transport> EthStaking<'_, T> {
     /// # Errors
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn cancel_redeem(&self, ord_id: &str) -> Result<Vec<CancelRedeem>, Error> {
-        let body = CancelRedeemBody { ord_id };
-        self.client.post(ETH_CANCEL_REDEEM, &body, true).await
+    pub async fn cancel_redeem(
+        &self,
+        request: &CancelRedeemRequest<'_>,
+    ) -> Result<Vec<CancelRedeem>, Error> {
+        self.client.post(ETH_CANCEL_REDEEM, request, true).await
     }
 
     /// Retrieve ETH staking balance.
@@ -317,7 +317,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn balance(&self) -> Result<Vec<StakingBalance>, Error> {
-        self.client.get(ETH_BALANCE, &NoParams {}, true).await
+        self.client.get(ETH_BALANCE, &EmptyRequest {}, true).await
     }
 
     /// Retrieve ETH staking purchase/redeem history.
@@ -341,9 +341,11 @@ impl<T: Transport> EthStaking<'_, T> {
     /// # Errors
     ///
     /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn apy_history(&self, days: &str) -> Result<Vec<StakingApyHistory>, Error> {
-        let query = DaysQuery { days };
-        self.client.get(ETH_APY_HISTORY, &query, false).await
+    pub async fn apy_history(
+        &self,
+        request: &ApyHistoryRequest<'_>,
+    ) -> Result<Vec<StakingApyHistory>, Error> {
+        self.client.get(ETH_APY_HISTORY, request, false).await
     }
 }
 
@@ -361,7 +363,9 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn product_info(&self) -> Result<StakingProductInfo, Error> {
-        self.client.get(SOL_PRODUCT_INFO, &NoParams {}, true).await
+        self.client
+            .get(SOL_PRODUCT_INFO, &EmptyRequest {}, true)
+            .await
     }
 
     /// Purchase SOL staking.
@@ -371,9 +375,8 @@ impl<T: Transport> SolStaking<'_, T> {
     /// # Errors
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn purchase(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
-        let body = AmountBody { amt };
-        self.client.post(SOL_PURCHASE, &body, true).await
+    pub async fn purchase(&self, request: &AmountRequest<'_>) -> Result<Vec<StakingOrder>, Error> {
+        self.client.post(SOL_PURCHASE, request, true).await
     }
 
     /// Redeem SOL staking.
@@ -383,9 +386,8 @@ impl<T: Transport> SolStaking<'_, T> {
     /// # Errors
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn redeem(&self, amt: &str) -> Result<Vec<StakingOrder>, Error> {
-        let body = AmountBody { amt };
-        self.client.post(SOL_REDEEM, &body, true).await
+    pub async fn redeem(&self, request: &AmountRequest<'_>) -> Result<Vec<StakingOrder>, Error> {
+        self.client.post(SOL_REDEEM, request, true).await
     }
 
     /// Retrieve SOL staking balance.
@@ -396,7 +398,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn balance(&self) -> Result<Vec<StakingBalance>, Error> {
-        self.client.get(SOL_BALANCE, &NoParams {}, true).await
+        self.client.get(SOL_BALANCE, &EmptyRequest {}, true).await
     }
 
     /// Retrieve SOL staking purchase/redeem history.
@@ -420,9 +422,11 @@ impl<T: Transport> SolStaking<'_, T> {
     /// # Errors
     ///
     /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
-    pub async fn apy_history(&self, days: &str) -> Result<Vec<StakingApyHistory>, Error> {
-        let query = DaysQuery { days };
-        self.client.get(SOL_APY_HISTORY, &query, false).await
+    pub async fn apy_history(
+        &self,
+        request: &ApyHistoryRequest<'_>,
+    ) -> Result<Vec<StakingApyHistory>, Error> {
+        self.client.get(SOL_APY_HISTORY, request, false).await
     }
 }
 
@@ -441,7 +445,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
     pub async fn borrow_currencies(&self) -> Result<Vec<FlexibleLoanCurrency>, Error> {
         self.client
-            .get(FLEX_BORROW_CURRENCIES, &NoParams {}, true)
+            .get(FLEX_BORROW_CURRENCIES, &EmptyRequest {}, true)
             .await
     }
 
