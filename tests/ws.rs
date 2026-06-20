@@ -14,7 +14,11 @@
 mod account;
 #[path = "ws/balance_and_position.rs"]
 mod balance_and_position;
+#[path = "ws/block.rs"]
+mod block;
 #[path = "ws/common.rs"]
 mod common;
+#[path = "ws/funding.rs"]
+mod funding;
 #[path = "ws/positions.rs"]
 mod positions;

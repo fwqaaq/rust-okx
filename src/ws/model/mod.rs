@@ -53,7 +53,7 @@ pub use account::{
     AccountBalanceUpdate, AccountGreeksUpdate, AccountUpdate, BalData, BalanceAndPositionUpdate,
     CloseOrderAlgo, LiquidationWarningUpdate, PosData, PositionUpdate, Trade,
 };
-pub use algo::{AdvancedAlgoOrderUpdate, AlgoOrderUpdate};
+pub use algo::{AdvancedAlgoOrderUpdate, AlgoOrderUpdate, LinkedOrder};
 pub use block::{
     BlockLeg, BlockQuoteUpdate, BlockRfqUpdate, BlockTickerUpdate, PublicBlockTradeUpdate,
     PublicStructureBlockTradeUpdate, StructureBlockTradeUpdate,
