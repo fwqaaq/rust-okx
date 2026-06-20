@@ -7,7 +7,7 @@ use crate::signing;
 use crate::ws::channels;
 use crate::ws::client::login_payload;
 use crate::ws::event::parse_text_event;
-use crate::ws::model::AccountUpdate;
+use crate::ws::model::{AccountUpdate, StatusUpdate};
 use crate::ws::ops::operation_payload_with_expiry;
 use crate::ws::request::{
     AmendSpreadOrderRequest, CancelSpreadOrderRequest, MassCancelRequest,
@@ -308,6 +308,47 @@ fn operation_payload_serializes_expiry_and_typed_ws_requests() {
     let cancel_all = MassCancelSpreadOrdersRequest::all();
     let value = serde_json::to_value(cancel_all).unwrap();
     assert_eq!(value, serde_json::json!({}));
+}
+
+#[test]
+fn parse_status_push() {
+    let json = r#"{
+        "arg": {"channel": "status"},
+        "data": [{
+            "begin": "1672823400000",
+            "end": "1672825980000",
+            "href": "",
+            "preOpenBegin": "",
+            "scheDesc": "",
+            "serviceType": "0",
+            "state": "completed",
+            "system": "unified",
+            "maintType": "1",
+            "env": "1",
+            "title": "Trading account WebSocket system upgrade",
+            "ts": "1672826038470"
+        }]
+    }"#;
+
+    let event = parse_text_event(json).unwrap().unwrap();
+    let WsEvent::Push(push) = event else {
+        panic!("expected Push, got {:?}", event);
+    };
+    assert_eq!(push.arg.channel, "status");
+
+    let rows: Vec<StatusUpdate> = push.parse().unwrap();
+    assert_eq!(rows.len(), 1);
+    let row = &rows[0];
+    assert_eq!(row.title, "Trading account WebSocket system upgrade");
+    assert_eq!(row.state, "completed");
+    assert_eq!(row.begin.as_str(), "1672823400000");
+    assert_eq!(row.end.as_str(), "1672825980000");
+    assert!(row.pre_open_begin.is_empty());
+    assert_eq!(row.service_type, "0");
+    assert_eq!(row.system, "unified");
+    assert_eq!(row.maint_type, "1");
+    assert_eq!(row.env, "1");
+    assert_eq!(row.ts.as_str(), "1672826038470");
 }
 
 fn operation_payload<A: Serialize>(
