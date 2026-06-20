@@ -30,7 +30,10 @@ pub async fn fetch_rest_snapshot(client: &OkxClient, inst_id: &str, bar: &str) -
         .unwrap_or_default();
     let positions = client
         .account()
-        .get_positions(&PositionsRequest { inst_id: Some(inst_id), ..Default::default() })
+        .get_positions(&PositionsRequest {
+            inst_id: Some(inst_id),
+            ..Default::default()
+        })
         .await
         .unwrap_or_default();
     let orders = client
@@ -40,7 +43,11 @@ pub async fn fetch_rest_snapshot(client: &OkxClient, inst_id: &str, bar: &str) -
         .unwrap_or_default();
     let candles = client
         .market()
-        .get_candlesticks(&CandlesRequest { inst_id, bar: Some(bar), limit: Some(120) })
+        .get_candlesticks(&CandlesRequest {
+            inst_id,
+            bar: Some(bar),
+            limit: Some(120),
+        })
         .await
         .unwrap_or_default()
         .into_iter()

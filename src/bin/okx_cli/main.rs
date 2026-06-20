@@ -405,7 +405,10 @@ async fn submit_order(app: &mut App, rest: &Arc<OkxClient>) {
 async fn cancel_order(app: &mut App, rest: &Arc<OkxClient>, ord_id: String) {
     match rest
         .trade()
-        .cancel_order(&CancelOrderRequest::by_order_id(&app.config.inst_id, &ord_id))
+        .cancel_order(&CancelOrderRequest::by_order_id(
+            &app.config.inst_id,
+            &ord_id,
+        ))
         .await
     {
         Ok(rows) => {
