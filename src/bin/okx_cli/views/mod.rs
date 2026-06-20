@@ -1,3 +1,7 @@
 pub mod account;
-pub mod chart;
-pub mod feed;
+pub mod dashboard;
+pub mod logs;
+pub mod market;
+pub mod orders;
+pub mod trade;
+pub mod watchlist;
