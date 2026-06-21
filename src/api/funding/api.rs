@@ -26,7 +26,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a
     /// non-zero OKX code, or transport/decode errors.
     pub async fn get_currencies(
         &self,

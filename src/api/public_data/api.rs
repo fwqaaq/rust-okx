@@ -27,8 +27,8 @@ impl<'a, T: Transport> PublicData<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] if OKX rejects the request, or
-    /// [`Error::Transport`]/[`Error::Decode`] on transport/parsing failure.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) if OKX rejects the request, or
+    /// [`RestError::Transport`](crate::RestError::Transport)/[`RestError::Decode`](crate::RestError::Decode) on transport/parsing failure.
     pub async fn get_instruments(
         &self,
         request: &InstrumentsRequest<'_>,
@@ -42,7 +42,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] if OKX rejects the request, or transport/decode
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) if OKX rejects the request, or transport/decode
     /// errors.
     pub async fn get_system_time(&self) -> Result<Vec<SystemTime>, Error> {
         self.client.get(SYSTEM_TIME, &EmptyRequest {}, false).await

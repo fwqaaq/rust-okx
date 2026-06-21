@@ -182,7 +182,10 @@ pub enum LogLevel {
 
 #[derive(Debug)]
 pub enum AppMsg {
-    RestSnapshot(RestSnapshot),
+    RestSnapshot {
+        generation: u64,
+        snapshot: RestSnapshot,
+    },
     Candle(CandleUpdate),
     Ticker(TickerUpdate),
     WatchlistTicker(TickerUpdate),
@@ -404,6 +407,9 @@ pub struct App {
     pub symbol_editing: bool,
     pub symbol_input: String,
     pub bar_picking: bool,
+    pub watchlist_editing: bool,
+    pub watchlist_input: String,
+    pub rest_generation: u64,
     pub selected_order: usize,
     pub trade: TradeForm,
     pub confirmation: Option<Confirmation>,
@@ -412,15 +418,8 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(config: RuntimeConfig) -> Self {
-        let watchlist = DEFAULT_WATCHLIST
-            .iter()
-            .map(|id| WatchlistEntry {
-                inst_id: id.to_string(),
-                last: None,
-                change24h: None,
-            })
-            .collect();
+    pub fn new(config: RuntimeConfig, watchlist: Vec<String>) -> Self {
+        let watchlist = normalized_watchlist_entries(watchlist);
         Self {
             tab: Tab::Dashboard,
             symbol_input: config.inst_id.clone(),
@@ -438,6 +437,9 @@ impl App {
             paused: false,
             symbol_editing: false,
             bar_picking: false,
+            watchlist_editing: false,
+            watchlist_input: String::new(),
+            rest_generation: 0,
             selected_order: 0,
             trade: TradeForm::default(),
             confirmation: None,
@@ -462,7 +464,10 @@ impl App {
 
     pub fn apply_msg(&mut self, msg: AppMsg) {
         match msg {
-            AppMsg::RestSnapshot(snapshot) => self.apply_rest_snapshot(snapshot),
+            AppMsg::RestSnapshot {
+                generation,
+                snapshot,
+            } => self.apply_rest_snapshot_for_generation(generation, snapshot),
             AppMsg::Candle(update) if !self.paused => self.push_candle(update),
             AppMsg::Ticker(update) if !self.paused => self.push_ticker(update),
             AppMsg::Trade(update) if !self.paused => self.push_trade(update),
@@ -471,6 +476,12 @@ impl App {
             AppMsg::Status(kind, state, detail) => self.set_status(kind, state, detail),
             AppMsg::Log(level, message) => self.log(level, message),
             AppMsg::Candle(_) | AppMsg::Ticker(_) | AppMsg::Trade(_) | AppMsg::Book(_) => {}
+        }
+    }
+
+    fn apply_rest_snapshot_for_generation(&mut self, generation: u64, snapshot: RestSnapshot) {
+        if generation == self.rest_generation {
+            self.apply_rest_snapshot(snapshot);
         }
     }
 
@@ -602,6 +613,44 @@ impl App {
             .map(|e| e.inst_id.clone())
     }
 
+    pub fn begin_rest_generation(&mut self, detail: String) -> u64 {
+        self.rest_generation = self.rest_generation.wrapping_add(1);
+        self.set_status(StreamKind::Rest, StreamState::Connecting, detail);
+        self.rest_generation
+    }
+
+    pub fn watchlist_instruments(&self) -> Vec<String> {
+        self.watchlist
+            .iter()
+            .map(|entry| entry.inst_id.clone())
+            .collect()
+    }
+
+    pub fn add_watchlist_inst(&mut self, inst_id: String) -> bool {
+        let inst_id = inst_id.trim().to_ascii_uppercase();
+        if inst_id.is_empty() {
+            return false;
+        }
+        if let Some(index) = self
+            .watchlist
+            .iter()
+            .position(|entry| entry.inst_id == inst_id)
+        {
+            self.watchlist_cursor = index;
+            self.log(LogLevel::Info, format!("{inst_id} 已在自选中"));
+            return false;
+        }
+
+        self.watchlist.push(WatchlistEntry {
+            inst_id: inst_id.clone(),
+            last: None,
+            change24h: None,
+        });
+        self.watchlist_cursor = self.watchlist.len().saturating_sub(1);
+        self.log(LogLevel::Info, format!("已添加自选 {inst_id}"));
+        true
+    }
+
     pub fn best_bid_ask(&self) -> (Option<&BookLevel>, Option<&BookLevel>) {
         let bid = self.book.as_ref().and_then(|book| book.bids.first());
         let ask = self.book.as_ref().and_then(|book| book.asks.first());
@@ -680,12 +729,48 @@ impl App {
     }
 }
 
+fn normalized_watchlist_entries(watchlist: Vec<String>) -> Vec<WatchlistEntry> {
+    let mut entries = Vec::new();
+    let source = if watchlist.is_empty() {
+        DEFAULT_WATCHLIST
+            .iter()
+            .map(|id| (*id).to_owned())
+            .collect::<Vec<_>>()
+    } else {
+        watchlist
+    };
+
+    for inst_id in source {
+        let inst_id = inst_id.trim().to_ascii_uppercase();
+        if inst_id.is_empty()
+            || entries
+                .iter()
+                .any(|entry: &WatchlistEntry| entry.inst_id == inst_id)
+        {
+            continue;
+        }
+        entries.push(WatchlistEntry {
+            inst_id,
+            last: None,
+            change24h: None,
+        });
+    }
+
+    entries
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     fn app() -> App {
-        App::new(RuntimeConfig::default())
+        App::new(
+            RuntimeConfig::default(),
+            DEFAULT_WATCHLIST
+                .iter()
+                .map(|id| (*id).to_owned())
+                .collect(),
+        )
     }
 
     fn candle(ts: &str, close: &str) -> CandleUpdate {
@@ -741,5 +826,64 @@ mod tests {
 
         assert!(!app.build_place_confirmation());
         assert!(app.confirmation.is_none());
+    }
+
+    #[test]
+    fn app_uses_default_watchlist_when_empty() {
+        let app = App::new(RuntimeConfig::default(), Vec::new());
+
+        assert_eq!(
+            app.watchlist_instruments(),
+            DEFAULT_WATCHLIST
+                .iter()
+                .map(|id| (*id).to_owned())
+                .collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn add_watchlist_inst_uppercases_and_dedupes() {
+        let mut app = App::new(RuntimeConfig::default(), vec!["BTC-USDT".to_owned()]);
+
+        assert!(app.add_watchlist_inst(" eth-usdt ".to_owned()));
+        assert_eq!(app.watchlist_cursor, 1);
+        assert_eq!(
+            app.watchlist_instruments(),
+            vec!["BTC-USDT".to_owned(), "ETH-USDT".to_owned()]
+        );
+
+        assert!(!app.add_watchlist_inst("ETH-USDT".to_owned()));
+        assert_eq!(app.watchlist_cursor, 1);
+        assert_eq!(app.watchlist.len(), 2);
+    }
+
+    #[test]
+    fn stale_rest_snapshot_is_ignored() {
+        let mut app = app();
+        let stale_generation = app.rest_generation;
+        let current_generation = app.begin_rest_generation("switch".to_owned());
+        assert_ne!(stale_generation, current_generation);
+
+        app.apply_msg(AppMsg::RestSnapshot {
+            generation: stale_generation,
+            snapshot: RestSnapshot {
+                balances: Vec::new(),
+                positions: Vec::new(),
+                orders: Vec::new(),
+                candles: vec![OhlcBar {
+                    ts: 1,
+                    open: 1.0,
+                    high: 1.0,
+                    low: 1.0,
+                    close: 9.0,
+                    volume: 1.0,
+                    confirm: false,
+                }],
+                perm: "stale".to_owned(),
+            },
+        });
+
+        assert!(app.candles.is_empty());
+        assert!(app.perm.is_empty());
     }
 }

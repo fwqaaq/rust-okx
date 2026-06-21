@@ -11,8 +11,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 /// Top-level error type.
 ///
-/// Wraps [`RestError`] (REST layer), optionally [`WsError`] (WebSocket layer),
-/// and [`RequestValidationError`] (shared pre-flight validation).
+/// Wraps [`RestError`] (REST layer) and optionally `WsError` (WebSocket layer).
 ///
 /// The enum is [`#[non_exhaustive]`](https://doc.rust-lang.org/reference/attributes/type_system.html)
 /// so new variants can be added without a breaking change.

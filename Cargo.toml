@@ -1,6 +1,6 @@
 [package]
 name = "rust-okx"
-version = "0.6.1"
+version = "0.6.2"
 edition = "2024"
 rust-version = "1.85"
 description = "Async Rust client for the OKX v5 REST API"
@@ -65,6 +65,9 @@ cli = [
   "dep:clap",
   "dep:toml",
 ]
+
+[package.metadata.docs.rs]
+features = ["websocket", "rust-decimal"]
 
 [dev-dependencies]
 tokio = { version = "1", features = [

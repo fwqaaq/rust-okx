@@ -60,7 +60,7 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
     .block(
         Block::default()
             .borders(Borders::ALL)
-            .title(" 自选列表  ↑/↓ 移动  Enter 切换行情 "),
+            .title(" 自选列表  ↑/↓ 移动  Enter 切换行情  a 添加 "),
     );
 
     f.render_widget(table, area);

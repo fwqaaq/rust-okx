@@ -14,46 +14,59 @@ use tokio::task::JoinHandle;
 use crate::app::{AppMsg, LogLevel, OhlcBar, RestSnapshot, StreamKind, StreamState};
 
 pub async fn fetch_rest_snapshot(client: &OkxClient, inst_id: &str, bar: &str) -> RestSnapshot {
-    let balances = client
-        .account()
-        .get_balance(BalanceRequest::default())
-        .await
-        .unwrap_or_default();
-    let config = client
-        .account()
-        .get_account_config()
-        .await
-        .unwrap_or_default();
+    let balances = async {
+        client
+            .account()
+            .get_balance(BalanceRequest::default())
+            .await
+            .unwrap_or_default()
+    };
+    let config = async {
+        client
+            .account()
+            .get_account_config()
+            .await
+            .unwrap_or_default()
+    };
+    let positions = async {
+        client
+            .account()
+            .get_positions(&PositionsRequest {
+                inst_id: Some(inst_id),
+                ..Default::default()
+            })
+            .await
+            .unwrap_or_default()
+    };
+    let orders = async {
+        client
+            .trade()
+            .get_order_list(&OrderListRequest::new().inst_id(inst_id).limit(20))
+            .await
+            .unwrap_or_default()
+    };
+    let candles = async {
+        client
+            .market()
+            .get_candlesticks(&CandlesRequest {
+                inst_id,
+                bar: Some(bar),
+                limit: Some(120),
+            })
+            .await
+            .unwrap_or_default()
+            .into_iter()
+            .rev()
+            .map(OhlcBar::from)
+            .collect()
+    };
+
+    let (balances, config, positions, orders, candles) =
+        tokio::join!(balances, config, positions, orders, candles);
     let perm = config
         .first()
         .map(|row| row.perm.clone())
         .unwrap_or_default();
-    let positions = client
-        .account()
-        .get_positions(&PositionsRequest {
-            inst_id: Some(inst_id),
-            ..Default::default()
-        })
-        .await
-        .unwrap_or_default();
-    let orders = client
-        .trade()
-        .get_order_list(&OrderListRequest::new().inst_id(inst_id).limit(20))
-        .await
-        .unwrap_or_default();
-    let candles = client
-        .market()
-        .get_candlesticks(&CandlesRequest {
-            inst_id,
-            bar: Some(bar),
-            limit: Some(120),
-        })
-        .await
-        .unwrap_or_default()
-        .into_iter()
-        .rev()
-        .map(OhlcBar::from)
-        .collect();
 
     RestSnapshot {
         balances,
@@ -69,10 +82,12 @@ pub fn spawn_periodic_rest_refresh(
     inst_id: String,
     bar: String,
     refresh_ms: u64,
+    generation: u64,
     tx: mpsc::Sender<AppMsg>,
 ) -> JoinHandle<()> {
     tokio::spawn(async move {
         let mut interval = tokio::time::interval(std::time::Duration::from_millis(refresh_ms));
+        interval.tick().await;
         loop {
             interval.tick().await;
             let _ = tx
@@ -83,10 +98,35 @@ pub fn spawn_periodic_rest_refresh(
                 ))
                 .await;
             let snapshot = fetch_rest_snapshot(&client, &inst_id, &bar).await;
-            if tx.send(AppMsg::RestSnapshot(snapshot)).await.is_err() {
+            if tx
+                .send(AppMsg::RestSnapshot {
+                    generation,
+                    snapshot,
+                })
+                .await
+                .is_err()
+            {
                 return;
             }
         }
+    })
+}
+
+pub fn spawn_rest_snapshot(
+    client: Arc<OkxClient>,
+    inst_id: String,
+    bar: String,
+    generation: u64,
+    tx: mpsc::Sender<AppMsg>,
+) -> JoinHandle<()> {
+    tokio::spawn(async move {
+        let snapshot = fetch_rest_snapshot(&client, &inst_id, &bar).await;
+        let _ = tx
+            .send(AppMsg::RestSnapshot {
+                generation,
+                snapshot,
+            })
+            .await;
     })
 }
 

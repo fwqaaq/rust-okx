@@ -307,7 +307,7 @@ mod tests {
     use crate::test_util::MockTransport;
     use crate::{OkxClient, OkxRegion};
 
-    /// A non-zero OKX response code is surfaced as [`RestError::Okx`] with the
+    /// A non-zero OKX response code is surfaced as [`RestError::Okx`](crate::RestError::Okx) with the
     /// code and message preserved (offline unit test; network path covered by
     /// integration tests).
     #[tokio::test]

@@ -24,7 +24,7 @@ pub struct AmountRequest<'a> {
     pub amt: &'a str,
 }
 
-/// Request for [`cancel_redeem`] on staking products.
+/// Request for `cancel_redeem` on staking products.
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CancelRedeemRequest<'a> {
@@ -32,7 +32,7 @@ pub struct CancelRedeemRequest<'a> {
     pub ord_id: &'a str,
 }
 
-/// Request for [`apy_history`] on staking products.
+/// Request for `apy_history` on staking products.
 #[derive(Debug, Clone, Serialize)]
 pub struct ApyHistoryRequest<'a> {
     /// Number of days of history, e.g. `"7"` or `"30"`.

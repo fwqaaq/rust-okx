@@ -37,7 +37,7 @@ pub struct CancelWithdrawalRequest<'a> {
     pub wd_id: &'a str,
 }
 
-/// Request body for [`Funding::funds_transfer`].
+/// Request body for [`Funding::funds_transfer`](crate::api::funding::Funding::funds_transfer).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FundsTransferRequest {
@@ -110,7 +110,7 @@ impl FundsTransferRequest {
     }
 }
 
-/// Request body for [`Funding::withdrawal`].
+/// Request body for [`Funding::withdrawal`](crate::api::funding::Funding::withdrawal).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WithdrawalRequest {
@@ -174,7 +174,7 @@ impl WithdrawalRequest {
     }
 }
 
-/// Query parameters for [`Funding::get_deposit_history`].
+/// Query parameters for [`Funding::get_deposit_history`](crate::api::funding::Funding::get_deposit_history).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DepositHistoryRequest {
@@ -259,7 +259,7 @@ impl DepositHistoryRequest {
     }
 }
 
-/// Query parameters for [`Funding::get_withdrawal_history`].
+/// Query parameters for [`Funding::get_withdrawal_history`](crate::api::funding::Funding::get_withdrawal_history).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WithdrawalHistoryRequest {
@@ -352,7 +352,7 @@ impl WithdrawalHistoryRequest {
     }
 }
 
-/// Query parameters for [`Funding::get_bills`].
+/// Query parameters for [`Funding::get_bills`](crate::api::funding::Funding::get_bills).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct FundingBillsRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -404,7 +404,7 @@ impl FundingBillsRequest {
     }
 }
 
-/// Query parameters for [`Funding::get_deposit_lightning`].
+/// Query parameters for [`Funding::get_deposit_lightning`](crate::api::funding::Funding::get_deposit_lightning).
 #[derive(Debug, Clone, Serialize)]
 pub struct DepositLightningRequest {
     ccy: String,
@@ -430,7 +430,7 @@ impl DepositLightningRequest {
     }
 }
 
-/// Request body for [`Funding::withdrawal_lightning`].
+/// Request body for [`Funding::withdrawal_lightning`](crate::api::funding::Funding::withdrawal_lightning).
 #[derive(Debug, Clone, Serialize)]
 pub struct WithdrawalLightningRequest {
     ccy: String,
@@ -456,7 +456,7 @@ impl WithdrawalLightningRequest {
     }
 }
 
-/// Query parameters for [`Funding::get_deposit_withdraw_status`].
+/// Query parameters for [`Funding::get_deposit_withdraw_status`](crate::api::funding::Funding::get_deposit_withdraw_status).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DepositWithdrawStatusRequest {

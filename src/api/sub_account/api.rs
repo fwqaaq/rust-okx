@@ -25,9 +25,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] if `limit` is outside 1–100,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_list(
         &self,
         request: &SubAccountListRequest,
@@ -41,8 +40,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn create_subaccount(
         &self,
         request: &CreateSubAccountRequest,
@@ -56,8 +55,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn create_subaccount_apikey(
         &self,
         request: &CreateSubAccountApiKeyRequest,
@@ -71,8 +70,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_apikeys(
         &self,
         request: &SubAccountApiKeysRequest,
@@ -86,9 +85,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] if none of `label`/`perm`/`ip` is set,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn modify_subaccount_apikey(
         &self,
         request: &ModifySubAccountApiKeyRequest,
@@ -104,8 +102,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn delete_subaccount_apikey(
         &self,
         request: &DeleteSubAccountApiKeyRequest,
@@ -121,8 +119,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_trading_balances(
         &self,
         request: &SubAccountTradingBalancesRequest,
@@ -138,8 +136,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_funding_balances(
         &self,
         request: &SubAccountFundingBalancesRequest,
@@ -155,8 +153,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_max_withdrawal(
         &self,
         request: &SubAccountMaxWithdrawalRequest,
@@ -172,9 +170,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] if `limit` is outside 1–100,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_bills(
         &self,
         request: &SubAccountBillsRequest,
@@ -188,9 +185,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] if `limit` is outside 1–100,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_managed_bills(
         &self,
         request: &ManagedSubAccountBillsRequest,
@@ -207,8 +203,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn transfer_between_subaccounts(
         &self,
         request: &SubAccountTransferRequest,
@@ -222,8 +218,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_subaccount_transfer_out(
         &self,
         request: &SetTransferOutRequest,
@@ -239,8 +235,8 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_entrust_subaccount_list(&self) -> Result<Vec<EntrustSubAccount>, Error> {
         self.client.get(ENTRUST_SUBACCOUNT_LIST, &(), true).await
     }

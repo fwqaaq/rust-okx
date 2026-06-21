@@ -44,10 +44,15 @@ pub fn render(f: &mut Frame, app: &App) {
         Tab::Watchlist => views::watchlist::render(f, chunks[1], app),
     }
 
-    let footer = if app.symbol_editing {
+    let footer = if app.watchlist_editing {
+        format!(
+            "  添加自选交易对: {}  Enter: 保存  Esc: 取消",
+            app.watchlist_input
+        )
+    } else if app.symbol_editing {
         format!("  输入交易对: {}  Enter: 应用  Esc: 取消", app.symbol_input)
     } else {
-        "  q/Esc 退出  Tab/←/→ 切页  1-7 跳转  r 刷新  p 暂停  / 切交易对  b 切周期  7: 自选列表"
+        "  q/Esc 退出  Tab/←/→ 切页  1-7 跳转  r 刷新  p 暂停  / 切交易对  b 切周期  7: 自选列表  a: 添加自选"
             .to_owned()
     };
     f.render_widget(

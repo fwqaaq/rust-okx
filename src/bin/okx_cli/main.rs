@@ -27,13 +27,17 @@ use app::{
 };
 use clap::Parser;
 use config::{CliArgs, RuntimeConfig, validate_bar};
+use okx_config::OkxConfig;
 
-#[tokio::main]
+#[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<()> {
     dotenvy::dotenv().ok();
 
     let args = CliArgs::parse();
     let profile_name = args.profile.clone();
+    let active_profile = profile_name
+        .clone()
+        .unwrap_or_else(|| credentials::DEFAULT_PROFILE.to_owned());
     let (creds, profile_demo, base_url) =
         tokio::task::block_in_place(|| credentials::load_or_prompt(profile_name.as_deref()))?;
 
@@ -61,13 +65,20 @@ async fn main() -> Result<()> {
         .build(),
     );
 
-    let mut app = App::new(config.clone());
+    let watchlist = OkxConfig::load()?
+        .map(|cfg| cfg.profile_watchlist_or_default(&active_profile, &DEFAULT_WATCHLIST))
+        .unwrap_or_else(|| {
+            DEFAULT_WATCHLIST
+                .iter()
+                .map(|id| (*id).to_owned())
+                .collect()
+        });
+    let mut app = App::new(config.clone(), watchlist);
     app.apply_rest_snapshot(tasks::fetch_rest_snapshot(&rest, &config.inst_id, &config.bar).await);
 
     let (tx, mut rx) = mpsc::channel(256);
 
-    let watchlist_insts: Vec<String> = DEFAULT_WATCHLIST.iter().map(|s| s.to_string()).collect();
-    let watchlist_handle = tasks::spawn_watchlist_ws(watchlist_insts, tx.clone());
+    let mut watchlist_handle = tasks::spawn_watchlist_ws(app.watchlist_instruments(), tx.clone());
 
     let mut handles = TaskHandles::spawn(rest.clone(), creds.clone(), &app, tx.clone());
 
@@ -81,8 +92,9 @@ async fn main() -> Result<()> {
         &mut rx,
         tx.clone(),
         rest,
-        creds,
         &mut handles,
+        &mut watchlist_handle,
+        active_profile.to_string(),
     )
     .await;
 
@@ -114,6 +126,7 @@ impl TaskHandles {
                 app.config.inst_id.clone(),
                 app.config.bar.clone(),
                 app.config.refresh_ms,
+                app.rest_generation,
                 tx.clone(),
             ),
             market: tasks::spawn_market_ws(app.config.inst_id.clone(), tx.clone()),
@@ -132,6 +145,48 @@ impl TaskHandles {
         self.candles.abort();
         self.private.abort();
     }
+
+    fn restart_instrument(
+        &mut self,
+        rest_client: Arc<OkxClient>,
+        app: &App,
+        tx: mpsc::Sender<app::AppMsg>,
+    ) {
+        self.rest.abort();
+        self.market.abort();
+        self.candles.abort();
+        self.rest = tasks::spawn_periodic_rest_refresh(
+            rest_client,
+            app.config.inst_id.clone(),
+            app.config.bar.clone(),
+            app.config.refresh_ms,
+            app.rest_generation,
+            tx.clone(),
+        );
+        self.market = tasks::spawn_market_ws(app.config.inst_id.clone(), tx.clone());
+        self.candles =
+            tasks::spawn_candle_ws(app.config.inst_id.clone(), app.config.bar.clone(), tx);
+    }
+
+    fn restart_bar(
+        &mut self,
+        rest_client: Arc<OkxClient>,
+        app: &App,
+        tx: mpsc::Sender<app::AppMsg>,
+    ) {
+        self.rest.abort();
+        self.candles.abort();
+        self.rest = tasks::spawn_periodic_rest_refresh(
+            rest_client,
+            app.config.inst_id.clone(),
+            app.config.bar.clone(),
+            app.config.refresh_ms,
+            app.rest_generation,
+            tx.clone(),
+        );
+        self.candles =
+            tasks::spawn_candle_ws(app.config.inst_id.clone(), app.config.bar.clone(), tx);
+    }
 }
 
 async fn run_tui(
@@ -140,8 +195,9 @@ async fn run_tui(
     rx: &mut mpsc::Receiver<app::AppMsg>,
     tx: mpsc::Sender<app::AppMsg>,
     rest: Arc<OkxClient>,
-    creds: Credentials,
     handles: &mut TaskHandles,
+    watchlist_handle: &mut JoinHandle<()>,
+    active_profile: String,
 ) -> Result<()> {
     let mut event_stream = EventStream::new();
     let mut tick = tokio::time::interval(std::time::Duration::from_millis(150));
@@ -153,7 +209,15 @@ async fn run_tui(
             }
             Some(Ok(Event::Key(key))) = event_stream.next() => {
                 if key.kind == KeyEventKind::Press
-                    && handle_key(key.code, app, &rest, &tx, &creds, handles).await?
+                    && handle_key(
+                        key.code,
+                        app,
+                        &rest,
+                        &tx,
+                        handles,
+                        watchlist_handle,
+                        &active_profile,
+                    ).await?
                 {
                     return Ok(());
                 }
@@ -170,16 +234,20 @@ async fn handle_key(
     app: &mut App,
     rest: &Arc<OkxClient>,
     tx: &mpsc::Sender<app::AppMsg>,
-    creds: &Credentials,
     handles: &mut TaskHandles,
+    watchlist_handle: &mut JoinHandle<()>,
+    active_profile: &str,
 ) -> Result<bool> {
-    if handle_confirmation(key, app, rest).await? {
+    if handle_confirmation(key, app, rest, tx).await? {
         return Ok(false);
     }
-    if handle_bar_picker(key, app, rest, tx, creds, handles).await? {
+    if handle_bar_picker(key, app, rest, tx, handles).await? {
         return Ok(false);
     }
-    if handle_symbol_input(key, app, rest, tx, creds, handles).await? {
+    if handle_watchlist_input(key, app, tx, watchlist_handle, active_profile)? {
+        return Ok(false);
+    }
+    if handle_symbol_input(key, app, rest, tx, handles).await? {
         return Ok(false);
     }
 
@@ -190,7 +258,7 @@ async fn handle_key(
         KeyCode::Char(c @ '1'..='7') if app.tab != Tab::Trade => {
             app.set_tab_by_number((c as u8 - b'0') as usize);
         }
-        KeyCode::Char('r') => refresh_now(app, rest).await,
+        KeyCode::Char('r') => refresh_now(app, rest, tx),
         KeyCode::Char('p') => {
             app.paused = !app.paused;
             app.log(
@@ -213,10 +281,14 @@ async fn handle_key(
         }
         KeyCode::Down if app.tab == Tab::Watchlist => app.select_next_watchlist(),
         KeyCode::Up if app.tab == Tab::Watchlist => app.select_prev_watchlist(),
+        KeyCode::Char('a') if app.tab == Tab::Watchlist => {
+            app.watchlist_editing = true;
+            app.watchlist_input.clear();
+        }
         KeyCode::Enter if app.tab == Tab::Watchlist => {
             if let Some(inst) = app.active_watchlist_inst() {
                 if inst != app.config.inst_id {
-                    change_instrument(app, rest, tx, creds, handles, inst).await?;
+                    change_instrument(app, rest, tx, handles, inst).await?;
                 }
             }
         }
@@ -232,7 +304,6 @@ async fn handle_bar_picker(
     app: &mut App,
     rest: &Arc<OkxClient>,
     tx: &mpsc::Sender<app::AppMsg>,
-    creds: &Credentials,
     handles: &mut TaskHandles,
 ) -> Result<bool> {
     if !app.bar_picking {
@@ -243,7 +314,7 @@ async fn handle_bar_picker(
             let idx = (c as u8 - b'1') as usize;
             if let Some(&bar) = BAR_OPTIONS.get(idx) {
                 app.bar_picking = false;
-                change_bar(app, rest, tx, creds, handles, bar.to_owned()).await?;
+                change_bar(app, rest, tx, handles, bar.to_owned()).await?;
             }
         }
         KeyCode::Esc => app.bar_picking = false,
@@ -252,7 +323,12 @@ async fn handle_bar_picker(
     Ok(true)
 }
 
-async fn handle_confirmation(key: KeyCode, app: &mut App, rest: &Arc<OkxClient>) -> Result<bool> {
+async fn handle_confirmation(
+    key: KeyCode,
+    app: &mut App,
+    rest: &Arc<OkxClient>,
+    tx: &mpsc::Sender<app::AppMsg>,
+) -> Result<bool> {
     let Some(confirmation) = app.confirmation.clone() else {
         return Ok(false);
     };
@@ -261,8 +337,8 @@ async fn handle_confirmation(key: KeyCode, app: &mut App, rest: &Arc<OkxClient>)
         KeyCode::Char('y') | KeyCode::Char('Y') => {
             app.confirmation = None;
             match confirmation.action {
-                PendingAction::PlaceOrder => submit_order(app, rest).await,
-                PendingAction::CancelOrder { ord_id } => cancel_order(app, rest, ord_id).await,
+                PendingAction::PlaceOrder => submit_order(app, rest, tx).await,
+                PendingAction::CancelOrder { ord_id } => cancel_order(app, rest, tx, ord_id).await,
             }
             Ok(true)
         }
@@ -280,7 +356,6 @@ async fn handle_symbol_input(
     app: &mut App,
     rest: &Arc<OkxClient>,
     tx: &mpsc::Sender<app::AppMsg>,
-    creds: &Credentials,
     handles: &mut TaskHandles,
 ) -> Result<bool> {
     if !app.symbol_editing {
@@ -292,7 +367,7 @@ async fn handle_symbol_input(
             let next = app.symbol_input.trim().to_ascii_uppercase();
             app.symbol_editing = false;
             if !next.is_empty() && next != app.config.inst_id {
-                change_instrument(app, rest, tx, creds, handles, next).await?;
+                change_instrument(app, rest, tx, handles, next).await?;
             }
         }
         KeyCode::Esc => {
@@ -304,6 +379,46 @@ async fn handle_symbol_input(
         }
         KeyCode::Char(c) if c.is_ascii_alphanumeric() || c == '-' => {
             app.symbol_input.push(c.to_ascii_uppercase());
+        }
+        _ => {}
+    }
+    Ok(true)
+}
+
+fn handle_watchlist_input(
+    key: KeyCode,
+    app: &mut App,
+    tx: &mpsc::Sender<app::AppMsg>,
+    watchlist_handle: &mut JoinHandle<()>,
+    active_profile: &str,
+) -> Result<bool> {
+    if !app.watchlist_editing {
+        return Ok(false);
+    }
+
+    match key {
+        KeyCode::Enter => {
+            let next = app.watchlist_input.trim().to_ascii_uppercase();
+            app.watchlist_editing = false;
+            app.watchlist_input.clear();
+            if app.add_watchlist_inst(next) {
+                let watchlist = app.watchlist_instruments();
+                if let Err(error) = OkxConfig::save_profile_watchlist(active_profile, &watchlist) {
+                    app.log(LogLevel::Error, format!("保存自选失败: {error}"));
+                }
+                watchlist_handle.abort();
+                *watchlist_handle = tasks::spawn_watchlist_ws(watchlist, tx.clone());
+            }
+        }
+        KeyCode::Esc => {
+            app.watchlist_editing = false;
+            app.watchlist_input.clear();
+        }
+        KeyCode::Backspace => {
+            app.watchlist_input.pop();
+        }
+        KeyCode::Char(c) if c.is_ascii_alphanumeric() || c == '-' => {
+            app.watchlist_input.push(c.to_ascii_uppercase());
         }
         _ => {}
     }
@@ -328,14 +443,19 @@ fn handle_trade_key(key: KeyCode, app: &mut App) {
     }
 }
 
-async fn refresh_now(app: &mut App, rest: &Arc<OkxClient>) {
+fn refresh_now(app: &mut App, rest: &Arc<OkxClient>, tx: &mpsc::Sender<app::AppMsg>) {
     app.set_status(
         StreamKind::Rest,
         StreamState::Connecting,
         "manual refresh".to_owned(),
     );
-    let snapshot = tasks::fetch_rest_snapshot(rest, &app.config.inst_id, &app.config.bar).await;
-    app.apply_rest_snapshot(snapshot);
+    tasks::spawn_rest_snapshot(
+        rest.clone(),
+        app.config.inst_id.clone(),
+        app.config.bar.clone(),
+        app.rest_generation,
+        tx.clone(),
+    );
     app.log(LogLevel::Info, "REST refreshed".to_owned());
 }
 
@@ -343,16 +463,20 @@ async fn change_instrument(
     app: &mut App,
     rest: &Arc<OkxClient>,
     tx: &mpsc::Sender<app::AppMsg>,
-    creds: &Credentials,
     handles: &mut TaskHandles,
     inst_id: String,
 ) -> Result<()> {
     app.log(LogLevel::Info, format!("switch instrument -> {inst_id}"));
-    let snapshot = tasks::fetch_rest_snapshot(rest, &inst_id, &app.config.bar).await;
-    app.set_market(inst_id, snapshot.candles.clone());
-    app.apply_rest_snapshot(snapshot);
-    handles.abort();
-    *handles = TaskHandles::spawn(rest.clone(), creds.clone(), app, tx.clone());
+    let generation = app.begin_rest_generation(format!("switching {inst_id}"));
+    app.set_market(inst_id, Vec::new());
+    handles.restart_instrument(rest.clone(), app, tx.clone());
+    tasks::spawn_rest_snapshot(
+        rest.clone(),
+        app.config.inst_id.clone(),
+        app.config.bar.clone(),
+        generation,
+        tx.clone(),
+    );
     Ok(())
 }
 
@@ -360,20 +484,24 @@ async fn change_bar(
     app: &mut App,
     rest: &Arc<OkxClient>,
     tx: &mpsc::Sender<app::AppMsg>,
-    creds: &Credentials,
     handles: &mut TaskHandles,
     bar: String,
 ) -> Result<()> {
-    let snapshot = tasks::fetch_rest_snapshot(rest, &app.config.inst_id, &bar).await;
-    app.set_bar(bar.clone(), snapshot.candles.clone());
-    app.apply_rest_snapshot(snapshot);
     app.log(LogLevel::Info, format!("switch bar -> {bar}"));
-    handles.abort();
-    *handles = TaskHandles::spawn(rest.clone(), creds.clone(), app, tx.clone());
+    let generation = app.begin_rest_generation(format!("switching bar {bar}"));
+    app.set_bar(bar, Vec::new());
+    handles.restart_bar(rest.clone(), app, tx.clone());
+    tasks::spawn_rest_snapshot(
+        rest.clone(),
+        app.config.inst_id.clone(),
+        app.config.bar.clone(),
+        generation,
+        tx.clone(),
+    );
     Ok(())
 }
 
-async fn submit_order(app: &mut App, rest: &Arc<OkxClient>) {
+async fn submit_order(app: &mut App, rest: &Arc<OkxClient>, tx: &mpsc::Sender<app::AppMsg>) {
     let mut request = PlaceOrderRequest::new(
         app.config.inst_id.clone(),
         app.trade.trade_mode.as_trade_mode(),
@@ -393,7 +521,7 @@ async fn submit_order(app: &mut App, rest: &Arc<OkxClient>) {
                 .unwrap_or_else(|| "empty place-order response".to_owned());
             app.trade.message = result.clone();
             app.log(LogLevel::Info, format!("place order: {result}"));
-            refresh_now(app, rest).await;
+            refresh_now(app, rest, tx);
         }
         Err(error) => {
             app.trade.message = error.to_string();
@@ -402,7 +530,12 @@ async fn submit_order(app: &mut App, rest: &Arc<OkxClient>) {
     }
 }
 
-async fn cancel_order(app: &mut App, rest: &Arc<OkxClient>, ord_id: String) {
+async fn cancel_order(
+    app: &mut App,
+    rest: &Arc<OkxClient>,
+    tx: &mpsc::Sender<app::AppMsg>,
+    ord_id: String,
+) {
     match rest
         .trade()
         .cancel_order(&CancelOrderRequest::by_order_id(
@@ -418,7 +551,7 @@ async fn cancel_order(app: &mut App, rest: &Arc<OkxClient>, ord_id: String) {
                 .unwrap_or_else(|| "empty cancel-order response".to_owned());
             app.trade.message = result.clone();
             app.log(LogLevel::Info, format!("cancel order {ord_id}: {result}"));
-            refresh_now(app, rest).await;
+            refresh_now(app, rest, tx);
         }
         Err(error) => {
             app.trade.message = error.to_string();

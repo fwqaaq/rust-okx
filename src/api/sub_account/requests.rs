@@ -11,7 +11,7 @@ pub enum SubAccountType {
     Trading,
 }
 
-/// Query parameters for [`SubAccount::get_subaccount_list`].
+/// Query parameters for [`SubAccount::get_subaccount_list`](crate::api::sub_account::SubAccount::get_subaccount_list).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubAccountListRequest {
@@ -64,7 +64,7 @@ impl SubAccountListRequest {
     }
 }
 
-/// Query parameters for [`SubAccount::get_subaccount_apikeys`].
+/// Query parameters for [`SubAccount::get_subaccount_apikeys`](crate::api::sub_account::SubAccount::get_subaccount_apikeys).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubAccountApiKeysRequest {
@@ -89,7 +89,7 @@ impl SubAccountApiKeysRequest {
     }
 }
 
-/// Query parameters for [`SubAccount::get_subaccount_trading_balances`].
+/// Query parameters for [`SubAccount::get_subaccount_trading_balances`](crate::api::sub_account::SubAccount::get_subaccount_trading_balances).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubAccountTradingBalancesRequest {
@@ -105,7 +105,7 @@ impl SubAccountTradingBalancesRequest {
     }
 }
 
-/// Query parameters for [`SubAccount::get_subaccount_funding_balances`].
+/// Query parameters for [`SubAccount::get_subaccount_funding_balances`](crate::api::sub_account::SubAccount::get_subaccount_funding_balances).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubAccountFundingBalancesRequest {
@@ -130,7 +130,7 @@ impl SubAccountFundingBalancesRequest {
     }
 }
 
-/// Query parameters for [`SubAccount::get_subaccount_max_withdrawal`].
+/// Query parameters for [`SubAccount::get_subaccount_max_withdrawal`](crate::api::sub_account::SubAccount::get_subaccount_max_withdrawal).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubAccountMaxWithdrawalRequest {
@@ -155,7 +155,7 @@ impl SubAccountMaxWithdrawalRequest {
     }
 }
 
-/// Request body for [`SubAccount::create_subaccount`].
+/// Request body for [`SubAccount::create_subaccount`](crate::api::sub_account::SubAccount::create_subaccount).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSubAccountRequest {
@@ -198,7 +198,7 @@ impl CreateSubAccountRequest {
     }
 }
 
-/// Request body for [`SubAccount::create_subaccount_apikey`].
+/// Request body for [`SubAccount::create_subaccount_apikey`](crate::api::sub_account::SubAccount::create_subaccount_apikey).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSubAccountApiKeyRequest {
@@ -240,7 +240,7 @@ impl CreateSubAccountApiKeyRequest {
     }
 }
 
-/// Request body for [`SubAccount::modify_subaccount_apikey`].
+/// Request body for [`SubAccount::modify_subaccount_apikey`](crate::api::sub_account::SubAccount::modify_subaccount_apikey).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ModifySubAccountApiKeyRequest {
@@ -285,7 +285,7 @@ impl ModifySubAccountApiKeyRequest {
     }
 }
 
-/// Request body for [`SubAccount::delete_subaccount_apikey`].
+/// Request body for [`SubAccount::delete_subaccount_apikey`](crate::api::sub_account::SubAccount::delete_subaccount_apikey).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteSubAccountApiKeyRequest {
@@ -303,7 +303,7 @@ impl DeleteSubAccountApiKeyRequest {
     }
 }
 
-/// Request body for [`SubAccount::transfer_between_subaccounts`].
+/// Request body for [`SubAccount::transfer_between_subaccounts`](crate::api::sub_account::SubAccount::transfer_between_subaccounts).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubAccountTransferRequest {
@@ -357,7 +357,7 @@ impl SubAccountTransferRequest {
     }
 }
 
-/// Request body for [`SubAccount::set_subaccount_transfer_out`].
+/// Request body for [`SubAccount::set_subaccount_transfer_out`](crate::api::sub_account::SubAccount::set_subaccount_transfer_out).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetTransferOutRequest {
@@ -382,7 +382,7 @@ impl SetTransferOutRequest {
     }
 }
 
-/// Query parameters for [`SubAccount::get_subaccount_bills`].
+/// Query parameters for [`SubAccount::get_subaccount_bills`](crate::api::sub_account::SubAccount::get_subaccount_bills).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubAccountBillsRequest {
@@ -443,7 +443,7 @@ impl SubAccountBillsRequest {
     }
 }
 
-/// Query parameters for [`SubAccount::get_subaccount_managed_bills`].
+/// Query parameters for [`SubAccount::get_subaccount_managed_bills`](crate::api::sub_account::SubAccount::get_subaccount_managed_bills).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ManagedSubAccountBillsRequest {
@@ -512,7 +512,7 @@ impl ManagedSubAccountBillsRequest {
     }
 }
 
-/// Query parameters for [`SubAccount::get_entrust_subaccount_list`].
+/// Query parameters for [`SubAccount::get_entrust_subaccount_list`](crate::api::sub_account::SubAccount::get_entrust_subaccount_list).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EntrustSubAccountListRequest {

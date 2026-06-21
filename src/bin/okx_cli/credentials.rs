@@ -8,7 +8,7 @@ use rust_okx::Credentials;
 
 use crate::okx_config::{OkxConfig, OkxProfile};
 
-const DEFAULT_PROFILE: &str = "live";
+pub const DEFAULT_PROFILE: &str = "live";
 
 /// Load credentials from `~/.okx/config.toml`.
 /// 默认使用 `[profiles.live]`，可通过 `--profile NAME` 指定其他 profile。
@@ -53,6 +53,7 @@ pub fn load_or_prompt(profile_name: Option<&str>) -> Result<(Credentials, bool, 
         passphrase: passphrase.clone(),
         demo,
         base_url: Some(base_url.clone()),
+        watchlist: Vec::new(),
     };
 
     let mut config = existing.unwrap_or_else(|| OkxConfig {

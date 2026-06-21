@@ -11,7 +11,7 @@ use crate::model::EmptyRequest;
 ///
 /// Obtain one via [`OkxClient::account`](crate::OkxClient::account). All methods
 /// require credentials; calling them without credentials returns
-/// [`Error::Configuration`].
+/// [`RestError::Configuration`](crate::RestError::Configuration).
 pub struct Account<'a, T> {
     client: &'a OkxClient<T>,
 }
@@ -27,8 +27,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_balance(
         &self,
         request: BalanceRequest<'_>,
@@ -42,8 +42,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_positions(
         &self,
         request: &PositionsRequest<'_>,
@@ -57,8 +57,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_position_risk(
         &self,
         request: &PositionRiskRequest<'_>,
@@ -72,8 +72,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_config(&self) -> Result<Vec<AccountConfig>, Error> {
         self.client
             .get(ACCOUNT_CONFIG, &EmptyRequest {}, true)
@@ -86,9 +86,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_bills(
         &self,
         request: &BillsRequest,
@@ -102,9 +101,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_bills_archive(
         &self,
         request: &BillsArchiveRequest,
@@ -118,8 +116,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_position_mode(
         &self,
         request: &SetPositionModeRequest<'_>,
@@ -133,9 +131,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_leverage(
         &self,
         request: &SetLeverageRequest,
@@ -149,9 +146,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_leverage(
         &self,
         request: &LeverageRequest,
@@ -165,9 +161,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_order_size(
         &self,
         request: &MaxOrderSizeRequest,
@@ -181,9 +176,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_avail_size(
         &self,
         request: &MaxAvailableSizeRequest,
@@ -197,9 +191,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn adjust_margin(
         &self,
         request: &AdjustMarginRequest,
@@ -213,9 +206,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_fee_rates(&self, request: &FeeRatesRequest) -> Result<Vec<FeeRate>, Error> {
         self.client.get(FEE_RATES, request, true).await
     }
@@ -226,9 +218,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_instruments(
         &self,
         request: &AccountInstrumentsRequest,
@@ -242,9 +233,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_loan(&self, request: &MaxLoanRequest) -> Result<Vec<MaxLoan>, Error> {
         self.client.get(MAX_LOAN, request, true).await
     }
@@ -255,9 +245,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_interest_accrued(
         &self,
         request: &InterestAccruedRequest,
@@ -271,8 +260,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_interest_rate(
         &self,
         request: BalanceRequest<'_>,
@@ -286,8 +275,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_greeks(
         &self,
         request: &SetGreeksRequest<'_>,
@@ -301,8 +290,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_isolated_mode(
         &self,
         request: &SetIsolatedModeRequest<'_>,
@@ -316,8 +305,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_withdrawal(
         &self,
         request: BalanceRequest<'_>,
@@ -331,9 +320,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_interest_limits(
         &self,
         request: &InterestLimitsRequest,
@@ -347,9 +335,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_simulated_margin(
         &self,
         request: &SimulatedMarginRequest,
@@ -363,8 +350,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_greeks(&self, request: BalanceRequest<'_>) -> Result<Vec<Greek>, Error> {
         self.client.get(GREEKS, &request, true).await
     }
@@ -375,9 +362,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_positions_history(
         &self,
         request: &PositionsHistoryRequest,
@@ -391,9 +377,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_position_tiers(
         &self,
         request: &AccountPositionTiersRequest,
@@ -407,8 +392,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_risk_state(&self) -> Result<Vec<RiskState>, Error> {
         self.client.get(RISK_STATE, &EmptyRequest {}, true).await
     }
@@ -419,8 +404,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_auto_loan(
         &self,
         request: &SetAutoLoanRequest,
@@ -434,8 +419,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_account_level(
         &self,
         request: &SetAccountLevelRequest<'_>,
@@ -449,8 +434,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn activate_option(&self) -> Result<Vec<ActivateOptionResult>, Error> {
         self.client
             .post(ACTIVATE_OPTION, &EmptyRequest {}, true)
@@ -463,9 +448,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn position_builder(
         &self,
         request: &PositionBuilderRequest,
@@ -479,9 +463,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn spot_manual_borrow_repay(
         &self,
         request: &SpotManualBorrowRepayRequest,
@@ -497,9 +480,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_auto_repay(
         &self,
         request: &SetAutoRepayRequest,
@@ -513,9 +495,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_spot_borrow_repay_history(
         &self,
         request: &SpotBorrowRepayHistoryRequest,
@@ -531,9 +512,8 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] on validation failure,
-    /// [`Error::Configuration`] if no credentials are set,
-    /// [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_auto_earn(
         &self,
         request: &SetAutoEarnRequest,

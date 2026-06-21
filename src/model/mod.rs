@@ -42,9 +42,7 @@ where
 
 /// The OKX response envelope: `{ "code": "...", "msg": "...", "data": [...] }`.
 ///
-/// Internal — the client unwraps it and returns `data` (or an [`Error::Api`]).
-///
-/// [`Error::Api`]: crate::Error::Api
+/// Internal — the client unwraps it and returns `data` (or a [`RestError::Okx`](crate::RestError::Okx)(crate::RestError::Okx)).
 #[derive(Debug, Clone, Deserialize)]
 pub(crate) struct OkxResponse<D> {
     pub code: String,

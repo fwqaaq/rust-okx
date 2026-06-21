@@ -66,7 +66,7 @@ impl<T: Transport> Savings<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero
     /// OKX code, or transport/decode errors.
     pub async fn get_saving_balance(
         &self,
@@ -81,7 +81,7 @@ impl<T: Transport> Savings<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero
     /// OKX code, or transport/decode errors.
     pub async fn purchase_redemption(
         &self,
@@ -98,7 +98,7 @@ impl<T: Transport> Savings<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero
     /// OKX code, or transport/decode errors.
     pub async fn set_lending_rate(
         &self,
@@ -115,7 +115,7 @@ impl<T: Transport> Savings<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero
     /// OKX code, or transport/decode errors.
     pub async fn get_lending_history(
         &self,
@@ -132,7 +132,7 @@ impl<T: Transport> Savings<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_public_borrow_history(
         &self,
         request: &FinanceHistoryRequest,
@@ -148,7 +148,7 @@ impl<T: Transport> Savings<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_public_borrow_info(
         &self,
         request: &CurrencyRequest<'_>,
@@ -171,7 +171,7 @@ impl<T: Transport> StakingDefi<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_offers(
         &self,
         request: &StakingDefiOffersRequest,
@@ -185,7 +185,7 @@ impl<T: Transport> StakingDefi<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase(
         &self,
         request: &StakingDefiPurchaseRequest,
@@ -199,7 +199,7 @@ impl<T: Transport> StakingDefi<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn redeem(
         &self,
         request: &StakingDefiRedeemRequest,
@@ -213,7 +213,7 @@ impl<T: Transport> StakingDefi<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn cancel(
         &self,
         request: &StakingDefiCancelRequest,
@@ -227,7 +227,7 @@ impl<T: Transport> StakingDefi<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_active_orders(
         &self,
         request: &StakingDefiActiveOrdersRequest,
@@ -243,7 +243,7 @@ impl<T: Transport> StakingDefi<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_orders_history(
         &self,
         request: &StakingDefiOrderHistoryRequest,
@@ -266,7 +266,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn product_info(&self) -> Result<Vec<StakingProductInfo>, Error> {
         self.client
             .get(ETH_PRODUCT_INFO, &EmptyRequest {}, true)
@@ -279,7 +279,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase(&self, request: &AmountRequest<'_>) -> Result<Vec<StakingOrder>, Error> {
         self.client.post(ETH_PURCHASE, request, true).await
     }
@@ -290,7 +290,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn redeem(&self, request: &AmountRequest<'_>) -> Result<Vec<StakingOrder>, Error> {
         self.client.post(ETH_REDEEM, request, true).await
     }
@@ -301,7 +301,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn cancel_redeem(
         &self,
         request: &CancelRedeemRequest<'_>,
@@ -315,7 +315,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn balance(&self) -> Result<Vec<StakingBalance>, Error> {
         self.client.get(ETH_BALANCE, &EmptyRequest {}, true).await
     }
@@ -326,7 +326,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase_redeem_history(
         &self,
         request: &FinanceHistoryRequest,
@@ -340,7 +340,7 @@ impl<T: Transport> EthStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn apy_history(
         &self,
         request: &ApyHistoryRequest<'_>,
@@ -361,7 +361,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn product_info(&self) -> Result<StakingProductInfo, Error> {
         self.client
             .get(SOL_PRODUCT_INFO, &EmptyRequest {}, true)
@@ -374,7 +374,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase(&self, request: &AmountRequest<'_>) -> Result<Vec<StakingOrder>, Error> {
         self.client.post(SOL_PURCHASE, request, true).await
     }
@@ -385,7 +385,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn redeem(&self, request: &AmountRequest<'_>) -> Result<Vec<StakingOrder>, Error> {
         self.client.post(SOL_REDEEM, request, true).await
     }
@@ -396,7 +396,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn balance(&self) -> Result<Vec<StakingBalance>, Error> {
         self.client.get(SOL_BALANCE, &EmptyRequest {}, true).await
     }
@@ -407,7 +407,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn purchase_redeem_history(
         &self,
         request: &FinanceHistoryRequest,
@@ -421,7 +421,7 @@ impl<T: Transport> SolStaking<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn apy_history(
         &self,
         request: &ApyHistoryRequest<'_>,
@@ -442,7 +442,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn borrow_currencies(&self) -> Result<Vec<FlexibleLoanCurrency>, Error> {
         self.client
             .get(FLEX_BORROW_CURRENCIES, &EmptyRequest {}, true)
@@ -455,7 +455,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn collateral_assets(
         &self,
         request: &FlexibleLoanCollateralAssetsRequest,
@@ -471,7 +471,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn max_loan(
         &self,
         request: &FlexibleLoanMaxLoanRequest,
@@ -485,7 +485,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn max_collateral_redeem_amount(
         &self,
         request: &FlexibleLoanMaxRedeemRequest,
@@ -499,7 +499,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn adjust_collateral(
         &self,
         request: &FlexibleLoanAdjustCollateralRequest,
@@ -515,7 +515,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn loan_info(
         &self,
         request: &FlexibleLoanInfoRequest,
@@ -529,7 +529,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn loan_history(
         &self,
         request: &FlexibleLoanHistoryRequest,
@@ -543,7 +543,7 @@ impl<T: Transport> FlexibleLoan<'_, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a non-zero OKX code, or transport/decode errors.
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn interest_accrued(
         &self,
         request: &FlexibleLoanInterestAccruedRequest,

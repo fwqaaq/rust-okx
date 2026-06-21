@@ -29,7 +29,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a
     /// non-zero top-level OKX code, or transport/decode errors.
     pub async fn place_order(
         &self,

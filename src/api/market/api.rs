@@ -26,8 +26,8 @@ impl<'a, T: Transport> Market<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Api`] on a non-zero OKX code, or
-    /// [`Error::Transport`]/[`Error::Decode`] on transport/parsing failure.
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or
+    /// [`RestError::Transport`](crate::RestError::Transport)/[`RestError::Decode`](crate::RestError::Decode) on transport/parsing failure.
     pub async fn get_ticker(&self, request: &InstIdRequest<'_>) -> Result<Vec<Ticker>, Error> {
         self.client.get(TICKER, request, false).await
     }

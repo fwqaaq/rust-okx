@@ -35,7 +35,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Configuration`] without credentials, [`Error::Api`] on a
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) without credentials, [`RestError::Okx`](crate::RestError::Okx) on a
     /// non-zero OKX code, or transport/decode errors.
     pub async fn get_currencies(&self) -> Result<Vec<ConvertCurrency>, Error> {
         let request = ConvertCurrenciesRequest::new();
@@ -49,7 +49,6 @@ impl<'a, T: Transport> Convert<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] when a required request field is empty.
     /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn get_currency_pair(
         &self,
@@ -64,9 +63,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] when required fields are empty or a
-    /// client request ID is invalid. See [`get_currencies`](Self::get_currencies)
-    /// for transport and API errors.
+    /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn estimate_quote(
         &self,
         request: &ConvertQuoteRequest,
@@ -80,9 +77,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] when required fields are empty or a
-    /// client request ID is invalid. See [`get_currencies`](Self::get_currencies)
-    /// for transport and API errors.
+    /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn convert_trade(
         &self,
         request: &ConvertTradeRequest,
@@ -96,9 +91,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::InvalidRequest`] when the limit or client request ID is
-    /// invalid. See [`get_currencies`](Self::get_currencies) for transport and
-    /// API errors.
+    /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn get_convert_history(
         &self,
         request: &ConvertHistoryRequest,

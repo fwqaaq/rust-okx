@@ -1,4 +1,4 @@
-//! Authenticated trading-account endpoints (`/api/v5/finance/*`).
+//! Authenticated finance endpoints (`/api/v5/finance/*`).
 
 mod api;
 mod endpoints;
