@@ -15,6 +15,7 @@ use crate::api::market::Market;
 use crate::api::public_data::PublicData;
 use crate::api::status::Status;
 use crate::api::sub_account::SubAccount;
+use crate::api::support::Support;
 use crate::api::trade::Trade;
 use crate::credentials::Credentials;
 use crate::error::{Error, RestError};
@@ -31,8 +32,9 @@ use crate::transport::{DefaultTransport, Transport};
 ///
 /// API groups are reached through accessor methods: [`market`](Self::market),
 /// [`public_data`](Self::public_data), [`status`](Self::status),
-/// [`account`](Self::account), [`funding`](Self::funding),
-/// [`convert`](Self::convert), [`finance`](Self::finance), and [`trade`](Self::trade).
+/// [`support`](Self::support), [`account`](Self::account),
+/// [`funding`](Self::funding), [`convert`](Self::convert),
+/// [`finance`](Self::finance), and [`trade`](Self::trade).
 pub struct OkxClient<T = DefaultTransport> {
     transport: T,
     credentials: Option<Credentials>,
@@ -70,6 +72,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access the public system-status endpoints.
     pub fn status(&self) -> Status<'_, T> {
         Status::new(self)
+    }
+
+    /// Access the public support and announcement endpoints.
+    pub fn support(&self) -> Support<'_, T> {
+        Support::new(self)
     }
 
     /// Access the (authenticated) account endpoints.
