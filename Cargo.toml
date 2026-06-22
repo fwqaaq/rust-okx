@@ -82,6 +82,10 @@ bytes = "1"
 dotenvy = "0.15"
 
 [[example]]
+name = "dca_bot"
+required-features = ["websocket"]
+
+[[example]]
 name = "ws_public"
 required-features = ["websocket"]
 
