@@ -8,35 +8,75 @@ use serde::Serialize;
 /// [`get_asset_valuation`](crate::api::funding::Funding::get_asset_valuation).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct CurrencyRequest<'a> {
-    /// Currency filter, e.g. `Some("BTC")`. `None` returns all currencies.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub ccy: Option<&'a str>,
+    ccy: Option<Cow<'a, str>>,
+}
+
+impl<'a> CurrencyRequest<'a> {
+    /// Create an unfiltered currency query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Set the currency filter.
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
+        self.ccy = Some(ccy.into());
+        self
+    }
 }
 
 /// Request for [`get_deposit_address`](crate::api::funding::Funding::get_deposit_address).
 #[derive(Debug, Clone, Serialize)]
 pub struct DepositAddressRequest<'a> {
-    /// Currency, e.g. `"USDT"`.
-    pub ccy: &'a str,
+    ccy: Cow<'a, str>,
+}
+
+impl<'a> DepositAddressRequest<'a> {
+    /// Create a deposit-address query for a currency.
+    pub fn new(ccy: impl Into<Cow<'a, str>>) -> Self {
+        Self { ccy: ccy.into() }
+    }
 }
 
 /// Request for [`transfer_state`](crate::api::funding::Funding::transfer_state).
 #[derive(Debug, Clone, Serialize)]
 pub struct TransferStateRequest<'a> {
-    /// Transfer ID.
     #[serde(rename = "transId")]
-    pub trans_id: &'a str,
-    /// Transfer type (optional).
+    trans_id: Cow<'a, str>,
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    pub transfer_type: Option<&'a str>,
+    transfer_type: Option<Cow<'a, str>>,
+}
+
+impl<'a> TransferStateRequest<'a> {
+    /// Create a transfer-state query for a transfer ID.
+    pub fn new(trans_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            trans_id: trans_id.into(),
+            transfer_type: None,
+        }
+    }
+
+    /// Set the transfer type filter.
+    pub fn transfer_type(mut self, transfer_type: impl Into<Cow<'a, str>>) -> Self {
+        self.transfer_type = Some(transfer_type.into());
+        self
+    }
 }
 
 /// Request for [`cancel_withdrawal`](crate::api::funding::Funding::cancel_withdrawal).
 #[derive(Debug, Clone, Serialize)]
 pub struct CancelWithdrawalRequest<'a> {
-    /// Withdrawal ID.
     #[serde(rename = "wdId")]
-    pub wd_id: &'a str,
+    wd_id: Cow<'a, str>,
+}
+
+impl<'a> CancelWithdrawalRequest<'a> {
+    /// Create a cancel-withdrawal request for a withdrawal ID.
+    pub fn new(wd_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            wd_id: wd_id.into(),
+        }
+    }
 }
 
 /// Request body for [`Funding::funds_transfer`](crate::api::funding::Funding::funds_transfer).

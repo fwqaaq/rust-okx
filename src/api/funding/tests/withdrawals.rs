@@ -67,7 +67,7 @@ async fn cancel_withdrawal_posts_wd_id() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = CancelWithdrawalRequest { wd_id: "58700" };
+    let request = CancelWithdrawalRequest::new("58700");
     let rows = client.funding().cancel_withdrawal(&request).await.unwrap();
     assert_eq!(rows[0].wd_id, "58700");
 

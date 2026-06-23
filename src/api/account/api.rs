@@ -61,7 +61,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_position_risk(
         &self,
-        request: &PositionRiskRequest<'_>,
+        request: &PositionRiskRequest,
     ) -> Result<Vec<PositionRisk>, Error> {
         self.client.get(POSITION_RISK, request, true).await
     }
@@ -90,7 +90,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_bills(
         &self,
-        request: &BillsRequest,
+        request: &BillsRequest<'_>,
     ) -> Result<Vec<AccountBill>, Error> {
         self.client.get(BILLS, request, true).await
     }
@@ -105,7 +105,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_bills_archive(
         &self,
-        request: &BillsArchiveRequest,
+        request: &BillsArchiveRequest<'_>,
     ) -> Result<Vec<AccountBill>, Error> {
         self.client.get(BILLS_ARCHIVE, request, true).await
     }
@@ -135,7 +135,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_leverage(
         &self,
-        request: &SetLeverageRequest,
+        request: &SetLeverageRequest<'_>,
     ) -> Result<Vec<LeverageInfo>, Error> {
         self.client.post(SET_LEVERAGE, request, true).await
     }
@@ -150,7 +150,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_leverage(
         &self,
-        request: &LeverageRequest,
+        request: &LeverageRequest<'_>,
     ) -> Result<Vec<LeverageInfo>, Error> {
         self.client.get(GET_LEVERAGE, request, true).await
     }
@@ -165,7 +165,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_order_size(
         &self,
-        request: &MaxOrderSizeRequest,
+        request: &MaxOrderSizeRequest<'_>,
     ) -> Result<Vec<MaxOrderSize>, Error> {
         self.client.get(MAX_ORDER_SIZE, request, true).await
     }
@@ -180,7 +180,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_max_avail_size(
         &self,
-        request: &MaxAvailableSizeRequest,
+        request: &MaxAvailableSizeRequest<'_>,
     ) -> Result<Vec<MaxAvailableSize>, Error> {
         self.client.get(MAX_AVAILABLE_SIZE, request, true).await
     }
@@ -195,7 +195,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn adjust_margin(
         &self,
-        request: &AdjustMarginRequest,
+        request: &AdjustMarginRequest<'_>,
     ) -> Result<Vec<AdjustMarginResult>, Error> {
         self.client.post(ADJUST_MARGIN, request, true).await
     }
@@ -208,7 +208,10 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
-    pub async fn get_fee_rates(&self, request: &FeeRatesRequest) -> Result<Vec<FeeRate>, Error> {
+    pub async fn get_fee_rates(
+        &self,
+        request: &FeeRatesRequest<'_>,
+    ) -> Result<Vec<FeeRate>, Error> {
         self.client.get(FEE_RATES, request, true).await
     }
 
@@ -222,7 +225,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_instruments(
         &self,
-        request: &AccountInstrumentsRequest,
+        request: &AccountInstrumentsRequest<'_>,
     ) -> Result<Vec<AccountInstrument>, Error> {
         self.client.get(ACCOUNT_INSTRUMENTS, request, true).await
     }
@@ -235,7 +238,7 @@ impl<'a, T: Transport> Account<'a, T> {
     ///
     /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
-    pub async fn get_max_loan(&self, request: &MaxLoanRequest) -> Result<Vec<MaxLoan>, Error> {
+    pub async fn get_max_loan(&self, request: &MaxLoanRequest<'_>) -> Result<Vec<MaxLoan>, Error> {
         self.client.get(MAX_LOAN, request, true).await
     }
 
@@ -249,7 +252,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_interest_accrued(
         &self,
-        request: &InterestAccruedRequest,
+        request: &InterestAccruedRequest<'_>,
     ) -> Result<Vec<InterestAccrued>, Error> {
         self.client.get(INTEREST_ACCRUED, request, true).await
     }
@@ -324,7 +327,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_interest_limits(
         &self,
-        request: &InterestLimitsRequest,
+        request: &InterestLimitsRequest<'_>,
     ) -> Result<Vec<InterestLimit>, Error> {
         self.client.get(INTEREST_LIMITS, request, true).await
     }
@@ -339,7 +342,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_simulated_margin(
         &self,
-        request: &SimulatedMarginRequest,
+        request: &SimulatedMarginRequest<'_>,
     ) -> Result<Vec<SimulatedMargin>, Error> {
         self.client.post(SIMULATED_MARGIN, request, true).await
     }
@@ -366,7 +369,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_positions_history(
         &self,
-        request: &PositionsHistoryRequest,
+        request: &PositionsHistoryRequest<'_>,
     ) -> Result<Vec<PositionHistory>, Error> {
         self.client.get(POSITIONS_HISTORY, request, true).await
     }
@@ -381,7 +384,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_account_position_tiers(
         &self,
-        request: &AccountPositionTiersRequest,
+        request: &AccountPositionTiersRequest<'_>,
     ) -> Result<Vec<AccountPositionTier>, Error> {
         self.client.get(ACCOUNT_POSITION_TIERS, request, true).await
     }
@@ -452,7 +455,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn position_builder(
         &self,
-        request: &PositionBuilderRequest,
+        request: &PositionBuilderRequest<'_>,
     ) -> Result<Vec<PositionBuilderResult>, Error> {
         self.client.post(POSITION_BUILDER, request, true).await
     }
@@ -467,7 +470,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn spot_manual_borrow_repay(
         &self,
-        request: &SpotManualBorrowRepayRequest,
+        request: &SpotManualBorrowRepayRequest<'_>,
     ) -> Result<Vec<SpotBorrowRepayResult>, Error> {
         self.client
             .post(SPOT_MANUAL_BORROW_REPAY, request, true)
@@ -499,7 +502,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_spot_borrow_repay_history(
         &self,
-        request: &SpotBorrowRepayHistoryRequest,
+        request: &SpotBorrowRepayHistoryRequest<'_>,
     ) -> Result<Vec<SpotBorrowRepayHistory>, Error> {
         self.client
             .get(SPOT_BORROW_REPAY_HISTORY, request, true)
@@ -516,7 +519,7 @@ impl<'a, T: Transport> Account<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_auto_earn(
         &self,
-        request: &SetAutoEarnRequest,
+        request: &SetAutoEarnRequest<'_>,
     ) -> Result<Vec<SetAutoEarnResult>, Error> {
         self.client.post(SET_AUTO_EARN, request, true).await
     }

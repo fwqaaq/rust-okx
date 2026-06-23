@@ -14,7 +14,7 @@ async fn funding_currency_and_balance_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     let currencies = client
         .funding()
-        .get_currencies(&CurrencyRequest { ccy: Some("USDT") })
+        .get_currencies(&CurrencyRequest::new().currency("USDT"))
         .await
         .expect("asset/currencies");
     assert!(currencies.iter().any(|row| row.ccy == "USDT"));
@@ -41,7 +41,7 @@ async fn funding_currency_and_balance_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     let valuation = client
         .funding()
-        .get_asset_valuation(&CurrencyRequest { ccy: Some("USD") })
+        .get_asset_valuation(&CurrencyRequest::new().currency("USD"))
         .await
         .expect("asset/asset-valuation");
     assert!(valuation.len() <= 1);
@@ -58,7 +58,7 @@ async fn funding_address_and_history_endpoints_parse() {
     // STATUS: LIVE — authenticated, read-only.
     let addresses = client
         .funding()
-        .get_deposit_address(&DepositAddressRequest { ccy: &ccy })
+        .get_deposit_address(&DepositAddressRequest::new(&ccy))
         .await
         .expect("asset/deposit-address");
     assert!(addresses.iter().all(|row| row.ccy == ccy));
@@ -105,9 +105,9 @@ async fn funding_transfer_state_parses_when_id_is_configured() {
 
     // API: GET /api/v5/asset/transfer-state
     // STATUS: LIVE/ENV — read-only but requires a real transfer ID.
-    let request = TransferStateRequest {
-        trans_id: &trans_id,
-        transfer_type: transfer_type.as_deref(),
+    let request = match transfer_type.as_deref() {
+        Some(transfer_type) => TransferStateRequest::new(&trans_id).transfer_type(transfer_type),
+        None => TransferStateRequest::new(&trans_id),
     };
     let rows = client
         .funding()

@@ -59,9 +59,7 @@ async fn get_status_state_filter_builds_query() {
 
     client
         .status()
-        .get_status(&StatusRequest {
-            state: Some("canceled"),
-        })
+        .get_status(&StatusRequest::new().state("canceled"))
         .await
         .unwrap();
 

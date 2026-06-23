@@ -327,7 +327,7 @@ mod tests {
     async fn non_zero_code_is_api_error() {
         let mock = MockTransport::new(r#"{"code":"51000","msg":"Parameter error","data":[]}"#);
         let client = OkxClient::with_transport(mock).build();
-        let request = InstIdRequest { inst_id: "BAD" };
+        let request = InstIdRequest::new("BAD");
         let err = client.market().get_ticker(&request).await.unwrap_err();
         match err {
             Error::Rest(RestError::Okx { code, message, .. }) => {
@@ -352,9 +352,7 @@ mod tests {
             .region(OkxRegion::Us)
             .build();
 
-        let request = InstIdRequest {
-            inst_id: "BTC-USDT",
-        };
+        let request = InstIdRequest::new("BTC-USDT");
         client.market().get_ticker(&request).await.unwrap();
 
         let req = mock.captured();
@@ -374,9 +372,7 @@ mod tests {
             .base_url("https://example.test")
             .build();
 
-        let request = InstIdRequest {
-            inst_id: "BTC-USDT",
-        };
+        let request = InstIdRequest::new("BTC-USDT");
         client.market().get_ticker(&request).await.unwrap();
 
         let req = mock.captured();

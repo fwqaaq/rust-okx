@@ -1,24 +1,26 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::model::{InstType, PositionSide, TradeMode};
 
 /// Request body for setting leverage.
 #[derive(Debug, Clone, Serialize)]
-pub struct SetLeverageRequest {
-    lever: String,
+pub struct SetLeverageRequest<'a> {
+    lever: Cow<'a, str>,
     #[serde(rename = "mgnMode")]
     mgn_mode: TradeMode,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(rename = "posSide", skip_serializing_if = "Option::is_none")]
     pos_side: Option<PositionSide>,
 }
 
-impl SetLeverageRequest {
+impl<'a> SetLeverageRequest<'a> {
     /// Create a leverage-setting request.
-    pub fn new(lever: impl Into<String>, mgn_mode: TradeMode) -> Self {
+    pub fn new(lever: impl Into<Cow<'a, str>>, mgn_mode: TradeMode) -> Self {
         Self {
             lever: lever.into(),
             mgn_mode,
@@ -29,13 +31,13 @@ impl SetLeverageRequest {
     }
 
     /// Set the instrument ID.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
 
     /// Set the currency.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
@@ -49,16 +51,16 @@ impl SetLeverageRequest {
 
 /// Query parameters for retrieving leverage.
 #[derive(Debug, Clone, Serialize)]
-pub struct LeverageRequest {
+pub struct LeverageRequest<'a> {
     #[serde(rename = "mgnMode")]
     mgn_mode: TradeMode,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
 }
 
-impl LeverageRequest {
+impl<'a> LeverageRequest<'a> {
     /// Create a leverage-info query.
     pub fn new(mgn_mode: TradeMode) -> Self {
         Self {
@@ -69,13 +71,13 @@ impl LeverageRequest {
     }
 
     /// Set the instrument ID.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
 
     /// Set the currency.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
@@ -83,22 +85,22 @@ impl LeverageRequest {
 
 /// Query parameters for maximum order size.
 #[derive(Debug, Clone, Serialize)]
-pub struct MaxOrderSizeRequest {
+pub struct MaxOrderSizeRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "tdMode")]
     td_mode: TradeMode,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    px: Option<String>,
+    px: Option<Cow<'a, str>>,
     #[serde(rename = "tradeQuoteCcy", skip_serializing_if = "Option::is_none")]
-    trade_quote_ccy: Option<String>,
+    trade_quote_ccy: Option<Cow<'a, str>>,
 }
 
-impl MaxOrderSizeRequest {
+impl<'a> MaxOrderSizeRequest<'a> {
     /// Create a maximum-order-size query.
-    pub fn new(inst_id: impl Into<String>, td_mode: TradeMode) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>, td_mode: TradeMode) -> Self {
         Self {
             inst_id: inst_id.into(),
             td_mode,
@@ -109,19 +111,19 @@ impl MaxOrderSizeRequest {
     }
 
     /// Set the currency.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
 
     /// Set the price.
-    pub fn price(mut self, px: impl Into<String>) -> Self {
+    pub fn price(mut self, px: impl Into<Cow<'a, str>>) -> Self {
         self.px = Some(px.into());
         self
     }
 
     /// Set the trade quote currency.
-    pub fn trade_quote_currency(mut self, trade_quote_ccy: impl Into<String>) -> Self {
+    pub fn trade_quote_currency(mut self, trade_quote_ccy: impl Into<Cow<'a, str>>) -> Self {
         self.trade_quote_ccy = Some(trade_quote_ccy.into());
         self
     }
@@ -129,26 +131,26 @@ impl MaxOrderSizeRequest {
 
 /// Query parameters for maximum available size.
 #[derive(Debug, Clone, Serialize)]
-pub struct MaxAvailableSizeRequest {
+pub struct MaxAvailableSizeRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "tdMode")]
     td_mode: TradeMode,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(rename = "reduceOnly", skip_serializing_if = "Option::is_none")]
     reduce_only: Option<bool>,
     #[serde(rename = "unSpotOffset", skip_serializing_if = "Option::is_none")]
     un_spot_offset: Option<bool>,
     #[serde(rename = "quickMgnType", skip_serializing_if = "Option::is_none")]
-    quick_mgn_type: Option<String>,
+    quick_mgn_type: Option<Cow<'a, str>>,
     #[serde(rename = "tradeQuoteCcy", skip_serializing_if = "Option::is_none")]
-    trade_quote_ccy: Option<String>,
+    trade_quote_ccy: Option<Cow<'a, str>>,
 }
 
-impl MaxAvailableSizeRequest {
+impl<'a> MaxAvailableSizeRequest<'a> {
     /// Create a maximum-available-size query.
-    pub fn new(inst_id: impl Into<String>, td_mode: TradeMode) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>, td_mode: TradeMode) -> Self {
         Self {
             inst_id: inst_id.into(),
             td_mode,
@@ -161,7 +163,7 @@ impl MaxAvailableSizeRequest {
     }
 
     /// Set the currency.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
@@ -179,13 +181,13 @@ impl MaxAvailableSizeRequest {
     }
 
     /// Set the quick margin type.
-    pub fn quick_margin_type(mut self, quick_mgn_type: impl Into<String>) -> Self {
+    pub fn quick_margin_type(mut self, quick_mgn_type: impl Into<Cow<'a, str>>) -> Self {
         self.quick_mgn_type = Some(quick_mgn_type.into());
         self
     }
 
     /// Set the trade quote currency.
-    pub fn trade_quote_currency(mut self, trade_quote_ccy: impl Into<String>) -> Self {
+    pub fn trade_quote_currency(mut self, trade_quote_ccy: impl Into<Cow<'a, str>>) -> Self {
         self.trade_quote_ccy = Some(trade_quote_ccy.into());
         self
     }
@@ -193,25 +195,25 @@ impl MaxAvailableSizeRequest {
 
 /// Request body for adjusting position margin.
 #[derive(Debug, Clone, Serialize)]
-pub struct AdjustMarginRequest {
+pub struct AdjustMarginRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "posSide")]
     pos_side: PositionSide,
     #[serde(rename = "type")]
-    action: String,
-    amt: String,
+    action: Cow<'a, str>,
+    amt: Cow<'a, str>,
     #[serde(rename = "loanTrans", skip_serializing_if = "Option::is_none")]
     loan_trans: Option<bool>,
 }
 
-impl AdjustMarginRequest {
+impl<'a> AdjustMarginRequest<'a> {
     /// Create a margin-adjustment request.
     pub fn new(
-        inst_id: impl Into<String>,
+        inst_id: impl Into<Cow<'a, str>>,
         pos_side: PositionSide,
-        action: impl Into<String>,
-        amt: impl Into<String>,
+        action: impl Into<Cow<'a, str>>,
+        amt: impl Into<Cow<'a, str>>,
     ) -> Self {
         Self {
             inst_id: inst_id.into(),
@@ -231,20 +233,20 @@ impl AdjustMarginRequest {
 
 /// Query parameters for trade fee rates.
 #[derive(Debug, Clone, Serialize)]
-pub struct FeeRatesRequest {
+pub struct FeeRatesRequest<'a> {
     #[serde(rename = "instType")]
     inst_type: InstType,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<String>,
+    underlying: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    category: Option<String>,
+    category: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<String>,
+    inst_family: Option<Cow<'a, str>>,
 }
 
-impl FeeRatesRequest {
+impl<'a> FeeRatesRequest<'a> {
     /// Create a fee-rates query.
     pub fn new(inst_type: InstType) -> Self {
         Self {
@@ -257,25 +259,25 @@ impl FeeRatesRequest {
     }
 
     /// Set the instrument ID.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
 
     /// Set the underlying.
-    pub fn underlying(mut self, underlying: impl Into<String>) -> Self {
+    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
         self.underlying = Some(underlying.into());
         self
     }
 
     /// Set the fee category.
-    pub fn category(mut self, category: impl Into<String>) -> Self {
+    pub fn category(mut self, category: impl Into<Cow<'a, str>>) -> Self {
         self.category = Some(category.into());
         self
     }
 
     /// Set the instrument family.
-    pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
     }
@@ -283,18 +285,18 @@ impl FeeRatesRequest {
 
 /// Query parameters for account instruments.
 #[derive(Debug, Clone, Serialize)]
-pub struct AccountInstrumentsRequest {
+pub struct AccountInstrumentsRequest<'a> {
     #[serde(rename = "instType")]
     inst_type: InstType,
     #[serde(rename = "seriesId", skip_serializing_if = "Option::is_none")]
-    series_id: Option<String>,
+    series_id: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<String>,
+    inst_family: Option<Cow<'a, str>>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
 }
 
-impl AccountInstrumentsRequest {
+impl<'a> AccountInstrumentsRequest<'a> {
     /// Create an empty account-instruments query.
     pub fn new(inst_type: InstType) -> Self {
         Self {
@@ -306,19 +308,19 @@ impl AccountInstrumentsRequest {
     }
 
     /// Set the series_id filter.
-    pub fn series_id(mut self, series_id: impl Into<String>) -> Self {
+    pub fn series_id(mut self, series_id: impl Into<Cow<'a, str>>) -> Self {
         self.series_id = Some(series_id.into());
         self
     }
 
     /// Set the instrument family filter.
-    pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
     }
 
     /// Set the instrument ID filter.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }

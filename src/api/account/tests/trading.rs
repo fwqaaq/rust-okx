@@ -16,9 +16,7 @@ async fn set_position_mode_posts_body() {
 
     let result = client
         .account()
-        .set_position_mode(&SetPositionModeRequest {
-            pos_mode: "net_mode",
-        })
+        .set_position_mode(&SetPositionModeRequest::new("net_mode"))
         .await
         .unwrap();
     assert_eq!(result[0].pos_mode, "net_mode");
@@ -131,7 +129,7 @@ async fn get_max_withdrawal_queries_currency() {
 
     let result = client
         .account()
-        .get_max_withdrawal(BalanceRequest { ccy: Some("BTC") })
+        .get_max_withdrawal(BalanceRequest::new().currency("BTC"))
         .await
         .unwrap();
     assert_eq!(result[0].max_wd.as_str(), "124.82837647");
@@ -199,7 +197,7 @@ async fn set_greeks_posts_body() {
 
     let result = client
         .account()
-        .set_greeks(&SetGreeksRequest { greeks_type: "PA" })
+        .set_greeks(&SetGreeksRequest::new("PA"))
         .await
         .unwrap();
     assert_eq!(result[0].greeks_type, "PA");
@@ -220,10 +218,7 @@ async fn set_isolated_mode_posts_body() {
 
     let result = client
         .account()
-        .set_isolated_mode(&SetIsolatedModeRequest {
-            iso_mode: "automatic",
-            mode_type: "MARGIN",
-        })
+        .set_isolated_mode(&SetIsolatedModeRequest::new("automatic", "MARGIN"))
         .await
         .unwrap();
     assert_eq!(result[0].iso_mode, "automatic");
@@ -245,7 +240,7 @@ async fn set_account_level_posts_body() {
 
     let result = client
         .account()
-        .set_account_level(&SetAccountLevelRequest { acct_lv: "2" })
+        .set_account_level(&SetAccountLevelRequest::new("2"))
         .await
         .unwrap();
     assert_eq!(result[0].acct_lv, "2");

@@ -10,10 +10,7 @@ async fn public_instruments_and_time_parse() {
     // STATUS: LIVE — public, read-only.
     let instruments = client
         .public_data()
-        .get_instruments(&InstrumentsRequest {
-            inst_type: &InstType::Spot,
-            inst_family: None,
-        })
+        .get_instruments(&InstrumentsRequest::new(InstType::Spot))
         .await
         .expect("public/instruments");
     assert!(instruments.iter().any(|row| row.inst_id == "BTC-USDT"));
@@ -36,9 +33,7 @@ async fn public_derivatives_reference_data_parse() {
     // STATUS: LIVE — public, read-only.
     client
         .public_data()
-        .get_funding_rate(&InstIdRequest {
-            inst_id: "BTC-USDT-SWAP",
-        })
+        .get_funding_rate(&InstIdRequest::new("BTC-USDT-SWAP"))
         .await
         .expect("public/funding-rate");
 
@@ -46,9 +41,7 @@ async fn public_derivatives_reference_data_parse() {
     // STATUS: LIVE — public, read-only.
     client
         .public_data()
-        .get_price_limit(&InstIdRequest {
-            inst_id: "BTC-USDT-SWAP",
-        })
+        .get_price_limit(&InstIdRequest::new("BTC-USDT-SWAP"))
         .await
         .expect("public/price-limit");
 

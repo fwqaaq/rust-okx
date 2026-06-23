@@ -18,7 +18,7 @@ async fn get_greeks_queries_currency() {
 
     let result = client
         .account()
-        .get_greeks(BalanceRequest { ccy: Some("BTC") })
+        .get_greeks(BalanceRequest::new().currency("BTC"))
         .await
         .unwrap();
     assert_eq!(result[0].delta_pa.as_str(), "0.91");

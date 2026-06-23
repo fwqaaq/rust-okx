@@ -1,31 +1,33 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::model::{InstType, TradeMode};
 
 /// Query parameters for account bills.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct BillsRequest {
+pub struct BillsRequest<'a> {
     #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
     inst_type: Option<InstType>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(rename = "mgnMode", skip_serializing_if = "Option::is_none")]
     mgn_mode: Option<TradeMode>,
     #[serde(rename = "ctType", skip_serializing_if = "Option::is_none")]
-    ct_type: Option<String>,
+    ct_type: Option<Cow<'a, str>>,
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    bill_type: Option<String>,
+    bill_type: Option<Cow<'a, str>>,
     #[serde(rename = "subType", skip_serializing_if = "Option::is_none")]
-    sub_type: Option<String>,
+    sub_type: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl BillsRequest {
+impl<'a> BillsRequest<'a> {
     /// Create an empty account-bills query.
     pub fn new() -> Self {
         Self::default()
@@ -38,7 +40,7 @@ impl BillsRequest {
     }
 
     /// Set the currency filter.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
@@ -50,31 +52,31 @@ impl BillsRequest {
     }
 
     /// Set the contract type filter.
-    pub fn contract_type(mut self, ct_type: impl Into<String>) -> Self {
+    pub fn contract_type(mut self, ct_type: impl Into<Cow<'a, str>>) -> Self {
         self.ct_type = Some(ct_type.into());
         self
     }
 
     /// Set the bill type filter.
-    pub fn bill_type(mut self, bill_type: impl Into<String>) -> Self {
+    pub fn bill_type(mut self, bill_type: impl Into<Cow<'a, str>>) -> Self {
         self.bill_type = Some(bill_type.into());
         self
     }
 
     /// Set the bill subtype filter.
-    pub fn sub_type(mut self, sub_type: impl Into<String>) -> Self {
+    pub fn sub_type(mut self, sub_type: impl Into<Cow<'a, str>>) -> Self {
         self.sub_type = Some(sub_type.into());
         self
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
@@ -88,35 +90,35 @@ impl BillsRequest {
 
 /// Query parameters for archived account bills.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct BillsArchiveRequest {
+pub struct BillsArchiveRequest<'a> {
     #[serde(flatten)]
-    base: BillsRequest,
+    base: BillsRequest<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    begin: Option<String>,
+    begin: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    end: Option<String>,
+    end: Option<Cow<'a, str>>,
 }
 
-impl BillsArchiveRequest {
+impl<'a> BillsArchiveRequest<'a> {
     /// Create an empty archived-bills query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Set the common bills filters.
-    pub fn filters(mut self, base: BillsRequest) -> Self {
+    pub fn filters(mut self, base: BillsRequest<'a>) -> Self {
         self.base = base;
         self
     }
 
     /// Set the begin timestamp.
-    pub fn begin(mut self, begin: impl Into<String>) -> Self {
+    pub fn begin(mut self, begin: impl Into<Cow<'a, str>>) -> Self {
         self.begin = Some(begin.into());
         self
     }
 
     /// Set the end timestamp.
-    pub fn end(mut self, end: impl Into<String>) -> Self {
+    pub fn end(mut self, end: impl Into<Cow<'a, str>>) -> Self {
         self.end = Some(end.into());
         self
     }
@@ -124,26 +126,26 @@ impl BillsArchiveRequest {
 
 /// Query parameters for position history.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct PositionsHistoryRequest {
+pub struct PositionsHistoryRequest<'a> {
     #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
     inst_type: Option<InstType>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(rename = "mgnMode", skip_serializing_if = "Option::is_none")]
     mgn_mode: Option<TradeMode>,
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    close_type: Option<String>,
+    close_type: Option<Cow<'a, str>>,
     #[serde(rename = "posId", skip_serializing_if = "Option::is_none")]
-    pos_id: Option<String>,
+    pos_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl PositionsHistoryRequest {
+impl<'a> PositionsHistoryRequest<'a> {
     /// Create an empty position-history query.
     pub fn new() -> Self {
         Self::default()
@@ -156,7 +158,7 @@ impl PositionsHistoryRequest {
     }
 
     /// Set the instrument ID filter.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
@@ -168,25 +170,25 @@ impl PositionsHistoryRequest {
     }
 
     /// Set the OKX close type filter.
-    pub fn close_type(mut self, close_type: impl Into<String>) -> Self {
+    pub fn close_type(mut self, close_type: impl Into<Cow<'a, str>>) -> Self {
         self.close_type = Some(close_type.into());
         self
     }
 
     /// Set the position ID filter.
-    pub fn position_id(mut self, pos_id: impl Into<String>) -> Self {
+    pub fn position_id(mut self, pos_id: impl Into<Cow<'a, str>>) -> Self {
         self.pos_id = Some(pos_id.into());
         self
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }

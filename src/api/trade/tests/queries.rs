@@ -22,10 +22,7 @@ async fn get_order_queries_and_parses() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = GetOrderRequest {
-        inst_id: "BTC-USDT",
-        ord_id: "312269865356374016",
-    };
+    let request = GetOrderRequest::new("BTC-USDT", "312269865356374016");
     let orders = client.trade().get_order(&request).await.unwrap();
     assert_eq!(orders[0].ord_id, "312269865356374016");
     assert_eq!(orders[0].state, OrderState::Filled);

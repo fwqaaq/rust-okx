@@ -28,9 +28,7 @@ async fn demo_place_get_cancel_order() {
 
     // API: GET /api/v5/market/ticker
     // STATUS: DEMO — public price lookup used by the simulated lifecycle.
-    let ticker_request = InstIdRequest {
-        inst_id: "BTC-USDT",
-    };
+    let ticker_request = InstIdRequest::new("BTC-USDT");
     let Some(ticker) = ok_or_skip(client.market().get_ticker(&ticker_request).await, "ticker")
     else {
         return;
@@ -62,10 +60,7 @@ async fn demo_place_get_cancel_order() {
 
     // API: GET /api/v5/trade/order
     // STATUS: DEMO — reads the simulated order created above.
-    let get_request = GetOrderRequest {
-        inst_id: "BTC-USDT",
-        ord_id: &ord_id,
-    };
+    let get_request = GetOrderRequest::new("BTC-USDT", &ord_id);
     let Some(live) = ok_or_skip(client.trade().get_order(&get_request).await, "get_order") else {
         return;
     };

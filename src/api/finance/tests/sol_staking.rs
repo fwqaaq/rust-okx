@@ -38,7 +38,7 @@ async fn sol_purchase_posts_signed_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = AmountRequest { amt: "1" };
+    let request = AmountRequest::new("1");
     let rows = client
         .finance()
         .sol_staking()
@@ -65,7 +65,7 @@ async fn sol_redeem_posts_signed_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = AmountRequest { amt: "1" };
+    let request = AmountRequest::new("1");
     let rows = client
         .finance()
         .sol_staking()
@@ -131,7 +131,7 @@ async fn sol_apy_history_is_not_signed() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let request = ApyHistoryRequest { days: "7" };
+    let request = ApyHistoryRequest::new("7");
     let rows = client
         .finance()
         .sol_staking()

@@ -8,83 +8,186 @@ use crate::model::InstType;
 /// [`get_block_ticker`](crate::api::market::Market::get_block_ticker).
 #[derive(Debug, Clone, Serialize)]
 pub struct InstIdRequest<'a> {
-    /// Instrument ID, e.g. `"BTC-USDT"`.
     #[serde(rename = "instId")]
-    pub inst_id: &'a str,
+    inst_id: Cow<'a, str>,
+}
+
+impl<'a> InstIdRequest<'a> {
+    /// Create a query for one instrument ID.
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_id: inst_id.into(),
+        }
+    }
 }
 
 /// Request for [`get_tickers`](crate::api::market::Market::get_tickers) and
 /// [`get_block_tickers`](crate::api::market::Market::get_block_tickers).
 #[derive(Debug, Clone, Serialize)]
 pub struct TickersRequest<'a> {
-    /// Instrument type.
     #[serde(rename = "instType")]
-    pub inst_type: &'a InstType,
-    /// Instrument family filter (optional).
+    inst_type: InstType,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    pub inst_family: Option<&'a str>,
+    inst_family: Option<Cow<'a, str>>,
+}
+
+impl<'a> TickersRequest<'a> {
+    /// Create a tickers query for an instrument type.
+    pub fn new(inst_type: InstType) -> Self {
+        Self {
+            inst_type,
+            inst_family: None,
+        }
+    }
+
+    /// Set the instrument family filter.
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_family = Some(inst_family.into());
+        self
+    }
 }
 
 /// Request for [`get_index_tickers`](crate::api::market::Market::get_index_tickers).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct IndexTickersRequest<'a> {
-    /// Quote currency filter, e.g. `Some("USD")`.
     #[serde(rename = "quoteCcy", skip_serializing_if = "Option::is_none")]
-    pub quote_ccy: Option<&'a str>,
-    /// Index instrument ID filter.
+    quote_ccy: Option<Cow<'a, str>>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    pub inst_id: Option<&'a str>,
+    inst_id: Option<Cow<'a, str>>,
+}
+
+impl<'a> IndexTickersRequest<'a> {
+    /// Create an empty index-tickers query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Set the quote currency filter.
+    pub fn quote_currency(mut self, quote_ccy: impl Into<Cow<'a, str>>) -> Self {
+        self.quote_ccy = Some(quote_ccy.into());
+        self
+    }
+
+    /// Set the index instrument ID filter.
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_id = Some(inst_id.into());
+        self
+    }
 }
 
 /// Request for [`get_orderbook`](crate::api::market::Market::get_orderbook).
 #[derive(Debug, Clone, Serialize)]
 pub struct OrderBookRequest<'a> {
-    /// Instrument ID.
     #[serde(rename = "instId")]
-    pub inst_id: &'a str,
-    /// Depth (number of price levels per side). OKX default 1, max 400.
+    inst_id: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sz: Option<u32>,
+    sz: Option<u32>,
+}
+
+impl<'a> OrderBookRequest<'a> {
+    /// Create an order-book query for an instrument.
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_id: inst_id.into(),
+            sz: None,
+        }
+    }
+
+    /// Set the depth, i.e. the number of price levels per side.
+    pub fn size(mut self, sz: u32) -> Self {
+        self.sz = Some(sz);
+        self
+    }
 }
 
 /// Request for [`get_candlesticks`](crate::api::market::Market::get_candlesticks).
 #[derive(Debug, Clone, Serialize)]
 pub struct CandlesRequest<'a> {
-    /// Instrument ID.
     #[serde(rename = "instId")]
-    pub inst_id: &'a str,
-    /// Bar size, e.g. `"1m"`, `"1H"`, `"1D"`. OKX default `"1m"`.
+    inst_id: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub bar: Option<&'a str>,
-    /// Maximum number of bars (max 300).
+    bar: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub limit: Option<u32>,
+    limit: Option<u32>,
+}
+
+impl<'a> CandlesRequest<'a> {
+    /// Create a candlestick query for an instrument.
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_id: inst_id.into(),
+            bar: None,
+            limit: None,
+        }
+    }
+
+    /// Set the bar size, e.g. `1m`, `1H`, or `1D`.
+    pub fn bar(mut self, bar: impl Into<Cow<'a, str>>) -> Self {
+        self.bar = Some(bar.into());
+        self
+    }
+
+    /// Set the maximum number of rows to return.
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
 }
 
 /// Request for [`get_trades`](crate::api::market::Market::get_trades).
 #[derive(Debug, Clone, Serialize)]
 pub struct TradesRequest<'a> {
-    /// Instrument ID.
     #[serde(rename = "instId")]
-    pub inst_id: &'a str,
-    /// Maximum number of trades to return.
+    inst_id: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub limit: Option<u32>,
+    limit: Option<u32>,
+}
+
+impl<'a> TradesRequest<'a> {
+    /// Create a recent-trades query for an instrument.
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_id: inst_id.into(),
+            limit: None,
+        }
+    }
+
+    /// Set the maximum number of rows to return.
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
 }
 
 /// Request for [`get_option_instrument_family_trades`](crate::api::market::Market::get_option_instrument_family_trades).
 #[derive(Debug, Clone, Serialize)]
 pub struct InstFamilyRequest<'a> {
-    /// Instrument family, e.g. `"BTC-USD"`.
     #[serde(rename = "instFamily")]
-    pub inst_family: &'a str,
+    inst_family: Cow<'a, str>,
+}
+
+impl<'a> InstFamilyRequest<'a> {
+    /// Create a query for an instrument family.
+    pub fn new(inst_family: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_family: inst_family.into(),
+        }
+    }
 }
 
 /// Request for [`get_index_components`](crate::api::market::Market::get_index_components).
 #[derive(Debug, Clone, Serialize)]
 pub struct IndexRequest<'a> {
-    /// Index symbol, e.g. `"BTC-USD"`.
-    pub index: &'a str,
+    index: Cow<'a, str>,
+}
+
+impl<'a> IndexRequest<'a> {
+    /// Create a query for an index symbol.
+    pub fn new(index: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            index: index.into(),
+        }
+    }
 }
 
 /// Query parameters for historical/index/mark-price candlestick endpoints.

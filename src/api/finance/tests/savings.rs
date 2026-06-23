@@ -14,7 +14,7 @@ async fn savings_balance_sends_signed_query() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = CurrencyRequest { ccy: Some("USDT") };
+    let request = CurrencyRequest::new().currency("USDT");
     let rows = client
         .finance()
         .savings()
@@ -69,10 +69,7 @@ async fn set_lending_rate_posts_signed_body() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = SetLendingRateRequest {
-        ccy: "USDT",
-        rate: "0.02",
-    };
+    let request = SetLendingRateRequest::new("USDT", "0.02");
     let rows = client
         .finance()
         .savings()

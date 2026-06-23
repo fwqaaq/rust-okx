@@ -7,12 +7,20 @@ use crate::model::{OrderSide, OrderState, OrderType, PositionSide, TradeMode};
 /// Request for [`get_order`](crate::api::trade::Trade::get_order).
 #[derive(Debug, Clone, Serialize)]
 pub struct GetOrderRequest<'a> {
-    /// Instrument ID, e.g. `"BTC-USDT"`.
     #[serde(rename = "instId")]
-    pub inst_id: &'a str,
-    /// OKX order ID.
+    inst_id: Cow<'a, str>,
     #[serde(rename = "ordId")]
-    pub ord_id: &'a str,
+    ord_id: Cow<'a, str>,
+}
+
+impl<'a> GetOrderRequest<'a> {
+    /// Create an order query by OKX order ID.
+    pub fn new(inst_id: impl Into<Cow<'a, str>>, ord_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_id: inst_id.into(),
+            ord_id: ord_id.into(),
+        }
+    }
 }
 
 mod advanced;

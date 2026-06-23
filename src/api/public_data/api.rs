@@ -57,7 +57,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_open_interest(
         &self,
-        request: &InstrumentFamilyRequest,
+        request: &InstrumentFamilyRequest<'_>,
     ) -> Result<Vec<OpenInterest>, Error> {
         self.client.get(OPEN_INTEREST, request, false).await
     }
@@ -85,7 +85,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_funding_rate_history(
         &self,
-        request: &FundingRateHistoryRequest,
+        request: &FundingRateHistoryRequest<'_>,
     ) -> Result<Vec<FundingRateHistory>, Error> {
         self.client.get(FUNDING_RATE_HISTORY, request, false).await
     }
@@ -113,7 +113,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_mark_price(
         &self,
-        request: &InstrumentFamilyRequest,
+        request: &InstrumentFamilyRequest<'_>,
     ) -> Result<Vec<MarkPrice>, Error> {
         self.client.get(MARK_PRICE, request, false).await
     }
@@ -127,7 +127,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_delivery_exercise_history(
         &self,
-        request: &DeliveryExerciseHistoryRequest,
+        request: &DeliveryExerciseHistoryRequest<'_>,
     ) -> Result<Vec<DeliveryExercise>, Error> {
         self.client
             .get(DELIVERY_EXERCISE_HISTORY, request, false)
@@ -143,7 +143,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_position_tiers(
         &self,
-        request: &PositionTiersRequest,
+        request: &PositionTiersRequest<'_>,
     ) -> Result<Vec<PositionTier>, Error> {
         self.client.get(POSITION_TIERS, request, false).await
     }
@@ -157,7 +157,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_underlying(
         &self,
-        request: &UnderlyingRequest,
+        request: &UnderlyingRequest<'_>,
     ) -> Result<Vec<Vec<String>>, Error> {
         self.client.get(UNDERLYING, request, false).await
     }
@@ -171,7 +171,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_insurance_fund(
         &self,
-        request: &InsuranceFundRequest,
+        request: &InsuranceFundRequest<'_>,
     ) -> Result<Vec<InsuranceFund>, Error> {
         self.client.get(INSURANCE_FUND, request, false).await
     }
@@ -185,7 +185,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_convert_contract_coin(
         &self,
-        request: &ConvertContractCoinRequest,
+        request: &ConvertContractCoinRequest<'_>,
     ) -> Result<Vec<ConvertContractCoin>, Error> {
         self.client.get(CONVERT_CONTRACT_COIN, request, false).await
     }
@@ -199,7 +199,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_option_summary(
         &self,
-        request: &OptionSummaryRequest,
+        request: &OptionSummaryRequest<'_>,
     ) -> Result<Vec<OptionSummary>, Error> {
         self.client.get(OPTION_SUMMARY, request, false).await
     }
@@ -259,7 +259,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_instrument_tick_bands(
         &self,
-        request: &InstrumentTickBandsRequest,
+        request: &InstrumentTickBandsRequest<'_>,
     ) -> Result<Vec<InstrumentTickBand>, Error> {
         self.client.get(INSTRUMENT_TICK_BANDS, request, false).await
     }
@@ -273,7 +273,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_option_trades(
         &self,
-        request: &PublicOptionTradesRequest,
+        request: &PublicOptionTradesRequest<'_>,
     ) -> Result<Vec<PublicOptionTrade>, Error> {
         self.client.get(OPTION_TRADES, request, false).await
     }
@@ -287,7 +287,7 @@ impl<'a, T: Transport> PublicData<'a, T> {
     /// See [`get_system_time`](Self::get_system_time).
     pub async fn get_market_data_history(
         &self,
-        request: &MarketDataHistoryRequest,
+        request: &MarketDataHistoryRequest<'_>,
     ) -> Result<Vec<MarketDataHistory>, Error> {
         self.client.get(MARKET_DATA_HISTORY, request, false).await
     }

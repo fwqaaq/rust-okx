@@ -14,7 +14,7 @@ async fn get_currencies_sends_signed_get() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = CurrencyRequest { ccy: Some("BTC") };
+    let request = CurrencyRequest::new().currency("BTC");
     let rows = client.funding().get_currencies(&request).await.unwrap();
     assert_eq!(rows[0].ccy, "BTC");
     assert_eq!(rows[0].name, "Bitcoin");
@@ -50,7 +50,7 @@ async fn get_balances_sends_signed_get() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = CurrencyRequest { ccy: Some("USDT") };
+    let request = CurrencyRequest::new().currency("USDT");
     let rows = client.funding().get_balances(&request).await.unwrap();
     assert_eq!(rows[0].ccy, "USDT");
     assert_eq!(rows[0].bal.as_str(), "1000");
@@ -91,7 +91,7 @@ async fn get_deposit_address_queries_required_currency() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = DepositAddressRequest { ccy: "USDT" };
+    let request = DepositAddressRequest::new("USDT");
     let rows = client
         .funding()
         .get_deposit_address(&request)

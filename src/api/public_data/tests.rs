@@ -25,10 +25,7 @@ async fn get_instruments_builds_request_and_parses() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let request = InstrumentsRequest {
-        inst_type: &InstType::Spot,
-        inst_family: None,
-    };
+    let request = InstrumentsRequest::new(InstType::Spot);
     let instruments = client
         .public_data()
         .get_instruments(&request)
@@ -92,9 +89,7 @@ async fn get_funding_rate_queries_instrument() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let request = InstIdRequest {
-        inst_id: "BTC-USDT-SWAP",
-    };
+    let request = InstIdRequest::new("BTC-USDT-SWAP");
     let rows = client
         .public_data()
         .get_funding_rate(&request)
@@ -142,9 +137,7 @@ async fn get_price_limit_queries_instrument() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let request = InstIdRequest {
-        inst_id: "BTC-USDT-SWAP",
-    };
+    let request = InstIdRequest::new("BTC-USDT-SWAP");
     let rows = client
         .public_data()
         .get_price_limit(&request)
@@ -310,9 +303,7 @@ async fn get_estimated_price_queries_inst_id() {
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
-    let request = InstIdRequest {
-        inst_id: "BTC-USD-240628",
-    };
+    let request = InstIdRequest::new("BTC-USD-240628");
     let rows = client
         .public_data()
         .get_estimated_price(&request)

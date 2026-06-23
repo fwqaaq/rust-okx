@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 /// Request for [`get_balance`](crate::api::account::Account::get_balance),
@@ -8,7 +10,19 @@ use serde::Serialize;
 /// All fields are optional; omit to return data for all currencies.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct BalanceRequest<'a> {
-    /// Currency filter (comma-separated, e.g. `"BTC,USDT"`). `None` returns all currencies.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub ccy: Option<&'a str>,
+    ccy: Option<Cow<'a, str>>,
+}
+
+impl<'a> BalanceRequest<'a> {
+    /// Create an unfiltered balance query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Set the currency filter.
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
+        self.ccy = Some(ccy.into());
+        self
+    }
 }

@@ -37,10 +37,7 @@ async fn transfer_state_queries_trans_id() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = TransferStateRequest {
-        trans_id: "754147",
-        transfer_type: None,
-    };
+    let request = TransferStateRequest::new("754147");
     let rows = client.funding().transfer_state(&request).await.unwrap();
     assert_eq!(rows[0].trans_id, "754147");
     assert_eq!(rows[0].state, "success");
@@ -58,10 +55,7 @@ async fn transfer_state_includes_type_when_set() {
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
-    let request = TransferStateRequest {
-        trans_id: "754147",
-        transfer_type: Some("1"),
-    };
+    let request = TransferStateRequest::new("754147").transfer_type("1");
     client.funding().transfer_state(&request).await.unwrap();
 
     let req = mock.captured();

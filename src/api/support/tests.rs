@@ -74,10 +74,11 @@ async fn get_announcements_with_filters_builds_query() {
 
     client
         .support()
-        .get_announcements(&AnnouncementsRequest {
-            ann_type: Some("announcements-new-listings"),
-            page: Some(2),
-        })
+        .get_announcements(
+            &AnnouncementsRequest::new()
+                .announcement_type("announcements-new-listings")
+                .page(2),
+        )
         .await
         .unwrap();
 
