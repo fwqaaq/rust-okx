@@ -59,9 +59,7 @@ async fn main() -> Result<(), rust_okx::Error> {
 
     let ticker = client
         .market()
-        .get_ticker(&InstIdRequest {
-            inst_id: "BTC-USDT",
-        })
+        .get_ticker(&InstIdRequest::new("BTC-USDT"))
         .await?;
     println!("BTC-USDT last price: {}", ticker[0].last.as_str());
 
