@@ -99,7 +99,7 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_history_candlesticks(
         &self,
-        request: &CandlesticksRequest,
+        request: &CandlesticksRequest<'_>,
     ) -> Result<Vec<Candle>, Error> {
         self.client.get(HISTORY_CANDLES, request, false).await
     }
@@ -113,7 +113,7 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_index_candlesticks(
         &self,
-        request: &CandlesticksRequest,
+        request: &CandlesticksRequest<'_>,
     ) -> Result<Vec<IndexCandle>, Error> {
         self.client.get(INDEX_CANDLES, request, false).await
     }
@@ -127,7 +127,7 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_mark_price_candlesticks(
         &self,
-        request: &CandlesticksRequest,
+        request: &CandlesticksRequest<'_>,
     ) -> Result<Vec<IndexCandle>, Error> {
         self.client.get(MARK_PRICE_CANDLES, request, false).await
     }
@@ -152,7 +152,7 @@ impl<'a, T: Transport> Market<'a, T> {
     /// See [`get_ticker`](Self::get_ticker).
     pub async fn get_history_trades(
         &self,
-        request: &HistoryTradesRequest,
+        request: &HistoryTradesRequest<'_>,
     ) -> Result<Vec<MarketTrade>, Error> {
         self.client.get(HISTORY_TRADES, request, false).await
     }

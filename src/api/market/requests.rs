@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::model::InstType;
@@ -87,22 +89,22 @@ pub struct IndexRequest<'a> {
 
 /// Query parameters for historical/index/mark-price candlestick endpoints.
 #[derive(Debug, Clone, Serialize)]
-pub struct CandlesticksRequest {
+pub struct CandlesticksRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    bar: Option<String>,
+    bar: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl CandlesticksRequest {
+impl<'a> CandlesticksRequest<'a> {
     /// Create a candlestick query for an instrument.
-    pub fn new(inst_id: impl Into<String>) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             inst_id: inst_id.into(),
             after: None,
@@ -113,19 +115,19 @@ impl CandlesticksRequest {
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
 
     /// Set the bar size, e.g. `1m`, `1H`, or `1D`.
-    pub fn bar(mut self, bar: impl Into<String>) -> Self {
+    pub fn bar(mut self, bar: impl Into<Cow<'a, str>>) -> Self {
         self.bar = Some(bar.into());
         self
     }
@@ -139,22 +141,22 @@ impl CandlesticksRequest {
 
 /// Query parameters for historical trades.
 #[derive(Debug, Clone, Serialize)]
-pub struct HistoryTradesRequest {
+pub struct HistoryTradesRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    trade_type: Option<String>,
+    trade_type: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl HistoryTradesRequest {
+impl<'a> HistoryTradesRequest<'a> {
     /// Create a historical trades query for an instrument.
-    pub fn new(inst_id: impl Into<String>) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             inst_id: inst_id.into(),
             trade_type: None,
@@ -165,19 +167,19 @@ impl HistoryTradesRequest {
     }
 
     /// Set the OKX trade type filter.
-    pub fn trade_type(mut self, trade_type: impl Into<String>) -> Self {
+    pub fn trade_type(mut self, trade_type: impl Into<Cow<'a, str>>) -> Self {
         self.trade_type = Some(trade_type.into());
         self
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
