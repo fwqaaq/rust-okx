@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::model::{OrderSide, OrderState, OrderType, PositionSide, TradeMode};
@@ -25,39 +27,39 @@ pub use algo::*;
 /// for optional fields. Optional fields are omitted from the request body when
 /// unset.
 #[derive(Debug, Clone, Serialize)]
-pub struct PlaceOrderRequest {
+pub struct PlaceOrderRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "tdMode")]
     td_mode: TradeMode,
     side: OrderSide,
     #[serde(rename = "ordType")]
     ord_type: OrderType,
-    sz: String,
+    sz: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tag: Option<String>,
+    tag: Option<Cow<'a, str>>,
     #[serde(rename = "px", skip_serializing_if = "Option::is_none")]
-    px: Option<String>,
+    px: Option<Cow<'a, str>>,
     #[serde(rename = "posSide", skip_serializing_if = "Option::is_none")]
     pos_side: Option<PositionSide>,
     #[serde(rename = "clOrdId", skip_serializing_if = "Option::is_none")]
-    cl_ord_id: Option<String>,
+    cl_ord_id: Option<Cow<'a, str>>,
     #[serde(rename = "reduceOnly", skip_serializing_if = "Option::is_none")]
     reduce_only: Option<bool>,
     #[serde(rename = "tgtCcy", skip_serializing_if = "Option::is_none")]
-    tgt_ccy: Option<String>,
+    tgt_ccy: Option<Cow<'a, str>>,
 }
 
-impl PlaceOrderRequest {
+impl<'a> PlaceOrderRequest<'a> {
     /// Create a new order request with the required fields.
     pub fn new(
-        inst_id: impl Into<String>,
+        inst_id: impl Into<Cow<'a, str>>,
         td_mode: TradeMode,
         side: OrderSide,
         ord_type: OrderType,
-        sz: impl Into<String>,
+        sz: impl Into<Cow<'a, str>>,
     ) -> Self {
         Self {
             inst_id: inst_id.into(),
@@ -76,7 +78,7 @@ impl PlaceOrderRequest {
     }
 
     /// Set the order price (required for `limit`-style orders).
-    pub fn price(mut self, px: impl Into<String>) -> Self {
+    pub fn price(mut self, px: impl Into<Cow<'a, str>>) -> Self {
         self.px = Some(px.into());
         self
     }
@@ -88,7 +90,7 @@ impl PlaceOrderRequest {
     }
 
     /// Set a client-supplied order ID.
-    pub fn client_order_id(mut self, cl_ord_id: impl Into<String>) -> Self {
+    pub fn client_order_id(mut self, cl_ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.cl_ord_id = Some(cl_ord_id.into());
         self
     }
@@ -100,19 +102,19 @@ impl PlaceOrderRequest {
     }
 
     /// Set the quantity unit for spot market orders (`base_ccy`/`quote_ccy`).
-    pub fn target_ccy(mut self, tgt_ccy: impl Into<String>) -> Self {
+    pub fn target_ccy(mut self, tgt_ccy: impl Into<Cow<'a, str>>) -> Self {
         self.tgt_ccy = Some(tgt_ccy.into());
         self
     }
 
     /// Set the margin currency.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
 
     /// Set an order tag.
-    pub fn tag(mut self, tag: impl Into<String>) -> Self {
+    pub fn tag(mut self, tag: impl Into<Cow<'a, str>>) -> Self {
         self.tag = Some(tag.into());
         self
     }
@@ -120,18 +122,18 @@ impl PlaceOrderRequest {
 
 /// A request to cancel an order.
 #[derive(Debug, Clone, Serialize)]
-pub struct CancelOrderRequest {
+pub struct CancelOrderRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
     #[serde(rename = "clOrdId", skip_serializing_if = "Option::is_none")]
-    cl_ord_id: Option<String>,
+    cl_ord_id: Option<Cow<'a, str>>,
 }
 
-impl CancelOrderRequest {
+impl<'a> CancelOrderRequest<'a> {
     /// Cancel by OKX order ID.
-    pub fn by_order_id(inst_id: impl Into<String>, ord_id: impl Into<String>) -> Self {
+    pub fn by_order_id(inst_id: impl Into<Cow<'a, str>>, ord_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             inst_id: inst_id.into(),
             ord_id: Some(ord_id.into()),
@@ -140,7 +142,10 @@ impl CancelOrderRequest {
     }
 
     /// Cancel by client order ID.
-    pub fn by_client_order_id(inst_id: impl Into<String>, cl_ord_id: impl Into<String>) -> Self {
+    pub fn by_client_order_id(
+        inst_id: impl Into<Cow<'a, str>>,
+        cl_ord_id: impl Into<Cow<'a, str>>,
+    ) -> Self {
         Self {
             inst_id: inst_id.into(),
             ord_id: None,
@@ -151,26 +156,26 @@ impl CancelOrderRequest {
 
 /// A request to amend an order.
 #[derive(Debug, Clone, Serialize)]
-pub struct AmendOrderRequest {
+pub struct AmendOrderRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
     #[serde(rename = "clOrdId", skip_serializing_if = "Option::is_none")]
-    cl_ord_id: Option<String>,
+    cl_ord_id: Option<Cow<'a, str>>,
     #[serde(rename = "reqId", skip_serializing_if = "Option::is_none")]
-    req_id: Option<String>,
+    req_id: Option<Cow<'a, str>>,
     #[serde(rename = "cxlOnFail", skip_serializing_if = "Option::is_none")]
     cxl_on_fail: Option<bool>,
     #[serde(rename = "newSz", skip_serializing_if = "Option::is_none")]
-    new_sz: Option<String>,
+    new_sz: Option<Cow<'a, str>>,
     #[serde(rename = "newPx", skip_serializing_if = "Option::is_none")]
-    new_px: Option<String>,
+    new_px: Option<Cow<'a, str>>,
 }
 
-impl AmendOrderRequest {
+impl<'a> AmendOrderRequest<'a> {
     /// Create an amend-order request for an instrument.
-    pub fn new(inst_id: impl Into<String>) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             inst_id: inst_id.into(),
             ord_id: None,
@@ -183,19 +188,19 @@ impl AmendOrderRequest {
     }
 
     /// Set the OKX order ID.
-    pub fn order_id(mut self, ord_id: impl Into<String>) -> Self {
+    pub fn order_id(mut self, ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(ord_id.into());
         self
     }
 
     /// Set the client order ID.
-    pub fn client_order_id(mut self, cl_ord_id: impl Into<String>) -> Self {
+    pub fn client_order_id(mut self, cl_ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.cl_ord_id = Some(cl_ord_id.into());
         self
     }
 
     /// Set a request ID.
-    pub fn request_id(mut self, req_id: impl Into<String>) -> Self {
+    pub fn request_id(mut self, req_id: impl Into<Cow<'a, str>>) -> Self {
         self.req_id = Some(req_id.into());
         self
     }
@@ -207,13 +212,13 @@ impl AmendOrderRequest {
     }
 
     /// Set the new order size.
-    pub fn new_size(mut self, new_sz: impl Into<String>) -> Self {
+    pub fn new_size(mut self, new_sz: impl Into<Cow<'a, str>>) -> Self {
         self.new_sz = Some(new_sz.into());
         self
     }
 
     /// Set the new order price.
-    pub fn new_price(mut self, new_px: impl Into<String>) -> Self {
+    pub fn new_price(mut self, new_px: impl Into<Cow<'a, str>>) -> Self {
         self.new_px = Some(new_px.into());
         self
     }
@@ -221,26 +226,26 @@ impl AmendOrderRequest {
 
 /// A request to close positions.
 #[derive(Debug, Clone, Serialize)]
-pub struct ClosePositionRequest {
+pub struct ClosePositionRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "mgnMode")]
     mgn_mode: TradeMode,
     #[serde(rename = "posSide", skip_serializing_if = "Option::is_none")]
     pos_side: Option<PositionSide>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(rename = "autoCxl", skip_serializing_if = "Option::is_none")]
     auto_cancel: Option<bool>,
     #[serde(rename = "clOrdId", skip_serializing_if = "Option::is_none")]
-    cl_ord_id: Option<String>,
+    cl_ord_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tag: Option<String>,
+    tag: Option<Cow<'a, str>>,
 }
 
-impl ClosePositionRequest {
+impl<'a> ClosePositionRequest<'a> {
     /// Create a close-position request.
-    pub fn new(inst_id: impl Into<String>, mgn_mode: TradeMode) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>, mgn_mode: TradeMode) -> Self {
         Self {
             inst_id: inst_id.into(),
             mgn_mode,
@@ -259,7 +264,7 @@ impl ClosePositionRequest {
     }
 
     /// Set the margin currency.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
@@ -271,13 +276,13 @@ impl ClosePositionRequest {
     }
 
     /// Set the client order ID.
-    pub fn client_order_id(mut self, cl_ord_id: impl Into<String>) -> Self {
+    pub fn client_order_id(mut self, cl_ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.cl_ord_id = Some(cl_ord_id.into());
         self
     }
 
     /// Set an order tag.
-    pub fn tag(mut self, tag: impl Into<String>) -> Self {
+    pub fn tag(mut self, tag: impl Into<Cow<'a, str>>) -> Self {
         self.tag = Some(tag.into());
         self
     }
@@ -285,28 +290,28 @@ impl ClosePositionRequest {
 
 /// Query parameters for pending order lists.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct OrderListRequest {
+pub struct OrderListRequest<'a> {
     #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
     inst_type: Option<crate::model::InstType>,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<String>,
+    underlying: Option<Cow<'a, str>>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(rename = "ordType", skip_serializing_if = "Option::is_none")]
     ord_type: Option<OrderType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     state: Option<OrderState>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<String>,
+    inst_family: Option<Cow<'a, str>>,
 }
 
-impl OrderListRequest {
+impl<'a> OrderListRequest<'a> {
     /// Create an empty order-list query.
     pub fn new() -> Self {
         Self::default()
@@ -319,13 +324,13 @@ impl OrderListRequest {
     }
 
     /// Set the underlying filter.
-    pub fn underlying(mut self, underlying: impl Into<String>) -> Self {
+    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
         self.underlying = Some(underlying.into());
         self
     }
 
     /// Set the instrument ID filter.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
@@ -343,13 +348,13 @@ impl OrderListRequest {
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
@@ -361,7 +366,7 @@ impl OrderListRequest {
     }
 
     /// Set the instrument family filter.
-    pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
     }
@@ -369,16 +374,16 @@ impl OrderListRequest {
 
 /// Query parameters for order history.
 #[derive(Debug, Clone, Serialize)]
-pub struct OrderHistoryRequest {
+pub struct OrderHistoryRequest<'a> {
     #[serde(flatten)]
-    base: OrderListRequest,
+    base: OrderListRequest<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    begin: Option<String>,
+    begin: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    end: Option<String>,
+    end: Option<Cow<'a, str>>,
 }
 
-impl OrderHistoryRequest {
+impl<'a> OrderHistoryRequest<'a> {
     /// Create an order-history query with the required instrument type.
     pub fn new(inst_type: crate::model::InstType) -> Self {
         Self {
@@ -389,19 +394,19 @@ impl OrderHistoryRequest {
     }
 
     /// Set the common order-list filters.
-    pub fn filters(mut self, base: OrderListRequest) -> Self {
+    pub fn filters(mut self, base: OrderListRequest<'a>) -> Self {
         self.base = base;
         self
     }
 
     /// Set the begin timestamp.
-    pub fn begin(mut self, begin: impl Into<String>) -> Self {
+    pub fn begin(mut self, begin: impl Into<Cow<'a, str>>) -> Self {
         self.begin = Some(begin.into());
         self
     }
 
     /// Set the end timestamp.
-    pub fn end(mut self, end: impl Into<String>) -> Self {
+    pub fn end(mut self, end: impl Into<Cow<'a, str>>) -> Self {
         self.end = Some(end.into());
         self
     }
@@ -409,30 +414,30 @@ impl OrderHistoryRequest {
 
 /// Query parameters for fills.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct FillsRequest {
+pub struct FillsRequest<'a> {
     #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
     inst_type: Option<crate::model::InstType>,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<String>,
+    underlying: Option<Cow<'a, str>>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    begin: Option<String>,
+    begin: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    end: Option<String>,
+    end: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<String>,
+    inst_family: Option<Cow<'a, str>>,
 }
 
-impl FillsRequest {
+impl<'a> FillsRequest<'a> {
     /// Create an empty fills query.
     pub fn new() -> Self {
         Self::default()
@@ -445,43 +450,43 @@ impl FillsRequest {
     }
 
     /// Set the underlying filter.
-    pub fn underlying(mut self, underlying: impl Into<String>) -> Self {
+    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
         self.underlying = Some(underlying.into());
         self
     }
 
     /// Set the instrument ID filter.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
 
     /// Set the order ID filter.
-    pub fn order_id(mut self, ord_id: impl Into<String>) -> Self {
+    pub fn order_id(mut self, ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(ord_id.into());
         self
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
 
     /// Set the begin timestamp.
-    pub fn begin(mut self, begin: impl Into<String>) -> Self {
+    pub fn begin(mut self, begin: impl Into<Cow<'a, str>>) -> Self {
         self.begin = Some(begin.into());
         self
     }
 
     /// Set the end timestamp.
-    pub fn end(mut self, end: impl Into<String>) -> Self {
+    pub fn end(mut self, end: impl Into<Cow<'a, str>>) -> Self {
         self.end = Some(end.into());
         self
     }
@@ -493,7 +498,7 @@ impl FillsRequest {
     }
 
     /// Set the instrument family filter.
-    pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
     }
@@ -505,26 +510,26 @@ impl FillsRequest {
 /// `instType` as required for `GET /api/v5/trade/fills-history`, while it is
 /// optional for `GET /api/v5/trade/fills`.
 #[derive(Debug, Clone, Serialize)]
-pub struct FillHistoryRequest {
+pub struct FillHistoryRequest<'a> {
     #[serde(rename = "instType")]
     inst_type: crate::model::InstType,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    begin: Option<String>,
+    begin: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    end: Option<String>,
+    end: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl FillHistoryRequest {
+impl<'a> FillHistoryRequest<'a> {
     /// Create a historical fills query with the required instrument type.
     pub fn new(inst_type: crate::model::InstType) -> Self {
         Self {
@@ -540,37 +545,37 @@ impl FillHistoryRequest {
     }
 
     /// Set the instrument ID filter.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
 
     /// Set the order ID filter.
-    pub fn order_id(mut self, ord_id: impl Into<String>) -> Self {
+    pub fn order_id(mut self, ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(ord_id.into());
         self
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
 
     /// Set the begin timestamp.
-    pub fn begin(mut self, begin: impl Into<String>) -> Self {
+    pub fn begin(mut self, begin: impl Into<Cow<'a, str>>) -> Self {
         self.begin = Some(begin.into());
         self
     }
 
     /// Set the end timestamp.
-    pub fn end(mut self, end: impl Into<String>) -> Self {
+    pub fn end(mut self, end: impl Into<Cow<'a, str>>) -> Self {
         self.end = Some(end.into());
         self
     }

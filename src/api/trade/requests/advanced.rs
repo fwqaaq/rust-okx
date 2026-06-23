@@ -1,22 +1,24 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 /// Request body for `POST /api/v5/trade/easy-convert`.
 #[derive(Debug, Clone, Serialize)]
-pub struct EasyConvertRequest {
+pub struct EasyConvertRequest<'a> {
     #[serde(rename = "fromCcy")]
-    from_ccy: Vec<String>,
+    from_ccy: Vec<Cow<'a, str>>,
     #[serde(rename = "toCcy")]
-    to_ccy: String,
+    to_ccy: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    source: Option<String>,
+    source: Option<Cow<'a, str>>,
 }
 
-impl EasyConvertRequest {
+impl<'a> EasyConvertRequest<'a> {
     /// Create an easy-convert request with one to five source currencies.
-    pub fn new<I, S>(from_ccy: I, to_ccy: impl Into<String>) -> Self
+    pub fn new<I, S>(from_ccy: I, to_ccy: impl Into<Cow<'a, str>>) -> Self
     where
         I: IntoIterator<Item = S>,
-        S: Into<String>,
+        S: Into<Cow<'a, str>>,
     {
         Self {
             from_ccy: from_ccy.into_iter().map(Into::into).collect(),
@@ -26,7 +28,7 @@ impl EasyConvertRequest {
     }
 
     /// Set the funding source: `1` for trading or `2` for funding.
-    pub fn source(mut self, value: impl Into<String>) -> Self {
+    pub fn source(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.source = Some(value.into());
         self
     }
@@ -34,29 +36,29 @@ impl EasyConvertRequest {
 
 /// Query parameters for easy-convert history.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct EasyConvertHistoryRequest {
+pub struct EasyConvertHistoryRequest<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl EasyConvertHistoryRequest {
+impl<'a> EasyConvertHistoryRequest<'a> {
     /// Create an empty history query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Return records earlier than this millisecond timestamp.
-    pub fn after(mut self, value: impl Into<String>) -> Self {
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(value.into());
         self
     }
 
     /// Return records newer than this millisecond timestamp.
-    pub fn before(mut self, value: impl Into<String>) -> Self {
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(value.into());
         self
     }
@@ -70,19 +72,19 @@ impl EasyConvertHistoryRequest {
 
 /// Query parameters for one-click-repay currency-list endpoints.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct OneClickRepayCurrencyListRequest {
+pub struct OneClickRepayCurrencyListRequest<'a> {
     #[serde(rename = "debtType", skip_serializing_if = "Option::is_none")]
-    debt_type: Option<String>,
+    debt_type: Option<Cow<'a, str>>,
 }
 
-impl OneClickRepayCurrencyListRequest {
+impl<'a> OneClickRepayCurrencyListRequest<'a> {
     /// Create an unfiltered currency-list query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Filter debt by `cross` or `isolated` type.
-    pub fn debt_type(mut self, value: impl Into<String>) -> Self {
+    pub fn debt_type(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.debt_type = Some(value.into());
         self
     }
@@ -91,28 +93,28 @@ impl OneClickRepayCurrencyListRequest {
 /// One or more debt currencies accepted by the legacy and v2 repay APIs.
 #[derive(Debug, Clone, Serialize)]
 #[serde(untagged)]
-enum DebtCurrencySelection {
-    One(String),
-    Many(Vec<String>),
+enum DebtCurrencySelection<'a> {
+    One(Cow<'a, str>),
+    Many(Vec<Cow<'a, str>>),
 }
 
 /// Request body shared by one-click-repay v1 and v2 endpoints.
 #[derive(Debug, Clone, Serialize)]
-pub struct OneClickRepayRequest {
+pub struct OneClickRepayRequest<'a> {
     #[serde(rename = "debtCcy")]
-    debt_ccy: DebtCurrencySelection,
+    debt_ccy: DebtCurrencySelection<'a>,
     #[serde(rename = "repayCcy", skip_serializing_if = "Option::is_none")]
-    repay_ccy: Option<String>,
+    repay_ccy: Option<Cow<'a, str>>,
     #[serde(rename = "repayCcyList", skip_serializing_if = "Option::is_none")]
-    repay_ccy_list: Option<Vec<String>>,
+    repay_ccy_list: Option<Vec<Cow<'a, str>>>,
 }
 
-impl OneClickRepayRequest {
+impl<'a> OneClickRepayRequest<'a> {
     /// Build the legacy v1 request (`debtCcy` array + one `repayCcy`).
-    pub fn new<I, S>(debt_ccy: I, repay_ccy: impl Into<String>) -> Self
+    pub fn new<I, S>(debt_ccy: I, repay_ccy: impl Into<Cow<'a, str>>) -> Self
     where
         I: IntoIterator<Item = S>,
-        S: Into<String>,
+        S: Into<Cow<'a, str>>,
     {
         Self {
             debt_ccy: DebtCurrencySelection::Many(debt_ccy.into_iter().map(Into::into).collect()),
@@ -122,10 +124,10 @@ impl OneClickRepayRequest {
     }
 
     /// Build the v2 request (`debtCcy` string + prioritized `repayCcyList`).
-    pub fn v2<I, S>(debt_ccy: impl Into<String>, repay_ccy_list: I) -> Self
+    pub fn v2<I, S>(debt_ccy: impl Into<Cow<'a, str>>, repay_ccy_list: I) -> Self
     where
         I: IntoIterator<Item = S>,
-        S: Into<String>,
+        S: Into<Cow<'a, str>>,
     {
         Self {
             debt_ccy: DebtCurrencySelection::One(debt_ccy.into()),
@@ -137,29 +139,29 @@ impl OneClickRepayRequest {
 
 /// Query parameters for one-click-repay history endpoints.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct OneClickRepayHistoryRequest {
+pub struct OneClickRepayHistoryRequest<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl OneClickRepayHistoryRequest {
+impl<'a> OneClickRepayHistoryRequest<'a> {
     /// Create an empty history query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Return records earlier than this millisecond timestamp.
-    pub fn after(mut self, value: impl Into<String>) -> Self {
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(value.into());
         self
     }
 
     /// Return records newer than this millisecond timestamp.
-    pub fn before(mut self, value: impl Into<String>) -> Self {
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(value.into());
         self
     }

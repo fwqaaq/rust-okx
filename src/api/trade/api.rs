@@ -33,7 +33,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// non-zero top-level OKX code, or transport/decode errors.
     pub async fn place_order(
         &self,
-        request: &PlaceOrderRequest,
+        request: &PlaceOrderRequest<'_>,
     ) -> Result<Vec<PlaceOrderResult>, Error> {
         self.client.post(ORDER, request, true).await
     }
@@ -47,7 +47,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn place_multiple_orders(
         &self,
-        requests: &[PlaceOrderRequest],
+        requests: &[PlaceOrderRequest<'_>],
     ) -> Result<Vec<PlaceOrderResult>, Error> {
         self.client.post(BATCH_ORDERS, &requests, true).await
     }
@@ -61,7 +61,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn cancel_order(
         &self,
-        request: &CancelOrderRequest,
+        request: &CancelOrderRequest<'_>,
     ) -> Result<Vec<CancelOrderResult>, Error> {
         self.client.post(CANCEL_ORDER, request, true).await
     }
@@ -75,7 +75,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn cancel_multiple_orders(
         &self,
-        requests: &[CancelOrderRequest],
+        requests: &[CancelOrderRequest<'_>],
     ) -> Result<Vec<CancelOrderResult>, Error> {
         self.client.post(CANCEL_BATCH_ORDERS, &requests, true).await
     }
@@ -89,7 +89,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn amend_order(
         &self,
-        request: &AmendOrderRequest,
+        request: &AmendOrderRequest<'_>,
     ) -> Result<Vec<AmendOrderResult>, Error> {
         self.client.post(AMEND_ORDER, request, true).await
     }
@@ -103,7 +103,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn amend_multiple_orders(
         &self,
-        requests: &[AmendOrderRequest],
+        requests: &[AmendOrderRequest<'_>],
     ) -> Result<Vec<AmendOrderResult>, Error> {
         self.client.post(AMEND_BATCH_ORDERS, &requests, true).await
     }
@@ -117,7 +117,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn close_positions(
         &self,
-        request: &ClosePositionRequest,
+        request: &ClosePositionRequest<'_>,
     ) -> Result<Vec<ClosePositionResult>, Error> {
         self.client.post(CLOSE_POSITION, request, true).await
     }
@@ -140,7 +140,10 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// # Errors
     ///
     /// See [`place_order`](Self::place_order).
-    pub async fn get_order_list(&self, request: &OrderListRequest) -> Result<Vec<Order>, Error> {
+    pub async fn get_order_list(
+        &self,
+        request: &OrderListRequest<'_>,
+    ) -> Result<Vec<Order>, Error> {
         self.client.get(ORDERS_PENDING, request, true).await
     }
 
@@ -153,7 +156,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_orders_history(
         &self,
-        request: &OrderHistoryRequest,
+        request: &OrderHistoryRequest<'_>,
     ) -> Result<Vec<Order>, Error> {
         self.client.get(ORDERS_HISTORY, request, true).await
     }
@@ -167,7 +170,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_orders_history_archive(
         &self,
-        request: &OrderHistoryRequest,
+        request: &OrderHistoryRequest<'_>,
     ) -> Result<Vec<Order>, Error> {
         self.client.get(ORDERS_HISTORY_ARCHIVE, request, true).await
     }
@@ -179,7 +182,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// # Errors
     ///
     /// See [`place_order`](Self::place_order).
-    pub async fn get_fills(&self, request: &FillsRequest) -> Result<Vec<Fill>, Error> {
+    pub async fn get_fills(&self, request: &FillsRequest<'_>) -> Result<Vec<Fill>, Error> {
         self.client.get(FILLS, request, true).await
     }
 
@@ -192,7 +195,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_fills_history(
         &self,
-        request: &FillHistoryRequest,
+        request: &FillHistoryRequest<'_>,
     ) -> Result<Vec<FillHistory>, Error> {
         self.client.get(FILLS_HISTORY, request, true).await
     }
@@ -220,7 +223,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn cancel_algo_orders(
         &self,
-        requests: &[CancelAlgoOrderRequest],
+        requests: &[CancelAlgoOrderRequest<'_>],
     ) -> Result<Vec<AlgoOrderResult>, Error> {
         self.client.post(CANCEL_ALGOS, &requests, true).await
     }
@@ -234,7 +237,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn amend_algo_order(
         &self,
-        request: &AmendAlgoOrderRequest,
+        request: &AmendAlgoOrderRequest<'_>,
     ) -> Result<Vec<AlgoOrderResult>, Error> {
         self.client.post(AMEND_ALGOS, request, true).await
     }
@@ -248,7 +251,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_algo_order_list(
         &self,
-        request: &AlgoOrderListRequest,
+        request: &AlgoOrderListRequest<'_>,
     ) -> Result<Vec<AlgoOrder>, Error> {
         self.client.get(ORDERS_ALGO_PENDING, request, true).await
     }
@@ -262,7 +265,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_algo_orders_history(
         &self,
-        request: &AlgoOrderHistoryRequest,
+        request: &AlgoOrderHistoryRequest<'_>,
     ) -> Result<Vec<AlgoOrder>, Error> {
         self.client.get(ORDERS_ALGO_HISTORY, request, true).await
     }
@@ -276,7 +279,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_algo_order_details(
         &self,
-        request: &AlgoOrderDetailsRequest,
+        request: &AlgoOrderDetailsRequest<'_>,
     ) -> Result<Vec<AlgoOrder>, Error> {
         self.client.get(ORDER_ALGO_DETAILS, request, true).await
     }
@@ -303,7 +306,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn easy_convert(
         &self,
-        request: &EasyConvertRequest,
+        request: &EasyConvertRequest<'_>,
     ) -> Result<Vec<EasyConvertResult>, Error> {
         self.client.post(EASY_CONVERT, request, true).await
     }
@@ -317,7 +320,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_easy_convert_history(
         &self,
-        request: &EasyConvertHistoryRequest,
+        request: &EasyConvertHistoryRequest<'_>,
     ) -> Result<Vec<EasyConvertHistory>, Error> {
         self.client.get(EASY_CONVERT_HISTORY, request, true).await
     }
@@ -331,7 +334,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_one_click_repay_currency_list(
         &self,
-        request: &OneClickRepayCurrencyListRequest,
+        request: &OneClickRepayCurrencyListRequest<'_>,
     ) -> Result<Vec<OneClickRepayCurrency>, Error> {
         self.client
             .get(ONE_CLICK_REPAY_CURRENCY_LIST, request, true)
@@ -347,7 +350,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn one_click_repay(
         &self,
-        request: &OneClickRepayRequest,
+        request: &OneClickRepayRequest<'_>,
     ) -> Result<Vec<OneClickRepayResult>, Error> {
         self.client.post(ONE_CLICK_REPAY, request, true).await
     }
@@ -361,7 +364,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_one_click_repay_history(
         &self,
-        request: &OneClickRepayHistoryRequest,
+        request: &OneClickRepayHistoryRequest<'_>,
     ) -> Result<Vec<OneClickRepayHistory>, Error> {
         self.client
             .get(ONE_CLICK_REPAY_HISTORY, request, true)
@@ -377,7 +380,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_one_click_repay_currency_list_v2(
         &self,
-        request: &OneClickRepayCurrencyListRequest,
+        request: &OneClickRepayCurrencyListRequest<'_>,
     ) -> Result<Vec<OneClickRepayCurrency>, Error> {
         self.client
             .get(ONE_CLICK_REPAY_CURRENCY_LIST_V2, request, true)
@@ -393,7 +396,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn one_click_repay_v2(
         &self,
-        request: &OneClickRepayRequest,
+        request: &OneClickRepayRequest<'_>,
     ) -> Result<Vec<OneClickRepayResult>, Error> {
         self.client.post(ONE_CLICK_REPAY_V2, request, true).await
     }
@@ -407,7 +410,7 @@ impl<'a, T: Transport> Trade<'a, T> {
     /// See [`place_order`](Self::place_order).
     pub async fn get_one_click_repay_history_v2(
         &self,
-        request: &OneClickRepayHistoryRequest,
+        request: &OneClickRepayHistoryRequest<'_>,
     ) -> Result<Vec<OneClickRepayHistory>, Error> {
         self.client
             .get(ONE_CLICK_REPAY_HISTORY_V2, request, true)

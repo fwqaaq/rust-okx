@@ -29,7 +29,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_list(
         &self,
-        request: &SubAccountListRequest,
+        request: &SubAccountListRequest<'_>,
     ) -> Result<Vec<SubAccountEntry>, Error> {
         self.client.get(SUBACCOUNT_LIST, request, true).await
     }
@@ -44,7 +44,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn create_subaccount(
         &self,
-        request: &CreateSubAccountRequest,
+        request: &CreateSubAccountRequest<'_>,
     ) -> Result<Vec<SubAccountEntry>, Error> {
         self.client.post(SUBACCOUNT_CREATE, request, true).await
     }
@@ -59,7 +59,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn create_subaccount_apikey(
         &self,
-        request: &CreateSubAccountApiKeyRequest,
+        request: &CreateSubAccountApiKeyRequest<'_>,
     ) -> Result<Vec<SubAccountApiKey>, Error> {
         self.client.post(SUBACCOUNT_APIKEY, request, true).await
     }
@@ -74,7 +74,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_apikeys(
         &self,
-        request: &SubAccountApiKeysRequest,
+        request: &SubAccountApiKeysRequest<'_>,
     ) -> Result<Vec<SubAccountApiKey>, Error> {
         self.client.get(SUBACCOUNT_APIKEY, request, true).await
     }
@@ -89,7 +89,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn modify_subaccount_apikey(
         &self,
-        request: &ModifySubAccountApiKeyRequest,
+        request: &ModifySubAccountApiKeyRequest<'_>,
     ) -> Result<Vec<SubAccountApiKey>, Error> {
         self.client
             .post(SUBACCOUNT_APIKEY_MODIFY, request, true)
@@ -106,7 +106,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn delete_subaccount_apikey(
         &self,
-        request: &DeleteSubAccountApiKeyRequest,
+        request: &DeleteSubAccountApiKeyRequest<'_>,
     ) -> Result<Vec<SubAccountApiKey>, Error> {
         self.client
             .post(SUBACCOUNT_APIKEY_DELETE, request, true)
@@ -123,7 +123,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_trading_balances(
         &self,
-        request: &SubAccountTradingBalancesRequest,
+        request: &SubAccountTradingBalancesRequest<'_>,
     ) -> Result<Vec<SubAccountTradingBalance>, Error> {
         self.client
             .get(SUBACCOUNT_TRADING_BALANCES, request, true)
@@ -140,7 +140,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_funding_balances(
         &self,
-        request: &SubAccountFundingBalancesRequest,
+        request: &SubAccountFundingBalancesRequest<'_>,
     ) -> Result<Vec<SubAccountFundingBalance>, Error> {
         self.client
             .get(SUBACCOUNT_FUNDING_BALANCES, request, true)
@@ -157,7 +157,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_max_withdrawal(
         &self,
-        request: &SubAccountMaxWithdrawalRequest,
+        request: &SubAccountMaxWithdrawalRequest<'_>,
     ) -> Result<Vec<SubAccountMaxWithdrawal>, Error> {
         self.client
             .get(SUBACCOUNT_MAX_WITHDRAWAL, request, true)
@@ -174,7 +174,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_bills(
         &self,
-        request: &SubAccountBillsRequest,
+        request: &SubAccountBillsRequest<'_>,
     ) -> Result<Vec<SubAccountBill>, Error> {
         self.client.get(SUBACCOUNT_BILLS, request, true).await
     }
@@ -189,7 +189,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn get_subaccount_managed_bills(
         &self,
-        request: &ManagedSubAccountBillsRequest,
+        request: &ManagedSubAccountBillsRequest<'_>,
     ) -> Result<Vec<ManagedSubAccountBill>, Error> {
         self.client
             .get(SUBACCOUNT_MANAGED_BILLS, request, true)
@@ -207,7 +207,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn transfer_between_subaccounts(
         &self,
-        request: &SubAccountTransferRequest,
+        request: &SubAccountTransferRequest<'_>,
     ) -> Result<Vec<SubAccountTransferResult>, Error> {
         self.client.post(SUBACCOUNT_TRANSFER, request, true).await
     }
@@ -222,7 +222,7 @@ impl<'a, T: Transport> SubAccount<'a, T> {
     /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
     pub async fn set_subaccount_transfer_out(
         &self,
-        request: &SetTransferOutRequest,
+        request: &SetTransferOutRequest<'_>,
     ) -> Result<Vec<SetTransferOutResult>, Error> {
         self.client
             .post(SUBACCOUNT_SET_TRANSFER_OUT, request, true)
