@@ -1,34 +1,36 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::model::TradeMode;
 
 /// Query parameters for maximum loan.
 #[derive(Debug, Clone, Serialize)]
-pub struct MaxLoanRequest {
+pub struct MaxLoanRequest<'a> {
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(rename = "mgnMode")]
     mgn_mode: TradeMode,
     #[serde(rename = "mgnCcy", skip_serializing_if = "Option::is_none")]
-    mgn_ccy: Option<String>,
+    mgn_ccy: Option<Cow<'a, str>>,
     #[serde(rename = "tradeQuoteCcy", skip_serializing_if = "Option::is_none")]
-    trade_quote_ccy: Option<String>,
+    trade_quote_ccy: Option<Cow<'a, str>>,
 }
 
-impl MaxLoanRequest {
+impl<'a> MaxLoanRequest<'a> {
     /// Create an instrument-based maximum-loan query.
     ///
     /// `inst_id` may contain one to five comma-separated instrument IDs, as
     /// documented by OKX. Use [`Self::by_currency`] for Spot-mode manual-borrow
     /// quota queries.
-    pub fn new(inst_id: impl Into<String>, mgn_mode: TradeMode) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>, mgn_mode: TradeMode) -> Self {
         Self::by_instrument(inst_id, mgn_mode)
     }
 
     /// Create an instrument-based maximum-loan query.
-    pub fn by_instrument(inst_id: impl Into<String>, mgn_mode: TradeMode) -> Self {
+    pub fn by_instrument(inst_id: impl Into<Cow<'a, str>>, mgn_mode: TradeMode) -> Self {
         Self {
             mgn_mode,
             inst_id: Some(inst_id.into()),
@@ -39,7 +41,7 @@ impl MaxLoanRequest {
     }
 
     /// Create a currency-based Spot-mode manual-borrow quota query.
-    pub fn by_currency(ccy: impl Into<String>) -> Self {
+    pub fn by_currency(ccy: impl Into<Cow<'a, str>>) -> Self {
         Self {
             mgn_mode: TradeMode::Cross,
             inst_id: None,
@@ -50,20 +52,20 @@ impl MaxLoanRequest {
     }
 
     /// Replace the selector with a currency-based Spot-mode query.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = None;
         self.ccy = Some(ccy.into());
         self
     }
 
     /// Set the margin currency.
-    pub fn margin_currency(mut self, mgn_ccy: impl Into<String>) -> Self {
+    pub fn margin_currency(mut self, mgn_ccy: impl Into<Cow<'a, str>>) -> Self {
         self.mgn_ccy = Some(mgn_ccy.into());
         self
     }
 
     /// Set the trade quote currency.
-    pub fn trade_quote_currency(mut self, trade_quote_ccy: impl Into<String>) -> Self {
+    pub fn trade_quote_currency(mut self, trade_quote_ccy: impl Into<Cow<'a, str>>) -> Self {
         self.trade_quote_ccy = Some(trade_quote_ccy.into());
         self
     }
@@ -71,35 +73,35 @@ impl MaxLoanRequest {
 
 /// Query parameters for interest-accrued records.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct InterestAccruedRequest {
+pub struct InterestAccruedRequest<'a> {
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(rename = "mgnMode", skip_serializing_if = "Option::is_none")]
     mgn_mode: Option<TradeMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl InterestAccruedRequest {
+impl<'a> InterestAccruedRequest<'a> {
     /// Create an empty interest-accrued query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Set the instrument ID filter.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
 
     /// Set the currency filter.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
@@ -111,13 +113,13 @@ impl InterestAccruedRequest {
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
@@ -131,17 +133,21 @@ impl InterestAccruedRequest {
 
 /// Request body for borrow/repay.
 #[derive(Debug, Clone, Serialize)]
-pub struct BorrowRepayRequest {
-    ccy: String,
-    side: String,
-    amt: String,
+pub struct BorrowRepayRequest<'a> {
+    ccy: Cow<'a, str>,
+    side: Cow<'a, str>,
+    amt: Cow<'a, str>,
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
 }
 
-impl BorrowRepayRequest {
+impl<'a> BorrowRepayRequest<'a> {
     /// Create a borrow/repay request.
-    pub fn new(ccy: impl Into<String>, side: impl Into<String>, amt: impl Into<String>) -> Self {
+    pub fn new(
+        ccy: impl Into<Cow<'a, str>>,
+        side: impl Into<Cow<'a, str>>,
+        amt: impl Into<Cow<'a, str>>,
+    ) -> Self {
         Self {
             ccy: ccy.into(),
             side: side.into(),
@@ -151,7 +157,7 @@ impl BorrowRepayRequest {
     }
 
     /// Set the related order ID.
-    pub fn order_id(mut self, ord_id: impl Into<String>) -> Self {
+    pub fn order_id(mut self, ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(ord_id.into());
         self
     }
@@ -159,37 +165,37 @@ impl BorrowRepayRequest {
 
 /// Query parameters for borrow/repay history.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct BorrowRepayHistoryRequest {
+pub struct BorrowRepayHistoryRequest<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl BorrowRepayHistoryRequest {
+impl<'a> BorrowRepayHistoryRequest<'a> {
     /// Create an empty borrow/repay-history query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Set the currency filter.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
@@ -203,27 +209,27 @@ impl BorrowRepayHistoryRequest {
 
 /// Query parameters for interest limits.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct InterestLimitsRequest {
+pub struct InterestLimitsRequest<'a> {
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    limit_type: Option<String>,
+    limit_type: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
 }
 
-impl InterestLimitsRequest {
+impl<'a> InterestLimitsRequest<'a> {
     /// Create an empty interest-limits query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Set the OKX interest-limit type.
-    pub fn limit_type(mut self, limit_type: impl Into<String>) -> Self {
+    pub fn limit_type(mut self, limit_type: impl Into<Cow<'a, str>>) -> Self {
         self.limit_type = Some(limit_type.into());
         self
     }
 
     /// Set the currency filter.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }

@@ -52,7 +52,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn get_currency_pair(
         &self,
-        request: &ConvertCurrencyPairRequest,
+        request: &ConvertCurrencyPairRequest<'_>,
     ) -> Result<Vec<ConvertCurrencyPair>, Error> {
         self.client.get(CURRENCY_PAIR, request, true).await
     }
@@ -66,7 +66,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn estimate_quote(
         &self,
-        request: &ConvertQuoteRequest,
+        request: &ConvertQuoteRequest<'_>,
     ) -> Result<Vec<ConvertQuote>, Error> {
         self.client.post(ESTIMATE_QUOTE, request, true).await
     }
@@ -80,7 +80,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn convert_trade(
         &self,
-        request: &ConvertTradeRequest,
+        request: &ConvertTradeRequest<'_>,
     ) -> Result<Vec<ConvertTradeResult>, Error> {
         self.client.post(TRADE, request, true).await
     }
@@ -94,7 +94,7 @@ impl<'a, T: Transport> Convert<'a, T> {
     /// See [`get_currencies`](Self::get_currencies) for transport and API errors.
     pub async fn get_convert_history(
         &self,
-        request: &ConvertHistoryRequest,
+        request: &ConvertHistoryRequest<'_>,
     ) -> Result<Vec<ConvertHistory>, Error> {
         self.client.get(HISTORY, request, true).await
     }

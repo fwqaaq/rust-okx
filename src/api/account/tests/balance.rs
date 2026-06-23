@@ -57,10 +57,11 @@ async fn get_positions_passes_filters() {
 
     let positions = client
         .account()
-        .get_positions(&PositionsRequest {
-            inst_type: Some(&InstType::Futures),
-            inst_id: Some("ETH-USD-210430"),
-        })
+        .get_positions(
+            &PositionsRequest::new()
+                .inst_type(InstType::Futures)
+                .inst_id("ETH-USD-210430"),
+        )
         .await
         .unwrap();
     assert_eq!(positions[0].inst_id, "ETH-USD-210430");
@@ -85,9 +86,7 @@ async fn get_position_risk_signs_and_parses() {
 
     let risk = client
         .account()
-        .get_position_risk(&PositionRiskRequest {
-            inst_type: Some(&InstType::Futures),
-        })
+        .get_position_risk(&PositionRiskRequest::new().inst_type(InstType::Futures))
         .await
         .unwrap();
     assert_eq!(risk[0].adj_eq.as_str(), "9850");

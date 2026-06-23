@@ -11,9 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = authenticated_client()?;
     let currency = env::var("OKX_EXAMPLE_FUNDING_CCY").unwrap_or_else(|_| "USDT".to_owned());
 
-    let currency_request = CurrencyRequest {
-        ccy: Some(&currency),
-    };
+    let currency_request = CurrencyRequest::new().currency(&currency);
     let currencies = client.funding().get_currencies(&currency_request).await?;
     println!("{currency} currency metadata rows: {}", currencies.len());
 
@@ -27,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let deposit_addresses = client
         .funding()
-        .get_deposit_address(&DepositAddressRequest { ccy: &currency })
+        .get_deposit_address(&DepositAddressRequest::new(&currency))
         .await?;
     println!(
         "{currency} deposit address rows: {}",
@@ -37,9 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let valuation_ccy = env::var("OKX_EXAMPLE_VALUATION_CCY").unwrap_or_else(|_| "USD".to_owned());
     let valuation = client
         .funding()
-        .get_asset_valuation(&CurrencyRequest {
-            ccy: Some(&valuation_ccy),
-        })
+        .get_asset_valuation(&CurrencyRequest::new().currency(&valuation_ccy))
         .await?;
     if let Some(row) = valuation.first() {
         println!("asset valuation in {valuation_ccy}: {}", row.total_bal);

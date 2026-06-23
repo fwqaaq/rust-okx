@@ -13,7 +13,7 @@ impl<C: WsConnector> OkxWs<C> {
     pub async fn place_order_ws(
         &mut self,
         id: impl Into<String>,
-        request: &PlaceOrderRequest,
+        request: &PlaceOrderRequest<'_>,
     ) -> Result<(), Error> {
         self.send_request(id, "order", std::slice::from_ref(request))
             .await
@@ -25,7 +25,7 @@ impl<C: WsConnector> OkxWs<C> {
     pub async fn place_orders_ws(
         &mut self,
         id: impl Into<String>,
-        requests: &[PlaceOrderRequest],
+        requests: &[PlaceOrderRequest<'_>],
     ) -> Result<(), Error> {
         self.send_request(id, "batch-orders", requests).await
     }
@@ -36,7 +36,7 @@ impl<C: WsConnector> OkxWs<C> {
     pub async fn cancel_order_ws(
         &mut self,
         id: impl Into<String>,
-        request: &CancelOrderRequest,
+        request: &CancelOrderRequest<'_>,
     ) -> Result<(), Error> {
         self.send_request(id, "cancel-order", std::slice::from_ref(request))
             .await
@@ -48,7 +48,7 @@ impl<C: WsConnector> OkxWs<C> {
     pub async fn cancel_orders_ws(
         &mut self,
         id: impl Into<String>,
-        requests: &[CancelOrderRequest],
+        requests: &[CancelOrderRequest<'_>],
     ) -> Result<(), Error> {
         self.send_request(id, "batch-cancel-orders", requests).await
     }
@@ -59,7 +59,7 @@ impl<C: WsConnector> OkxWs<C> {
     pub async fn amend_order_ws(
         &mut self,
         id: impl Into<String>,
-        request: &AmendOrderRequest,
+        request: &AmendOrderRequest<'_>,
     ) -> Result<(), Error> {
         self.send_request(id, "amend-order", std::slice::from_ref(request))
             .await
@@ -71,7 +71,7 @@ impl<C: WsConnector> OkxWs<C> {
     pub async fn amend_orders_ws(
         &mut self,
         id: impl Into<String>,
-        requests: &[AmendOrderRequest],
+        requests: &[AmendOrderRequest<'_>],
     ) -> Result<(), Error> {
         self.send_request(id, "batch-amend-orders", requests).await
     }

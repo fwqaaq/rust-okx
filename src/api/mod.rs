@@ -10,5 +10,7 @@ pub mod finance;
 pub mod funding;
 pub mod market;
 pub mod public_data;
+pub mod status;
 pub mod sub_account;
+pub mod support;
 pub mod trade;

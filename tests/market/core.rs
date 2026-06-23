@@ -9,9 +9,7 @@ async fn market_ticker_parses() {
     // STATUS: LIVE — public, read-only.
     let tickers = client
         .market()
-        .get_ticker(&InstIdRequest {
-            inst_id: "BTC-USDT",
-        })
+        .get_ticker(&InstIdRequest::new("BTC-USDT"))
         .await
         .expect("market/ticker");
 
@@ -32,11 +30,7 @@ async fn market_candles_and_trades_parse() {
     // STATUS: LIVE — public, read-only.
     let candles = client
         .market()
-        .get_candlesticks(&CandlesRequest {
-            inst_id: "BTC-USDT",
-            bar: Some("1H"),
-            limit: Some(10),
-        })
+        .get_candlesticks(&CandlesRequest::new("BTC-USDT").bar("1H").limit(10))
         .await
         .expect("market/candles");
     assert!(!candles.is_empty());
@@ -48,10 +42,7 @@ async fn market_candles_and_trades_parse() {
     // STATUS: LIVE — public, read-only.
     client
         .market()
-        .get_trades(&TradesRequest {
-            inst_id: "BTC-USDT",
-            limit: Some(10),
-        })
+        .get_trades(&TradesRequest::new("BTC-USDT").limit(10))
         .await
         .expect("market/trades");
 }

@@ -13,7 +13,9 @@ use crate::api::finance::Finance;
 use crate::api::funding::Funding;
 use crate::api::market::Market;
 use crate::api::public_data::PublicData;
+use crate::api::status::Status;
 use crate::api::sub_account::SubAccount;
+use crate::api::support::Support;
 use crate::api::trade::Trade;
 use crate::credentials::Credentials;
 use crate::error::{Error, RestError};
@@ -29,7 +31,8 @@ use crate::transport::{DefaultTransport, Transport};
 /// request methods take `&self`.
 ///
 /// API groups are reached through accessor methods: [`market`](Self::market),
-/// [`public_data`](Self::public_data), [`account`](Self::account),
+/// [`public_data`](Self::public_data), [`status`](Self::status),
+/// [`support`](Self::support), [`account`](Self::account),
 /// [`funding`](Self::funding), [`convert`](Self::convert),
 /// [`finance`](Self::finance), and [`trade`](Self::trade).
 pub struct OkxClient<T = DefaultTransport> {
@@ -64,6 +67,16 @@ impl<T: Transport> OkxClient<T> {
     /// Access the public reference-data endpoints.
     pub fn public_data(&self) -> PublicData<'_, T> {
         PublicData::new(self)
+    }
+
+    /// Access the public system-status endpoints.
+    pub fn status(&self) -> Status<'_, T> {
+        Status::new(self)
+    }
+
+    /// Access the public support and announcement endpoints.
+    pub fn support(&self) -> Support<'_, T> {
+        Support::new(self)
     }
 
     /// Access the (authenticated) account endpoints.
@@ -314,7 +327,7 @@ mod tests {
     async fn non_zero_code_is_api_error() {
         let mock = MockTransport::new(r#"{"code":"51000","msg":"Parameter error","data":[]}"#);
         let client = OkxClient::with_transport(mock).build();
-        let request = InstIdRequest { inst_id: "BAD" };
+        let request = InstIdRequest::new("BAD");
         let err = client.market().get_ticker(&request).await.unwrap_err();
         match err {
             Error::Rest(RestError::Okx { code, message, .. }) => {
@@ -339,9 +352,7 @@ mod tests {
             .region(OkxRegion::Us)
             .build();
 
-        let request = InstIdRequest {
-            inst_id: "BTC-USDT",
-        };
+        let request = InstIdRequest::new("BTC-USDT");
         client.market().get_ticker(&request).await.unwrap();
 
         let req = mock.captured();
@@ -361,9 +372,7 @@ mod tests {
             .base_url("https://example.test")
             .build();
 
-        let request = InstIdRequest {
-            inst_id: "BTC-USDT",
-        };
+        let request = InstIdRequest::new("BTC-USDT");
         client.market().get_ticker(&request).await.unwrap();
 
         let req = mock.captured();

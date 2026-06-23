@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::model::InstType;
@@ -5,12 +7,26 @@ use crate::model::InstType;
 /// Request for [`get_instruments`](crate::api::public_data::PublicData::get_instruments).
 #[derive(Debug, Clone, Serialize)]
 pub struct InstrumentsRequest<'a> {
-    /// Instrument type.
     #[serde(rename = "instType")]
-    pub inst_type: &'a InstType,
-    /// Instrument family filter (optional, for derivatives).
+    inst_type: InstType,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    pub inst_family: Option<&'a str>,
+    inst_family: Option<Cow<'a, str>>,
+}
+
+impl<'a> InstrumentsRequest<'a> {
+    /// Create an instruments query for an instrument type.
+    pub fn new(inst_type: InstType) -> Self {
+        Self {
+            inst_type,
+            inst_family: None,
+        }
+    }
+
+    /// Set the instrument family filter.
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_family = Some(inst_family.into());
+        self
+    }
 }
 
 /// Request for [`get_funding_rate`](crate::api::public_data::PublicData::get_funding_rate),
@@ -18,36 +34,57 @@ pub struct InstrumentsRequest<'a> {
 /// [`get_estimated_price`](crate::api::public_data::PublicData::get_estimated_price).
 #[derive(Debug, Clone, Serialize)]
 pub struct InstIdRequest<'a> {
-    /// Instrument ID, e.g. `"BTC-USDT-SWAP"`.
     #[serde(rename = "instId")]
-    pub inst_id: &'a str,
+    inst_id: Cow<'a, str>,
+}
+
+impl<'a> InstIdRequest<'a> {
+    /// Create a query for one instrument ID.
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_id: inst_id.into(),
+        }
+    }
 }
 
 /// Request for [`get_discount_rate_interest_free_quota`](crate::api::public_data::PublicData::get_discount_rate_interest_free_quota).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct CurrencyRequest<'a> {
-    /// Currency filter, e.g. `Some("BTC")`. `None` returns all currencies.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub ccy: Option<&'a str>,
+    ccy: Option<Cow<'a, str>>,
+}
+
+impl<'a> CurrencyRequest<'a> {
+    /// Create an unfiltered currency query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Set the currency filter.
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
+        self.ccy = Some(ccy.into());
+        self
+    }
 }
 
 mod edge;
 
 pub use edge::*;
+
 /// Query parameters for public endpoints filtered by instrument family.
 #[derive(Debug, Clone, Serialize)]
-pub struct InstrumentFamilyRequest {
+pub struct InstrumentFamilyRequest<'a> {
     #[serde(rename = "instType")]
     inst_type: InstType,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<String>,
+    underlying: Option<Cow<'a, str>>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<String>,
+    inst_family: Option<Cow<'a, str>>,
 }
 
-impl InstrumentFamilyRequest {
+impl<'a> InstrumentFamilyRequest<'a> {
     /// Create a query for an instrument type.
     pub fn new(inst_type: InstType) -> Self {
         Self {
@@ -59,19 +96,19 @@ impl InstrumentFamilyRequest {
     }
 
     /// Set the underlying filter.
-    pub fn underlying(mut self, underlying: impl Into<String>) -> Self {
+    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
         self.underlying = Some(underlying.into());
         self
     }
 
     /// Set the instrument ID filter.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
 
     /// Set the instrument family filter.
-    pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
     }
@@ -79,20 +116,20 @@ impl InstrumentFamilyRequest {
 
 /// Query parameters for funding-rate history.
 #[derive(Debug, Clone, Serialize)]
-pub struct FundingRateHistoryRequest {
+pub struct FundingRateHistoryRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl FundingRateHistoryRequest {
+impl<'a> FundingRateHistoryRequest<'a> {
     /// Create a funding-rate history query.
-    pub fn new(inst_id: impl Into<String>) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             inst_id: inst_id.into(),
             after: None,
@@ -102,13 +139,13 @@ impl FundingRateHistoryRequest {
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
@@ -122,22 +159,22 @@ impl FundingRateHistoryRequest {
 
 /// Query parameters for delivery/exercise history.
 #[derive(Debug, Clone, Serialize)]
-pub struct DeliveryExerciseHistoryRequest {
+pub struct DeliveryExerciseHistoryRequest<'a> {
     #[serde(rename = "instType")]
     inst_type: InstType,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<String>,
+    underlying: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<String>,
+    inst_family: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl DeliveryExerciseHistoryRequest {
+impl<'a> DeliveryExerciseHistoryRequest<'a> {
     /// Create a delivery/exercise history query.
     pub fn new(inst_type: InstType) -> Self {
         Self {
@@ -151,25 +188,25 @@ impl DeliveryExerciseHistoryRequest {
     }
 
     /// Set the underlying filter.
-    pub fn underlying(mut self, underlying: impl Into<String>) -> Self {
+    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
         self.underlying = Some(underlying.into());
         self
     }
 
     /// Set the instrument family filter.
-    pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
@@ -183,26 +220,26 @@ impl DeliveryExerciseHistoryRequest {
 
 /// Query parameters for public position tiers.
 #[derive(Debug, Clone, Serialize)]
-pub struct PositionTiersRequest {
+pub struct PositionTiersRequest<'a> {
     #[serde(rename = "instType")]
     inst_type: InstType,
     #[serde(rename = "tdMode")]
-    td_mode: String,
+    td_mode: Cow<'a, str>,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<String>,
+    underlying: Option<Cow<'a, str>>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tier: Option<String>,
+    tier: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<String>,
+    inst_family: Option<Cow<'a, str>>,
 }
 
-impl PositionTiersRequest {
+impl<'a> PositionTiersRequest<'a> {
     /// Create a position-tiers query.
-    pub fn new(inst_type: InstType, td_mode: impl Into<String>) -> Self {
+    pub fn new(inst_type: InstType, td_mode: impl Into<Cow<'a, str>>) -> Self {
         Self {
             inst_type,
             td_mode: td_mode.into(),
@@ -215,31 +252,31 @@ impl PositionTiersRequest {
     }
 
     /// Set the underlying filter.
-    pub fn underlying(mut self, underlying: impl Into<String>) -> Self {
+    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
         self.underlying = Some(underlying.into());
         self
     }
 
     /// Set the instrument ID filter.
-    pub fn inst_id(mut self, inst_id: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
         self
     }
 
     /// Set the currency filter.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
 
     /// Set the tier filter.
-    pub fn tier(mut self, tier: impl Into<String>) -> Self {
+    pub fn tier(mut self, tier: impl Into<Cow<'a, str>>) -> Self {
         self.tier = Some(tier.into());
         self
     }
 
     /// Set the instrument family filter.
-    pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
     }
@@ -247,26 +284,26 @@ impl PositionTiersRequest {
 
 /// Query parameters for insurance fund snapshots.
 #[derive(Debug, Clone, Serialize)]
-pub struct InsuranceFundRequest {
+pub struct InsuranceFundRequest<'a> {
     #[serde(rename = "instType")]
     inst_type: InstType,
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    fund_type: Option<String>,
+    fund_type: Option<Cow<'a, str>>,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<String>,
+    underlying: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<String>,
+    inst_family: Option<Cow<'a, str>>,
 }
 
-impl InsuranceFundRequest {
+impl<'a> InsuranceFundRequest<'a> {
     /// Create an insurance fund query.
     pub fn new(inst_type: InstType) -> Self {
         Self {
@@ -282,31 +319,31 @@ impl InsuranceFundRequest {
     }
 
     /// Set the OKX fund type filter.
-    pub fn fund_type(mut self, fund_type: impl Into<String>) -> Self {
+    pub fn fund_type(mut self, fund_type: impl Into<Cow<'a, str>>) -> Self {
         self.fund_type = Some(fund_type.into());
         self
     }
 
     /// Set the underlying filter.
-    pub fn underlying(mut self, underlying: impl Into<String>) -> Self {
+    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
         self.underlying = Some(underlying.into());
         self
     }
 
     /// Set the currency filter.
-    pub fn currency(mut self, ccy: impl Into<String>) -> Self {
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
 
     /// Return records before this pagination cursor.
-    pub fn before(mut self, before: impl Into<String>) -> Self {
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
 
     /// Return records after this pagination cursor.
-    pub fn after(mut self, after: impl Into<String>) -> Self {
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
@@ -318,7 +355,7 @@ impl InsuranceFundRequest {
     }
 
     /// Set the instrument family filter.
-    pub fn inst_family(mut self, inst_family: impl Into<String>) -> Self {
+    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
         self
     }
@@ -326,24 +363,24 @@ impl InsuranceFundRequest {
 
 /// Query parameters for contract/coin conversion.
 #[derive(Debug, Clone, Serialize)]
-pub struct ConvertContractCoinRequest {
+pub struct ConvertContractCoinRequest<'a> {
     #[serde(rename = "type")]
-    conversion_type: String,
+    conversion_type: Cow<'a, str>,
     #[serde(rename = "instId")]
-    inst_id: String,
-    sz: String,
+    inst_id: Cow<'a, str>,
+    sz: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    px: Option<String>,
+    px: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    unit: Option<String>,
+    unit: Option<Cow<'a, str>>,
 }
 
-impl ConvertContractCoinRequest {
+impl<'a> ConvertContractCoinRequest<'a> {
     /// Create a contract/coin conversion query.
     pub fn new(
-        conversion_type: impl Into<String>,
-        inst_id: impl Into<String>,
-        sz: impl Into<String>,
+        conversion_type: impl Into<Cow<'a, str>>,
+        inst_id: impl Into<Cow<'a, str>>,
+        sz: impl Into<Cow<'a, str>>,
     ) -> Self {
         Self {
             conversion_type: conversion_type.into(),
@@ -355,13 +392,13 @@ impl ConvertContractCoinRequest {
     }
 
     /// Set the price used for conversion.
-    pub fn price(mut self, px: impl Into<String>) -> Self {
+    pub fn price(mut self, px: impl Into<Cow<'a, str>>) -> Self {
         self.px = Some(px.into());
         self
     }
 
     /// Set the unit used for conversion.
-    pub fn unit(mut self, unit: impl Into<String>) -> Self {
+    pub fn unit(mut self, unit: impl Into<Cow<'a, str>>) -> Self {
         self.unit = Some(unit.into());
         self
     }

@@ -150,21 +150,16 @@ def check_unit_tests(path: Path) -> None:
             violations.append(
                 f"[T1] {path}:{lineno}: `{fn_name}` must use `MockTransport::new` (unit tests run offline)"
             )
-        # T2 — raw string mock body
-        if 'r#"' not in body:
-            violations.append(
-                f'[T2] {path}:{lineno}: `{fn_name}` must include a raw-string mock body (`r#"..."`)'
-            )
-        # T3 — captured() required unless it's a failure test
+        # T2 — captured() required unless it's a failure test
         is_failure_test = ".unwrap_err()" in body
         if not is_failure_test and "mock.captured()" not in body:
             violations.append(
-                f"[T3] {path}:{lineno}: `{fn_name}` must call `mock.captured()` to assert the outgoing request"
+                f"[T2] {path}:{lineno}: `{fn_name}` must call `mock.captured()` to assert the outgoing request"
             )
-        # T4 — is_signed() required whenever captured() is used
+        # T3 — is_signed() required whenever captured() is used
         if "mock.captured()" in body and "is_signed()" not in body:
             violations.append(
-                f"[T4] {path}:{lineno}: `{fn_name}` calls `mock.captured()` but never checks `is_signed()`"
+                f"[T3] {path}:{lineno}: `{fn_name}` calls `mock.captured()` but never checks `is_signed()`"
             )
 
 

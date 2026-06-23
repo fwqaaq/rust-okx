@@ -58,7 +58,7 @@ async fn get_interest_rate_queries_currency() {
 
     let result = client
         .account()
-        .get_interest_rate(BalanceRequest { ccy: Some("BTC") })
+        .get_interest_rate(BalanceRequest::new().currency("BTC"))
         .await
         .unwrap();
     assert_eq!(result[0].ccy, "BTC");
@@ -157,7 +157,7 @@ async fn set_auto_loan_posts_body() {
 
     let result = client
         .account()
-        .set_auto_loan(&SetAutoLoanRequest { auto_loan: true })
+        .set_auto_loan(&SetAutoLoanRequest::new(true))
         .await
         .unwrap();
     assert_eq!(result[0].auto_loan, "true");

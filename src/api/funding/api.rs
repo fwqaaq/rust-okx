@@ -86,7 +86,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn funds_transfer(
         &self,
-        request: &FundsTransferRequest,
+        request: &FundsTransferRequest<'_>,
     ) -> Result<Vec<TransferResult>, Error> {
         self.client.post(TRANSFER, request, true).await
     }
@@ -116,7 +116,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn withdrawal(
         &self,
-        request: &WithdrawalRequest,
+        request: &WithdrawalRequest<'_>,
     ) -> Result<Vec<WithdrawalResult>, Error> {
         self.client.post(WITHDRAWAL, request, true).await
     }
@@ -130,7 +130,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn get_deposit_history(
         &self,
-        request: &DepositHistoryRequest,
+        request: &DepositHistoryRequest<'_>,
     ) -> Result<Vec<DepositRecord>, Error> {
         self.client.get(DEPOSIT_HISTORY, request, true).await
     }
@@ -144,7 +144,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn get_bills(
         &self,
-        request: &FundingBillsRequest,
+        request: &FundingBillsRequest<'_>,
     ) -> Result<Vec<FundingBill>, Error> {
         self.client.get(BILLS, request, true).await
     }
@@ -158,7 +158,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn get_deposit_lightning(
         &self,
-        request: &DepositLightningRequest,
+        request: &DepositLightningRequest<'_>,
     ) -> Result<Vec<DepositLightning>, Error> {
         self.client.get(DEPOSIT_LIGHTNING, request, true).await
     }
@@ -172,7 +172,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn withdrawal_lightning(
         &self,
-        request: &WithdrawalLightningRequest,
+        request: &WithdrawalLightningRequest<'_>,
     ) -> Result<Vec<WithdrawalLightning>, Error> {
         self.client.post(WITHDRAWAL_LIGHTNING, request, true).await
     }
@@ -214,7 +214,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn get_deposit_withdraw_status(
         &self,
-        request: &DepositWithdrawStatusRequest,
+        request: &DepositWithdrawStatusRequest<'_>,
     ) -> Result<Vec<DepositWithdrawStatus>, Error> {
         self.client
             .get(DEPOSIT_WITHDRAW_STATUS, request, true)
@@ -230,7 +230,7 @@ impl<'a, T: Transport> Funding<'a, T> {
     /// See [`get_currencies`](Self::get_currencies).
     pub async fn get_withdrawal_history(
         &self,
-        request: &WithdrawalHistoryRequest,
+        request: &WithdrawalHistoryRequest<'_>,
     ) -> Result<Vec<WithdrawalRecord>, Error> {
         self.client.get(WITHDRAWAL_HISTORY, request, true).await
     }

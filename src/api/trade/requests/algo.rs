@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 /// One attached take-profit/stop-loss definition for an algo order.
@@ -505,18 +507,18 @@ impl AlgoOrderRequest {
 
 /// Request body for one entry in `POST /api/v5/trade/cancel-algos`.
 #[derive(Debug, Clone, Serialize)]
-pub struct CancelAlgoOrderRequest {
+pub struct CancelAlgoOrderRequest<'a> {
     #[serde(rename = "algoId", skip_serializing_if = "Option::is_none")]
-    algo_id: Option<String>,
+    algo_id: Option<Cow<'a, str>>,
     #[serde(rename = "algoClOrdId", skip_serializing_if = "Option::is_none")]
-    algo_cl_ord_id: Option<String>,
+    algo_cl_ord_id: Option<Cow<'a, str>>,
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
 }
 
-impl CancelAlgoOrderRequest {
+impl<'a> CancelAlgoOrderRequest<'a> {
     /// Create a cancellation using an OKX algo ID.
-    pub fn new(algo_id: impl Into<String>, inst_id: impl Into<String>) -> Self {
+    pub fn new(algo_id: impl Into<Cow<'a, str>>, inst_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             algo_id: Some(algo_id.into()),
             algo_cl_ord_id: None,
@@ -526,8 +528,8 @@ impl CancelAlgoOrderRequest {
 
     /// Create a cancellation using a client-supplied algo ID.
     pub fn by_client_algo_order_id(
-        algo_cl_ord_id: impl Into<String>,
-        inst_id: impl Into<String>,
+        algo_cl_ord_id: impl Into<Cow<'a, str>>,
+        inst_id: impl Into<Cow<'a, str>>,
     ) -> Self {
         Self {
             algo_id: None,
@@ -539,36 +541,36 @@ impl CancelAlgoOrderRequest {
 
 /// Request body for `POST /api/v5/trade/amend-algos`.
 #[derive(Debug, Clone, Serialize)]
-pub struct AmendAlgoOrderRequest {
+pub struct AmendAlgoOrderRequest<'a> {
     #[serde(rename = "instId")]
-    inst_id: String,
+    inst_id: Cow<'a, str>,
     #[serde(rename = "algoId", skip_serializing_if = "Option::is_none")]
-    algo_id: Option<String>,
+    algo_id: Option<Cow<'a, str>>,
     #[serde(rename = "algoClOrdId", skip_serializing_if = "Option::is_none")]
-    algo_cl_ord_id: Option<String>,
+    algo_cl_ord_id: Option<Cow<'a, str>>,
     #[serde(rename = "reqId", skip_serializing_if = "Option::is_none")]
-    req_id: Option<String>,
+    req_id: Option<Cow<'a, str>>,
     #[serde(rename = "newSz", skip_serializing_if = "Option::is_none")]
-    new_sz: Option<String>,
+    new_sz: Option<Cow<'a, str>>,
     #[serde(rename = "newTpTriggerPx", skip_serializing_if = "Option::is_none")]
-    new_tp_trigger_px: Option<String>,
+    new_tp_trigger_px: Option<Cow<'a, str>>,
     #[serde(rename = "newTpOrdPx", skip_serializing_if = "Option::is_none")]
-    new_tp_ord_px: Option<String>,
+    new_tp_ord_px: Option<Cow<'a, str>>,
     #[serde(rename = "newTpTriggerPxType", skip_serializing_if = "Option::is_none")]
-    new_tp_trigger_px_type: Option<String>,
+    new_tp_trigger_px_type: Option<Cow<'a, str>>,
     #[serde(rename = "newSlTriggerPx", skip_serializing_if = "Option::is_none")]
-    new_sl_trigger_px: Option<String>,
+    new_sl_trigger_px: Option<Cow<'a, str>>,
     #[serde(rename = "newSlOrdPx", skip_serializing_if = "Option::is_none")]
-    new_sl_ord_px: Option<String>,
+    new_sl_ord_px: Option<Cow<'a, str>>,
     #[serde(rename = "newSlTriggerPxType", skip_serializing_if = "Option::is_none")]
-    new_sl_trigger_px_type: Option<String>,
+    new_sl_trigger_px_type: Option<Cow<'a, str>>,
     #[serde(rename = "cxlOnFail", skip_serializing_if = "Option::is_none")]
     cancel_on_fail: Option<bool>,
 }
 
-impl AmendAlgoOrderRequest {
+impl<'a> AmendAlgoOrderRequest<'a> {
     /// Create an amendment for an instrument; add an algo identifier next.
-    pub fn new(inst_id: impl Into<String>) -> Self {
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             inst_id: inst_id.into(),
             algo_id: None,
@@ -586,25 +588,25 @@ impl AmendAlgoOrderRequest {
     }
 
     /// Identify the order by OKX algo ID.
-    pub fn algo_id(mut self, value: impl Into<String>) -> Self {
+    pub fn algo_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.algo_id = Some(value.into());
         self
     }
 
     /// Identify the order by client-supplied algo ID.
-    pub fn client_algo_order_id(mut self, value: impl Into<String>) -> Self {
+    pub fn client_algo_order_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.algo_cl_ord_id = Some(value.into());
         self
     }
 
     /// Set a client request ID of up to 32 ASCII alphanumeric characters.
-    pub fn request_id(mut self, value: impl Into<String>) -> Self {
+    pub fn request_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.req_id = Some(value.into());
         self
     }
 
     /// Amend the order size.
-    pub fn new_size(mut self, value: impl Into<String>) -> Self {
+    pub fn new_size(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.new_sz = Some(value.into());
         self
     }
@@ -612,8 +614,8 @@ impl AmendAlgoOrderRequest {
     /// Amend take-profit prices.
     pub fn take_profit(
         mut self,
-        trigger_px: impl Into<String>,
-        order_px: impl Into<String>,
+        trigger_px: impl Into<Cow<'a, str>>,
+        order_px: impl Into<Cow<'a, str>>,
     ) -> Self {
         self.new_tp_trigger_px = Some(trigger_px.into());
         self.new_tp_ord_px = Some(order_px.into());
@@ -621,35 +623,39 @@ impl AmendAlgoOrderRequest {
     }
 
     /// Set the amended take-profit trigger price source.
-    pub fn take_profit_price_type(mut self, value: impl Into<String>) -> Self {
+    pub fn take_profit_price_type(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.new_tp_trigger_px_type = Some(value.into());
         self
     }
 
     /// Delete the take-profit definition by sending the documented `0` sentinel.
     pub fn delete_take_profit(mut self) -> Self {
-        self.new_tp_trigger_px = Some("0".to_owned());
+        self.new_tp_trigger_px = Some(Cow::Borrowed("0"));
         self.new_tp_ord_px = None;
         self.new_tp_trigger_px_type = None;
         self
     }
 
     /// Amend stop-loss prices.
-    pub fn stop_loss(mut self, trigger_px: impl Into<String>, order_px: impl Into<String>) -> Self {
+    pub fn stop_loss(
+        mut self,
+        trigger_px: impl Into<Cow<'a, str>>,
+        order_px: impl Into<Cow<'a, str>>,
+    ) -> Self {
         self.new_sl_trigger_px = Some(trigger_px.into());
         self.new_sl_ord_px = Some(order_px.into());
         self
     }
 
     /// Set the amended stop-loss trigger price source.
-    pub fn stop_loss_price_type(mut self, value: impl Into<String>) -> Self {
+    pub fn stop_loss_price_type(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.new_sl_trigger_px_type = Some(value.into());
         self
     }
 
     /// Delete the stop-loss definition by sending the documented `0` sentinel.
     pub fn delete_stop_loss(mut self) -> Self {
-        self.new_sl_trigger_px = Some("0".to_owned());
+        self.new_sl_trigger_px = Some(Cow::Borrowed("0"));
         self.new_sl_ord_px = None;
         self.new_sl_trigger_px_type = None;
         self
@@ -664,26 +670,26 @@ impl AmendAlgoOrderRequest {
 
 /// Query parameters shared by pending and historical algo orders.
 #[derive(Debug, Clone, Serialize)]
-pub struct AlgoOrderListRequest {
+pub struct AlgoOrderListRequest<'a> {
     #[serde(rename = "ordType")]
-    ord_type: String,
+    ord_type: Cow<'a, str>,
     #[serde(rename = "algoId", skip_serializing_if = "Option::is_none")]
-    algo_id: Option<String>,
+    algo_id: Option<Cow<'a, str>>,
     #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
-    inst_type: Option<String>,
+    inst_type: Option<Cow<'a, str>>,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<String>,
+    inst_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl AlgoOrderListRequest {
+impl<'a> AlgoOrderListRequest<'a> {
     /// Create a query for one documented algo order type.
-    pub fn new(ord_type: impl Into<String>) -> Self {
+    pub fn new(ord_type: impl Into<Cow<'a, str>>) -> Self {
         Self {
             ord_type: ord_type.into(),
             algo_id: None,
@@ -696,31 +702,31 @@ impl AlgoOrderListRequest {
     }
 
     /// Filter by algo ID.
-    pub fn algo_id(mut self, value: impl Into<String>) -> Self {
+    pub fn algo_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.algo_id = Some(value.into());
         self
     }
 
     /// Filter by instrument type.
-    pub fn inst_type(mut self, value: impl Into<String>) -> Self {
+    pub fn inst_type(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.inst_type = Some(value.into());
         self
     }
 
     /// Filter by instrument ID.
-    pub fn inst_id(mut self, value: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(value.into());
         self
     }
 
     /// Return records before this algo-ID cursor.
-    pub fn after(mut self, value: impl Into<String>) -> Self {
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(value.into());
         self
     }
 
     /// Return records after this algo-ID cursor.
-    pub fn before(mut self, value: impl Into<String>) -> Self {
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(value.into());
         self
     }
@@ -734,16 +740,16 @@ impl AlgoOrderListRequest {
 
 /// Query parameters for historical algo orders.
 #[derive(Debug, Clone, Serialize)]
-pub struct AlgoOrderHistoryRequest {
+pub struct AlgoOrderHistoryRequest<'a> {
     #[serde(flatten)]
-    common: AlgoOrderListRequest,
+    common: AlgoOrderListRequest<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    state: Option<String>,
+    state: Option<Cow<'a, str>>,
 }
 
-impl AlgoOrderHistoryRequest {
+impl<'a> AlgoOrderHistoryRequest<'a> {
     /// Create a history query for one documented algo order type.
-    pub fn new(ord_type: impl Into<String>) -> Self {
+    pub fn new(ord_type: impl Into<Cow<'a, str>>) -> Self {
         Self {
             common: AlgoOrderListRequest::new(ord_type),
             state: None,
@@ -751,37 +757,37 @@ impl AlgoOrderHistoryRequest {
     }
 
     /// Filter by historical state.
-    pub fn state(mut self, value: impl Into<String>) -> Self {
+    pub fn state(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.state = Some(value.into());
         self
     }
 
     /// Filter by OKX algo order ID.
-    pub fn algo_id(mut self, value: impl Into<String>) -> Self {
+    pub fn algo_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.common = self.common.algo_id(value);
         self
     }
 
     /// Filter by instrument type.
-    pub fn inst_type(mut self, value: impl Into<String>) -> Self {
+    pub fn inst_type(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.common = self.common.inst_type(value);
         self
     }
 
     /// Filter by instrument ID.
-    pub fn inst_id(mut self, value: impl Into<String>) -> Self {
+    pub fn inst_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.common = self.common.inst_id(value);
         self
     }
 
     /// Return records before this cursor.
-    pub fn after(mut self, value: impl Into<String>) -> Self {
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.common = self.common.after(value);
         self
     }
 
     /// Return records after this cursor.
-    pub fn before(mut self, value: impl Into<String>) -> Self {
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.common = self.common.before(value);
         self
     }
@@ -795,16 +801,16 @@ impl AlgoOrderHistoryRequest {
 
 /// Query parameters for `GET /api/v5/trade/order-algo`.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct AlgoOrderDetailsRequest {
+pub struct AlgoOrderDetailsRequest<'a> {
     #[serde(rename = "algoId", skip_serializing_if = "Option::is_none")]
-    algo_id: Option<String>,
+    algo_id: Option<Cow<'a, str>>,
     #[serde(rename = "algoClOrdId", skip_serializing_if = "Option::is_none")]
-    algo_cl_ord_id: Option<String>,
+    algo_cl_ord_id: Option<Cow<'a, str>>,
 }
 
-impl AlgoOrderDetailsRequest {
+impl<'a> AlgoOrderDetailsRequest<'a> {
     /// Query by OKX algo ID.
-    pub fn by_algo_id(value: impl Into<String>) -> Self {
+    pub fn by_algo_id(value: impl Into<Cow<'a, str>>) -> Self {
         Self {
             algo_id: Some(value.into()),
             algo_cl_ord_id: None,
@@ -812,7 +818,7 @@ impl AlgoOrderDetailsRequest {
     }
 
     /// Query by client-supplied algo ID.
-    pub fn by_client_algo_order_id(value: impl Into<String>) -> Self {
+    pub fn by_client_algo_order_id(value: impl Into<Cow<'a, str>>) -> Self {
         Self {
             algo_id: None,
             algo_cl_ord_id: Some(value.into()),

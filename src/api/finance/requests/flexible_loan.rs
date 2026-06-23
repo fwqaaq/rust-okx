@@ -1,28 +1,30 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 /// Query parameters for `GET /api/v5/finance/flexible-loan/collateral-assets`.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct FlexibleLoanCollateralAssetsRequest {
+pub struct FlexibleLoanCollateralAssetsRequest<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
 }
 
-impl FlexibleLoanCollateralAssetsRequest {
+impl<'a> FlexibleLoanCollateralAssetsRequest<'a> {
     /// Create an unfiltered collateral-assets query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Filter by collateral currency.
-    pub fn currency(mut self, value: impl Into<String>) -> Self {
+    pub fn currency(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(value.into());
         self
     }
 
     /// Scope the query to one flexible-loan order.
-    pub fn order_id(mut self, value: impl Into<String>) -> Self {
+    pub fn order_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(value.into());
         self
     }
@@ -30,20 +32,20 @@ impl FlexibleLoanCollateralAssetsRequest {
 
 /// Request body for `POST /api/v5/finance/flexible-loan/max-loan`.
 #[derive(Debug, Clone, Serialize)]
-pub struct FlexibleLoanMaxLoanRequest {
+pub struct FlexibleLoanMaxLoanRequest<'a> {
     #[serde(rename = "borrowCcy")]
-    borrow_ccy: String,
+    borrow_ccy: Cow<'a, str>,
     #[serde(rename = "collateralCcy", skip_serializing_if = "Option::is_none")]
-    collateral_ccy: Option<String>,
+    collateral_ccy: Option<Cow<'a, str>>,
     #[serde(rename = "collateralAmt", skip_serializing_if = "Option::is_none")]
-    collateral_amt: Option<String>,
+    collateral_amt: Option<Cow<'a, str>>,
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
 }
 
-impl FlexibleLoanMaxLoanRequest {
+impl<'a> FlexibleLoanMaxLoanRequest<'a> {
     /// Create a maximum-loan estimate for a borrowing currency.
-    pub fn new(borrow_ccy: impl Into<String>) -> Self {
+    pub fn new(borrow_ccy: impl Into<Cow<'a, str>>) -> Self {
         Self {
             borrow_ccy: borrow_ccy.into(),
             collateral_ccy: None,
@@ -53,14 +55,18 @@ impl FlexibleLoanMaxLoanRequest {
     }
 
     /// Estimate using a collateral currency and amount.
-    pub fn collateral(mut self, ccy: impl Into<String>, amt: impl Into<String>) -> Self {
+    pub fn collateral(
+        mut self,
+        ccy: impl Into<Cow<'a, str>>,
+        amt: impl Into<Cow<'a, str>>,
+    ) -> Self {
         self.collateral_ccy = Some(ccy.into());
         self.collateral_amt = Some(amt.into());
         self
     }
 
     /// Estimate additional borrowing for one existing flexible-loan order.
-    pub fn order_id(mut self, value: impl Into<String>) -> Self {
+    pub fn order_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(value.into());
         self
     }
@@ -68,27 +74,27 @@ impl FlexibleLoanMaxLoanRequest {
 
 /// Query parameters for `GET /api/v5/finance/flexible-loan/max-collateral-redeem-amount`.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct FlexibleLoanMaxRedeemRequest {
+pub struct FlexibleLoanMaxRedeemRequest<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
 }
 
-impl FlexibleLoanMaxRedeemRequest {
+impl<'a> FlexibleLoanMaxRedeemRequest<'a> {
     /// Create an unfiltered maximum-redeem query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Filter by collateral currency.
-    pub fn currency(mut self, value: impl Into<String>) -> Self {
+    pub fn currency(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(value.into());
         self
     }
 
     /// Scope the calculation to one flexible-loan order.
-    pub fn order_id(mut self, value: impl Into<String>) -> Self {
+    pub fn order_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(value.into());
         self
     }
@@ -96,23 +102,23 @@ impl FlexibleLoanMaxRedeemRequest {
 
 /// Request body for `POST /api/v5/finance/flexible-loan/adjust-collateral`.
 #[derive(Debug, Clone, Serialize)]
-pub struct FlexibleLoanAdjustCollateralRequest {
+pub struct FlexibleLoanAdjustCollateralRequest<'a> {
     #[serde(rename = "ordId")]
-    ord_id: String,
+    ord_id: Cow<'a, str>,
     #[serde(rename = "collateralCcy")]
-    collateral_ccy: String,
-    amt: String,
+    collateral_ccy: Cow<'a, str>,
+    amt: Cow<'a, str>,
     #[serde(rename = "type")]
-    adjustment_type: String,
+    adjustment_type: Cow<'a, str>,
 }
 
-impl FlexibleLoanAdjustCollateralRequest {
+impl<'a> FlexibleLoanAdjustCollateralRequest<'a> {
     /// Create a collateral adjustment; `type` must be `add` or `reduce`.
     pub fn new(
-        ord_id: impl Into<String>,
-        collateral_ccy: impl Into<String>,
-        amt: impl Into<String>,
-        adjustment_type: impl Into<String>,
+        ord_id: impl Into<Cow<'a, str>>,
+        collateral_ccy: impl Into<Cow<'a, str>>,
+        amt: impl Into<Cow<'a, str>>,
+        adjustment_type: impl Into<Cow<'a, str>>,
     ) -> Self {
         Self {
             ord_id: ord_id.into(),
@@ -125,19 +131,19 @@ impl FlexibleLoanAdjustCollateralRequest {
 
 /// Query parameters for `GET /api/v5/finance/flexible-loan/loan-info`.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct FlexibleLoanInfoRequest {
+pub struct FlexibleLoanInfoRequest<'a> {
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
 }
 
-impl FlexibleLoanInfoRequest {
+impl<'a> FlexibleLoanInfoRequest<'a> {
     /// Create a query for all current flexible-loan orders.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Restrict the result to one flexible-loan order.
-    pub fn order_id(mut self, value: impl Into<String>) -> Self {
+    pub fn order_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(value.into());
         self
     }
@@ -145,37 +151,37 @@ impl FlexibleLoanInfoRequest {
 
 /// Query parameters for `GET /api/v5/finance/flexible-loan/loan-history`.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct FlexibleLoanHistoryRequest {
+pub struct FlexibleLoanHistoryRequest<'a> {
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl FlexibleLoanHistoryRequest {
+impl<'a> FlexibleLoanHistoryRequest<'a> {
     /// Create an unfiltered loan-history query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Restrict the result to one flexible-loan order.
-    pub fn order_id(mut self, value: impl Into<String>) -> Self {
+    pub fn order_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(value.into());
         self
     }
 
     /// Set the endpoint's `after` cursor.
-    pub fn after(mut self, value: impl Into<String>) -> Self {
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(value.into());
         self
     }
 
     /// Set the endpoint's `before` cursor.
-    pub fn before(mut self, value: impl Into<String>) -> Self {
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(value.into());
         self
     }
@@ -189,45 +195,45 @@ impl FlexibleLoanHistoryRequest {
 
 /// Query parameters for `GET /api/v5/finance/flexible-loan/interest-accrued`.
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct FlexibleLoanInterestAccruedRequest {
+pub struct FlexibleLoanInterestAccruedRequest<'a> {
     #[serde(rename = "ordId", skip_serializing_if = "Option::is_none")]
-    ord_id: Option<String>,
+    ord_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    ccy: Option<String>,
+    ccy: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    after: Option<String>,
+    after: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    before: Option<String>,
+    before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
-impl FlexibleLoanInterestAccruedRequest {
+impl<'a> FlexibleLoanInterestAccruedRequest<'a> {
     /// Create an unfiltered accrued-interest query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Restrict the result to one flexible-loan order.
-    pub fn order_id(mut self, value: impl Into<String>) -> Self {
+    pub fn order_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(value.into());
         self
     }
 
     /// Restrict the result to one currency.
-    pub fn currency(mut self, value: impl Into<String>) -> Self {
+    pub fn currency(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(value.into());
         self
     }
 
     /// Set the endpoint's `after` cursor.
-    pub fn after(mut self, value: impl Into<String>) -> Self {
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(value.into());
         self
     }
 
     /// Set the endpoint's `before` cursor.
-    pub fn before(mut self, value: impl Into<String>) -> Self {
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(value.into());
         self
     }

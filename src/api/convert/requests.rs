@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::model::OrderSide;
@@ -28,16 +30,16 @@ impl ConvertCurrenciesRequest {
 /// Query parameters for [`Convert::get_currency_pair`](super::Convert::get_currency_pair).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ConvertCurrencyPairRequest {
-    from_ccy: String,
-    to_ccy: String,
+pub struct ConvertCurrencyPairRequest<'a> {
+    from_ccy: Cow<'a, str>,
+    to_ccy: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     convert_mode: Option<ConvertMode>,
 }
 
-impl ConvertCurrencyPairRequest {
+impl<'a> ConvertCurrencyPairRequest<'a> {
     /// Create a currency-pair request with the required source and destination currencies.
-    pub fn new(from_ccy: impl Into<String>, to_ccy: impl Into<String>) -> Self {
+    pub fn new(from_ccy: impl Into<Cow<'a, str>>, to_ccy: impl Into<Cow<'a, str>>) -> Self {
         Self {
             from_ccy: from_ccy.into(),
             to_ccy: to_ccy.into(),
@@ -55,28 +57,28 @@ impl ConvertCurrencyPairRequest {
 /// Request body for [`Convert::estimate_quote`](super::Convert::estimate_quote).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ConvertQuoteRequest {
-    base_ccy: String,
-    quote_ccy: String,
+pub struct ConvertQuoteRequest<'a> {
+    base_ccy: Cow<'a, str>,
+    quote_ccy: Cow<'a, str>,
     side: OrderSide,
-    rfq_sz: String,
-    rfq_sz_ccy: String,
+    rfq_sz: Cow<'a, str>,
+    rfq_sz_ccy: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    cl_q_req_id: Option<String>,
+    cl_q_req_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tag: Option<String>,
+    tag: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     convert_mode: Option<ConvertMode>,
 }
 
-impl ConvertQuoteRequest {
+impl<'a> ConvertQuoteRequest<'a> {
     /// Create an estimate-quote request with all fields required by OKX.
     pub fn new(
-        base_ccy: impl Into<String>,
-        quote_ccy: impl Into<String>,
+        base_ccy: impl Into<Cow<'a, str>>,
+        quote_ccy: impl Into<Cow<'a, str>>,
         side: OrderSide,
-        rfq_sz: impl Into<String>,
-        rfq_sz_ccy: impl Into<String>,
+        rfq_sz: impl Into<Cow<'a, str>>,
+        rfq_sz_ccy: impl Into<Cow<'a, str>>,
     ) -> Self {
         Self {
             base_ccy: base_ccy.into(),
@@ -91,13 +93,13 @@ impl ConvertQuoteRequest {
     }
 
     /// Set the client quote request ID (`clQReqId`).
-    pub fn client_quote_request_id(mut self, id: impl Into<String>) -> Self {
+    pub fn client_quote_request_id(mut self, id: impl Into<Cow<'a, str>>) -> Self {
         self.cl_q_req_id = Some(id.into());
         self
     }
 
     /// Set the broker order tag.
-    pub fn tag(mut self, tag: impl Into<String>) -> Self {
+    pub fn tag(mut self, tag: impl Into<Cow<'a, str>>) -> Self {
         self.tag = Some(tag.into());
         self
     }
@@ -112,30 +114,30 @@ impl ConvertQuoteRequest {
 /// Request body for [`Convert::convert_trade`](super::Convert::convert_trade).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ConvertTradeRequest {
-    quote_id: String,
-    base_ccy: String,
-    quote_ccy: String,
+pub struct ConvertTradeRequest<'a> {
+    quote_id: Cow<'a, str>,
+    base_ccy: Cow<'a, str>,
+    quote_ccy: Cow<'a, str>,
     side: OrderSide,
-    sz: String,
-    sz_ccy: String,
+    sz: Cow<'a, str>,
+    sz_ccy: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    cl_t_req_id: Option<String>,
+    cl_t_req_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tag: Option<String>,
+    tag: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     convert_mode: Option<ConvertMode>,
 }
 
-impl ConvertTradeRequest {
+impl<'a> ConvertTradeRequest<'a> {
     /// Create a Convert trade request with all fields required by OKX.
     pub fn new(
-        quote_id: impl Into<String>,
-        base_ccy: impl Into<String>,
-        quote_ccy: impl Into<String>,
+        quote_id: impl Into<Cow<'a, str>>,
+        base_ccy: impl Into<Cow<'a, str>>,
+        quote_ccy: impl Into<Cow<'a, str>>,
         side: OrderSide,
-        sz: impl Into<String>,
-        sz_ccy: impl Into<String>,
+        sz: impl Into<Cow<'a, str>>,
+        sz_ccy: impl Into<Cow<'a, str>>,
     ) -> Self {
         Self {
             quote_id: quote_id.into(),
@@ -151,13 +153,13 @@ impl ConvertTradeRequest {
     }
 
     /// Set the client trade request ID (`clTReqId`).
-    pub fn client_trade_request_id(mut self, id: impl Into<String>) -> Self {
+    pub fn client_trade_request_id(mut self, id: impl Into<Cow<'a, str>>) -> Self {
         self.cl_t_req_id = Some(id.into());
         self
     }
 
     /// Set the broker order tag.
-    pub fn tag(mut self, tag: impl Into<String>) -> Self {
+    pub fn tag(mut self, tag: impl Into<Cow<'a, str>>) -> Self {
         self.tag = Some(tag.into());
         self
     }
@@ -172,27 +174,27 @@ impl ConvertTradeRequest {
 /// Query parameters for [`Convert::get_convert_history`](super::Convert::get_convert_history).
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ConvertHistoryRequest {
+pub struct ConvertHistoryRequest<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    cl_t_req_id: Option<String>,
+    cl_t_req_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     after: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     before: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    limit: Option<String>,
+    limit: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tag: Option<String>,
+    tag: Option<Cow<'a, str>>,
 }
 
-impl ConvertHistoryRequest {
+impl<'a> ConvertHistoryRequest<'a> {
     /// Create an empty history query.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Filter by the client trade request ID (`clTReqId`).
-    pub fn client_trade_request_id(mut self, id: impl Into<String>) -> Self {
+    pub fn client_trade_request_id(mut self, id: impl Into<Cow<'a, str>>) -> Self {
         self.cl_t_req_id = Some(id.into());
         self
     }
@@ -211,12 +213,12 @@ impl ConvertHistoryRequest {
 
     /// Set the maximum number of returned rows. OKX accepts values from 1 to 100.
     pub fn limit(mut self, limit: u8) -> Self {
-        self.limit = Some(limit.to_string());
+        self.limit = Some(limit);
         self
     }
 
     /// Filter by the broker order tag used by the original Convert trade.
-    pub fn tag(mut self, tag: impl Into<String>) -> Self {
+    pub fn tag(mut self, tag: impl Into<Cow<'a, str>>) -> Self {
         self.tag = Some(tag.into());
         self
     }
