@@ -140,6 +140,21 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(BILLS_HISTORY_ARCHIVE, request, true).await
     }
 
+    /// Retrieve account bill types and subtype mappings.
+    ///
+    /// `GET /api/v5/account/subtypes`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn get_bill_subtypes(
+        &self,
+        request: &BillSubtypesRequest<'_>,
+    ) -> Result<Vec<BillSubtypeMapping>, Error> {
+        self.client.get(SUBTYPES, request, true).await
+    }
+
     /// Set the account position mode.
     ///
     /// `POST /api/v5/account/set-position-mode`. Authenticated.
