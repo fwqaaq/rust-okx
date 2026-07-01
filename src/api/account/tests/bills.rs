@@ -87,7 +87,7 @@ async fn apply_bills_history_archive_posts_body_and_parses_available_status() {
 async fn apply_bills_history_archive_parses_generating_status() {
     let body = r#"{"code":"0","msg":"","data":[{"result":"false","ts":"1646892328000"}]}"#;
     let mock = MockTransport::new(body);
-    let client = signed_client(mock);
+    let client = signed_client(mock.clone());
     let request = ApplyBillsHistoryArchiveRequest::new("2023", BillsHistoryArchiveQuarter::Q2);
 
     let result = client
@@ -97,6 +97,11 @@ async fn apply_bills_history_archive_parses_generating_status() {
         .unwrap();
 
     assert_eq!(result[0].status, BillsHistoryArchiveStatus::Generating);
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req.uri.ends_with("/api/v5/account/bills-history-archive"));
+    assert!(req.is_signed());
 }
 
 #[tokio::test]
@@ -128,7 +133,7 @@ async fn get_bills_history_archive_parses_ongoing_and_failed_states() {
         {"fileHref":"","state":"failed","ts":"1646892328000"}
     ]}"#;
     let mock = MockTransport::new(body);
-    let client = signed_client(mock);
+    let client = signed_client(mock.clone());
     let request = BillsHistoryArchiveRequest::new("2023", BillsHistoryArchiveQuarter::Q4);
 
     let files = client
@@ -139,6 +144,10 @@ async fn get_bills_history_archive_parses_ongoing_and_failed_states() {
 
     assert_eq!(files[0].state, BillsHistoryArchiveFileState::Ongoing);
     assert_eq!(files[1].state, BillsHistoryArchiveFileState::Failed);
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("year=2023&quarter=Q4"));
+    assert!(req.is_signed());
 }
 
 #[tokio::test]

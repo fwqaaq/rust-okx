@@ -92,6 +92,7 @@ impl<'de> Deserialize<'de> for BillsHistoryArchiveStatus {
 
 /// Result returned after applying for historical account-bills archive generation.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct ApplyBillsHistoryArchiveResult {
     /// Whether the download link already exists or is being generated.
