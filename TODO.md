@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **151/342 (44.2%)**
+> Progress: **153/342 (44.7%)**
 
 ## Account
 
@@ -19,8 +19,8 @@
 - [x] GET /api/v5/account/account-position-risk
 - [x] GET /api/v5/account/bills
 - [x] GET /api/v5/account/bills-archive
-- [ ] POST /api/v5/account/bills-history-archive
-- [ ] GET /api/v5/account/bills-history-archive
+- [x] POST /api/v5/account/bills-history-archive
+- [x] GET /api/v5/account/bills-history-archive
 - [ ] GET /api/v5/account/subtypes
 - [x] GET /api/v5/account/config
 - [x] POST /api/v5/account/set-position-mode
@@ -63,7 +63,7 @@
 - [ ] POST /api/v5/account/mmp-reset
 - [ ] POST /api/v5/account/demo-adjust-balance
 
-<!-- Account: 35/50 implemented -->
+<!-- Account: 37/50 implemented -->
 
 ## Trade
 
