@@ -110,6 +110,36 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(BILLS_ARCHIVE, request, true).await
     }
 
+    /// Apply for historical account-bills archive generation.
+    ///
+    /// `POST /api/v5/account/bills-history-archive`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn apply_bills_history_archive(
+        &self,
+        request: &ApplyBillsHistoryArchiveRequest<'_>,
+    ) -> Result<Vec<ApplyBillsHistoryArchiveResult>, Error> {
+        self.client.post(BILLS_HISTORY_ARCHIVE, request, true).await
+    }
+
+    /// Retrieve historical account-bills archive download links.
+    ///
+    /// `GET /api/v5/account/bills-history-archive`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn get_bills_history_archive(
+        &self,
+        request: &BillsHistoryArchiveRequest<'_>,
+    ) -> Result<Vec<BillsHistoryArchiveFile>, Error> {
+        self.client.get(BILLS_HISTORY_ARCHIVE, request, true).await
+    }
+
     /// Set the account position mode.
     ///
     /// `POST /api/v5/account/set-position-mode`. Authenticated.

@@ -1,4 +1,6 @@
-use serde::Deserialize;
+use std::fmt;
+
+use serde::{Deserialize, Deserializer};
 
 use crate::model::NumberString;
 
@@ -35,6 +37,136 @@ pub struct AccountBill {
     #[serde(default)]
     pub bal: NumberString,
     /// Timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// Status returned after applying for a historical bills archive.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum BillsHistoryArchiveStatus {
+    /// A download link already exists.
+    LinkAvailable,
+    /// The file is being generated.
+    Generating,
+    /// A value not modeled by this crate version.
+    Unknown(String),
+}
+
+impl BillsHistoryArchiveStatus {
+    /// Return the OKX wire representation of this status.
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::LinkAvailable => "true",
+            Self::Generating => "false",
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for BillsHistoryArchiveStatus {
+    fn from(value: &str) -> Self {
+        match value {
+            "true" => Self::LinkAvailable,
+            "false" => Self::Generating,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for BillsHistoryArchiveStatus {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for BillsHistoryArchiveStatus {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        Ok(Self::from(value.as_str()))
+    }
+}
+
+/// Result returned after applying for historical account-bills archive generation.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct ApplyBillsHistoryArchiveResult {
+    /// Whether the download link already exists or is being generated.
+    #[serde(rename = "result")]
+    pub status: BillsHistoryArchiveStatus,
+    /// First request time received by OKX, as Unix milliseconds.
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// Download-link state for historical account-bills archive files.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum BillsHistoryArchiveFileState {
+    /// The download link is ready.
+    Finished,
+    /// The archive file is still being generated.
+    Ongoing,
+    /// File generation failed; apply again.
+    Failed,
+    /// A value not modeled by this crate version.
+    Unknown(String),
+}
+
+impl BillsHistoryArchiveFileState {
+    /// Return the OKX wire representation of this state.
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Finished => "finished",
+            Self::Ongoing => "ongoing",
+            Self::Failed => "failed",
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for BillsHistoryArchiveFileState {
+    fn from(value: &str) -> Self {
+        match value {
+            "finished" => Self::Finished,
+            "ongoing" => Self::Ongoing,
+            "failed" => Self::Failed,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for BillsHistoryArchiveFileState {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for BillsHistoryArchiveFileState {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        Ok(Self::from(value.as_str()))
+    }
+}
+
+/// Historical account-bills archive download-link information.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BillsHistoryArchiveFile {
+    /// Download file link.
+    #[serde(default)]
+    pub file_href: String,
+    /// Download-link status.
+    pub state: BillsHistoryArchiveFileState,
+    /// First request time received by OKX, as Unix milliseconds.
     #[serde(default)]
     pub ts: NumberString,
 }

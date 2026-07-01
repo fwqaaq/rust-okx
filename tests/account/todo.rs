@@ -28,6 +28,8 @@ fn account_borrowing_and_margin_mutations_todo() {
 #[ignore = "requires complex portfolio inputs or special account state"]
 fn account_calculation_and_uncovered_reads_todo() {
     // API: GET /api/v5/account/bills-archive
+    // API: POST /api/v5/account/bills-history-archive
+    // API: GET /api/v5/account/bills-history-archive
     // API: GET /api/v5/account/max-size
     // API: GET /api/v5/account/max-loan
     // API: GET /api/v5/account/interest-accrued
@@ -39,6 +41,6 @@ fn account_calculation_and_uncovered_reads_todo() {
     // API: GET /api/v5/account/position-tiers
     // API: GET /api/v5/account/risk-state
     // API: POST /api/v5/account/position-builder
-    // STATUS: TODO — each needs deterministic fixtures, IDs, or account eligibility.
+    // STATUS: TODO — needs deterministic fixtures, IDs, account eligibility, or avoids triggering server-side archive generation / time-limited download-link workflows.
     todo!("add endpoint-specific fixtures before promoting these to live tests");
 }

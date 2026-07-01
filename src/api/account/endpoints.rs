@@ -4,6 +4,7 @@ pub(super) const POSITION_RISK: &str = "/api/v5/account/account-position-risk";
 pub(super) const ACCOUNT_CONFIG: &str = "/api/v5/account/config";
 pub(super) const BILLS: &str = "/api/v5/account/bills";
 pub(super) const BILLS_ARCHIVE: &str = "/api/v5/account/bills-archive";
+pub(super) const BILLS_HISTORY_ARCHIVE: &str = "/api/v5/account/bills-history-archive";
 pub(super) const SET_POSITION_MODE: &str = "/api/v5/account/set-position-mode";
 pub(super) const SET_LEVERAGE: &str = "/api/v5/account/set-leverage";
 pub(super) const GET_LEVERAGE: &str = "/api/v5/account/leverage-info";

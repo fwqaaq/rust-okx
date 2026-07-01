@@ -1,7 +1,11 @@
 use crate::model::InstType;
 use crate::test_util::MockTransport;
 
-use super::super::{BillsArchiveRequest, BillsRequest, PositionsHistoryRequest};
+use super::super::{
+    ApplyBillsHistoryArchiveRequest, BillsArchiveRequest, BillsHistoryArchiveFileState,
+    BillsHistoryArchiveQuarter, BillsHistoryArchiveRequest, BillsHistoryArchiveStatus,
+    BillsRequest, PositionsHistoryRequest,
+};
 use super::signed_client;
 
 #[tokio::test]
@@ -50,6 +54,99 @@ async fn get_account_bills_archive_uses_builder_query() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("ccy=USDT&begin=100&end=200"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn apply_bills_history_archive_posts_body_and_parses_available_status() {
+    let body = r#"{"code":"0","msg":"","data":[{"result":"true","ts":"1646892328000"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = ApplyBillsHistoryArchiveRequest::new("2023", BillsHistoryArchiveQuarter::Q1)
+        .bill_type("1,2,3");
+
+    let result = client
+        .account()
+        .apply_bills_history_archive(&request)
+        .await
+        .unwrap();
+    assert_eq!(result[0].status, BillsHistoryArchiveStatus::LinkAvailable);
+    assert_eq!(result[0].ts.as_str(), "1646892328000");
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req.uri.ends_with("/api/v5/account/bills-history-archive"));
+    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
+    assert_eq!(sent["year"], "2023");
+    assert_eq!(sent["quarter"], "Q1");
+    assert_eq!(sent["type"], "1,2,3");
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn apply_bills_history_archive_parses_generating_status() {
+    let body = r#"{"code":"0","msg":"","data":[{"result":"false","ts":"1646892328000"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = ApplyBillsHistoryArchiveRequest::new("2023", BillsHistoryArchiveQuarter::Q2);
+
+    let result = client
+        .account()
+        .apply_bills_history_archive(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(result[0].status, BillsHistoryArchiveStatus::Generating);
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req.uri.ends_with("/api/v5/account/bills-history-archive"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn get_bills_history_archive_uses_builder_query_and_parses_finished_file() {
+    let body = r#"{"code":"0","msg":"","data":[{"fileHref":"http://example.test/bills.csv","state":"finished","ts":"1646892328000"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request =
+        BillsHistoryArchiveRequest::new("2023", BillsHistoryArchiveQuarter::Q4).bill_type("1,2,3");
+
+    let files = client
+        .account()
+        .get_bills_history_archive(&request)
+        .await
+        .unwrap();
+    assert_eq!(files[0].file_href, "http://example.test/bills.csv");
+    assert_eq!(files[0].state, BillsHistoryArchiveFileState::Finished);
+    assert_eq!(files[0].ts.as_str(), "1646892328000");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("year=2023&quarter=Q4&type=1%2C2%2C3"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn get_bills_history_archive_parses_ongoing_and_failed_states() {
+    let body = r#"{"code":"0","msg":"","data":[
+        {"fileHref":"","state":"ongoing","ts":"1646892328000"},
+        {"fileHref":"","state":"failed","ts":"1646892328000"}
+    ]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = BillsHistoryArchiveRequest::new("2023", BillsHistoryArchiveQuarter::Q4);
+
+    let files = client
+        .account()
+        .get_bills_history_archive(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(files[0].state, BillsHistoryArchiveFileState::Ongoing);
+    assert_eq!(files[1].state, BillsHistoryArchiveFileState::Failed);
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("year=2023&quarter=Q4"));
     assert!(req.is_signed());
 }
 
