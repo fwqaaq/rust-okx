@@ -174,9 +174,6 @@ pub struct FeeRate {
     /// Fee groups for this instrument type.
     #[serde(default)]
     pub fee_group: Vec<FeeGroup>,
-    /// Fiat fee-rate rows.
-    #[serde(default)]
-    pub fiat: Vec<FiatFeeRate>,
     /// Delivery fee rate.
     #[serde(default)]
     pub delivery: NumberString,
@@ -194,12 +191,6 @@ pub struct FeeRate {
     /// Maker fee rate.
     #[serde(default)]
     pub maker: NumberString,
-    /// Taker fee rate for USDT-margined contracts.
-    #[serde(default)]
-    pub taker_u: NumberString,
-    /// Maker fee rate for USDT-margined contracts.
-    #[serde(default)]
-    pub maker_u: NumberString,
     /// Taker fee rate for USDC-margined contracts.
     #[serde(default)]
     pub taker_usdc: NumberString,
@@ -209,9 +200,6 @@ pub struct FeeRate {
     /// Trading rule type.
     #[serde(default)]
     pub rule_type: String,
-    /// Currency category.
-    #[serde(default)]
-    pub category: String,
     /// Settlement fee rate for event contracts.
     #[serde(default)]
     pub settle: NumberString,
@@ -234,22 +222,6 @@ pub struct FeeGroup {
     /// ELP maker effective fee rate.
     #[serde(default)]
     pub elp_maker: NumberString,
-}
-
-/// Fiat fee-rate row nested in [`FeeRate`].
-#[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct FiatFeeRate {
-    /// Fiat currency.
-    #[serde(default)]
-    pub ccy: String,
-    /// Taker fee rate.
-    #[serde(default)]
-    pub taker: NumberString,
-    /// Maker fee rate.
-    #[serde(default)]
-    pub maker: NumberString,
 }
 
 /// Maximum withdrawal amount for a currency.

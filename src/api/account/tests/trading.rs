@@ -204,7 +204,6 @@ async fn get_fee_rates_uses_builder_query() {
     assert_eq!(result[0].level, "Lv1");
     assert_eq!(result[0].fee_group[0].group_id, "1");
     assert_eq!(result[0].fee_group[0].elp_maker.as_str(), "-0.0008");
-    assert_eq!(result[0].fiat[0].ccy, "USD");
     assert_eq!(result[0].taker.as_str(), "-0.001");
 
     let req = mock.captured();
@@ -244,7 +243,7 @@ async fn get_fee_rates_can_query_instrument_family() {
 
     let result = client.account().get_fee_rates(&request).await.unwrap();
     assert_eq!(result[0].inst_type, InstType::Swap);
-    assert_eq!(result[0].maker_u.as_str(), "-0.0002");
+    assert_eq!(result[0].level, "Lv1");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SWAP&instFamily=BTC-USD"));
