@@ -116,44 +116,27 @@ impl<'a> SimulatedMarginRequest<'a> {
 }
 
 /// Query parameters for account position tiers.
+#[derive(Debug, Clone, Serialize)]
+pub struct AccountPositionTiersRequest<'a> {
+    #[serde(rename = "instType")]
+    inst_type: InstType,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<Cow<'a, str>>,
-    #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
-    inst_family: Option<Cow<'a, str>>,
-    /// Create an account position-tiers query with the documented required instrument type.
-    ///
-    /// Set either [`Self::underlying`] or [`Self::inst_family`]. OKX uses
-    /// `instFamily` first when both are provided.
-    pub fn new(inst_type: InstType) -> Self {
-            underlying: None,
-            inst_family: None,
-
-    /// Set the underlying filter.
-    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
-        self.underlying = Some(underlying.into());
-        self
-    }
-
-    /// Set the instrument family filter.
-    pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
-        self.inst_family = Some(inst_family.into());
-        self
-    }
     underlying: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
     inst_family: Option<Cow<'a, str>>,
 }
 
 impl<'a> AccountPositionTiersRequest<'a> {
-    /// Create an empty account position-tiers query.
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Set the instrument type filter.
-    pub fn inst_type(mut self, inst_type: InstType) -> Self {
-        self.inst_type = Some(inst_type);
-        self
+    /// Create an account position-tiers query with the documented required instrument type.
+    ///
+    /// Set either [`Self::underlying`] or [`Self::inst_family`]. OKX uses
+    /// `instFamily` first when both are provided.
+    pub fn new(inst_type: InstType) -> Self {
+        Self {
+            inst_type,
+            underlying: None,
+            inst_family: None,
+        }
     }
 
     /// Set the underlying filter.
