@@ -164,6 +164,19 @@ pub struct AccountPositionTier {
     pub max_sz: NumberString,
 }
 
+/// Result of setting the spot risk offset amount.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SetRiskOffsetAmountResult {
+    /// Currency.
+    #[serde(default)]
+    pub ccy: String,
+    /// User-defined spot risk offset amount.
+    #[serde(rename = "clSpotInUseAmt", default)]
+    pub cl_spot_in_use_amt: NumberString,
+}
+
 /// Position-builder result.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]

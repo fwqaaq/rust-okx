@@ -151,6 +151,24 @@ impl<'a> AccountPositionTiersRequest<'a> {
     }
 }
 
+/// Request body for setting the spot risk offset amount.
+#[derive(Debug, Clone, Serialize)]
+pub struct SetRiskOffsetAmountRequest<'a> {
+    ccy: Cow<'a, str>,
+    #[serde(rename = "clSpotInUseAmt")]
+    cl_spot_in_use_amt: Cow<'a, str>,
+}
+
+impl<'a> SetRiskOffsetAmountRequest<'a> {
+    /// Create a risk-offset amount update for a currency.
+    pub fn new(ccy: impl Into<Cow<'a, str>>, cl_spot_in_use_amt: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            ccy: ccy.into(),
+            cl_spot_in_use_amt: cl_spot_in_use_amt.into(),
+        }
+    }
+}
+
 /// Request body for position builder.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct PositionBuilderRequest<'a> {

@@ -3,8 +3,8 @@ use crate::model::InstType;
 use crate::test_util::MockTransport;
 
 use super::super::{
-    AccountPositionTiersRequest, PositionBuilderRequest, SimulatedAsset, SimulatedMarginRequest,
-    SimulatedPosition,
+    AccountPositionTiersRequest, PositionBuilderRequest, SetRiskOffsetAmountRequest,
+    SimulatedAsset, SimulatedMarginRequest, SimulatedPosition,
 };
 use super::signed_client;
 
@@ -85,6 +85,29 @@ async fn get_simulated_margin_posts_body_and_omits_unset_fields() {
     assert_eq!(sent["simPos"][0]["lever"], "10");
     assert!(sent.get("inclRealPos").is_none());
     assert!(sent["simPos"][0].get("avgPx").is_none());
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn set_risk_offset_amount_posts_body() {
+    let body = r#"{"code":"0","msg":"","data":[{"ccy":"BTC","clSpotInUseAmt":"0.5"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+
+    let result = client
+        .account()
+        .set_risk_offset_amount(&SetRiskOffsetAmountRequest::new("BTC", "0.5"))
+        .await
+        .unwrap();
+    assert_eq!(result[0].ccy, "BTC");
+    assert_eq!(result[0].cl_spot_in_use_amt.as_str(), "0.5");
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req.uri.ends_with("/api/v5/account/set-riskOffset-amt"));
+    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
+    assert_eq!(sent["ccy"], "BTC");
+    assert_eq!(sent["clSpotInUseAmt"], "0.5");
     assert!(req.is_signed());
 }
 
