@@ -83,6 +83,54 @@ impl<'a> LeverageRequest<'a> {
     }
 }
 
+/// Query parameters for estimating leverage adjustment effects.
+#[derive(Debug, Clone, Serialize)]
+pub struct AdjustLeverageInfoRequest<'a> {
+    #[serde(rename = "instType")]
+    inst_type: InstType,
+    #[serde(rename = "mgnMode")]
+    mgn_mode: TradeMode,
+    lever: Cow<'a, str>,
+    #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
+    inst_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    ccy: Option<Cow<'a, str>>,
+    #[serde(rename = "posSide", skip_serializing_if = "Option::is_none")]
+    pos_side: Option<PositionSide>,
+}
+
+impl<'a> AdjustLeverageInfoRequest<'a> {
+    /// Create an adjust-leverage-info query.
+    pub fn new(inst_type: InstType, mgn_mode: TradeMode, lever: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_type,
+            mgn_mode,
+            lever: lever.into(),
+            inst_id: None,
+            ccy: None,
+            pos_side: None,
+        }
+    }
+
+    /// Set the instrument ID.
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_id = Some(inst_id.into());
+        self
+    }
+
+    /// Set the margin currency.
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
+        self.ccy = Some(ccy.into());
+        self
+    }
+
+    /// Set the position side.
+    pub fn position_side(mut self, pos_side: PositionSide) -> Self {
+        self.pos_side = Some(pos_side);
+        self
+    }
+}
+
 /// Query parameters for maximum order size.
 #[derive(Debug, Clone, Serialize)]
 pub struct MaxOrderSizeRequest<'a> {

@@ -3,6 +3,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("GET", "/api/v5/account/account-position-risk"),
+    ("GET", "/api/v5/account/adjust-leverage-info"),
     ("GET", "/api/v5/account/balance"),
     ("GET", "/api/v5/account/bills"),
     ("GET", "/api/v5/account/bills-archive"),
