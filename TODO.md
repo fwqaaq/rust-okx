@@ -21,7 +21,7 @@
 - [x] GET /api/v5/account/bills-archive
 - [x] POST /api/v5/account/bills-history-archive
 - [x] GET /api/v5/account/bills-history-archive
-- [ ] GET /api/v5/account/subtypes
+- [x] GET /api/v5/account/subtypes
 - [x] GET /api/v5/account/config
 - [x] POST /api/v5/account/set-position-mode
 - [x] POST /api/v5/account/set-leverage

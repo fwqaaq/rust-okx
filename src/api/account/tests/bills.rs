@@ -2,9 +2,9 @@ use crate::model::InstType;
 use crate::test_util::MockTransport;
 
 use super::super::{
-    ApplyBillsHistoryArchiveRequest, BillsArchiveRequest, BillsHistoryArchiveFileState,
-    BillsHistoryArchiveQuarter, BillsHistoryArchiveRequest, BillsHistoryArchiveStatus,
-    BillsRequest, PositionsHistoryRequest,
+    ApplyBillsHistoryArchiveRequest, BillSubtypesRequest, BillsArchiveRequest,
+    BillsHistoryArchiveFileState, BillsHistoryArchiveQuarter, BillsHistoryArchiveRequest,
+    BillsHistoryArchiveStatus, BillsRequest, PositionsHistoryRequest,
 };
 use super::signed_client;
 
@@ -147,6 +147,25 @@ async fn get_bills_history_archive_parses_ongoing_and_failed_states() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("year=2023&quarter=Q4"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn get_bill_subtypes_uses_builder_query_and_parses_mapping() {
+    let body = r#"{"code":"0","msg":"","data":[{"type":"1","typeDesc":"Transfer","subTypeDetails":[{"subType":"11","subTypeDesc":"Transfer in"},{"subType":"12","subTypeDesc":"Transfer out"}]}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = BillSubtypesRequest::new().bill_type("1,2");
+
+    let mappings = client.account().get_bill_subtypes(&request).await.unwrap();
+    assert_eq!(mappings[0].bill_type, "1");
+    assert_eq!(mappings[0].type_desc, "Transfer");
+    assert_eq!(mappings[0].sub_type_details[0].sub_type, "11");
+    assert_eq!(mappings[0].sub_type_details[0].sub_type_desc, "Transfer in");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("type=1%2C2"));
+    assert!(req.uri.contains("/api/v5/account/subtypes"));
     assert!(req.is_signed());
 }
 

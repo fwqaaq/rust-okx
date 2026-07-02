@@ -124,6 +124,26 @@ impl<'a> BillsArchiveRequest<'a> {
     }
 }
 
+/// Query parameters for account bill type/subtype mapping.
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct BillSubtypesRequest<'a> {
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    bill_type: Option<Cow<'a, str>>,
+}
+
+impl<'a> BillSubtypesRequest<'a> {
+    /// Create an empty bill-subtypes query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Filter by bill type. Multiple values can be separated by commas.
+    pub fn bill_type(mut self, bill_type: impl Into<Cow<'a, str>>) -> Self {
+        self.bill_type = Some(bill_type.into());
+        self
+    }
+}
+
 /// Quarter selector for historical account-bills archive generation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[non_exhaustive]

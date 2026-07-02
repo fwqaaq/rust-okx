@@ -1,7 +1,7 @@
 use crate::common::{demo_client, live_client};
 use rust_okx::api::account::{
-    AccountInstrumentsRequest, BalanceRequest, BillsRequest, FeeRatesRequest, LeverageRequest,
-    MaxAvailableSizeRequest, PositionRiskRequest, PositionsRequest,
+    AccountInstrumentsRequest, BalanceRequest, BillSubtypesRequest, BillsRequest, FeeRatesRequest,
+    LeverageRequest, MaxAvailableSizeRequest, PositionRiskRequest, PositionsRequest,
 };
 use rust_okx::model::{InstType, TradeMode};
 use rust_okx::{Error, OkxClient};
@@ -107,6 +107,19 @@ async fn read_only_suite(client: &OkxClient, label: &str) {
             .account()
             .get_account_bills(&BillsRequest::new().limit(5)),
         "account/bills"
+    );
+
+    // API: GET /api/v5/account/subtypes
+    // STATUS: LIVE — authenticated, read-only.
+    let subtypes = live!(
+        client
+            .account()
+            .get_bill_subtypes(&BillSubtypesRequest::new()),
+        "account/subtypes"
+    );
+    assert!(
+        !subtypes.is_empty(),
+        "[{label}] account subtypes should return at least one row"
     );
 
     // API: GET /api/v5/account/instruments

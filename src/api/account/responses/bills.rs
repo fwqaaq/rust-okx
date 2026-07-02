@@ -41,6 +41,35 @@ pub struct AccountBill {
     pub ts: NumberString,
 }
 
+/// Mapping for an account bill type and its subtypes.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BillSubtypeMapping {
+    /// Bill type.
+    #[serde(rename = "type", default)]
+    pub bill_type: String,
+    /// Bill type description. Empty means the type is not enabled.
+    #[serde(default)]
+    pub type_desc: String,
+    /// Sub-type details.
+    #[serde(default)]
+    pub sub_type_details: Vec<BillSubtypeDetail>,
+}
+
+/// Account bill subtype details.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct BillSubtypeDetail {
+    /// Bill subtype.
+    #[serde(default)]
+    pub sub_type: String,
+    /// Bill subtype description. Empty means the subtype is not enabled.
+    #[serde(default)]
+    pub sub_type_desc: String,
+}
+
 /// Status returned after applying for a historical bills archive.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[non_exhaustive]
