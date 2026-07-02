@@ -37,6 +37,14 @@ async fn get_account_position_tiers_uses_builder_query() {
     let client = signed_client(mock.clone());
     let request = AccountPositionTiersRequest::new(InstType::Option).underlying("BTC-USD");
     assert_eq!(req.query(), Some("instType=OPTION&uly=BTC-USD"));
+#[test]
+fn account_position_tiers_request_serializes_inst_family_filter() {
+    let request = AccountPositionTiersRequest::new(InstType::Swap).inst_family("BTC-USDT");
+
+    let query = serde_urlencoded::to_string(&request).unwrap();
+    assert_eq!(query, "instType=SWAP&instFamily=BTC-USDT");
+}
+
         .underlying("BTC-USD");
 
     let result = client
