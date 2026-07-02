@@ -18,6 +18,60 @@ impl<'a> SetPositionModeRequest<'a> {
     }
 }
 
+/// Request for [`set_collateral_assets`](crate::api::account::Account::set_collateral_assets).
+#[derive(Debug, Clone, Serialize)]
+pub struct SetCollateralAssetsRequest<'a> {
+    #[serde(rename = "type")]
+    collateral_type: Cow<'a, str>,
+    #[serde(rename = "collateralEnabled")]
+    collateral_enabled: bool,
+    #[serde(rename = "ccyList", skip_serializing_if = "Vec::is_empty")]
+    ccy_list: Vec<Cow<'a, str>>,
+}
+
+impl<'a> SetCollateralAssetsRequest<'a> {
+    /// Create a request that updates the collateral setting for all assets.
+    pub fn all(collateral_enabled: bool) -> Self {
+        Self {
+            collateral_type: Cow::Borrowed("all"),
+            collateral_enabled,
+            ccy_list: Vec::new(),
+        }
+    }
+
+    /// Create a request that updates the collateral setting for specific currencies.
+    pub fn custom<I, C>(ccy_list: I, collateral_enabled: bool) -> Self
+    where
+        I: IntoIterator<Item = C>,
+        C: Into<Cow<'a, str>>,
+    {
+        Self {
+            collateral_type: Cow::Borrowed("custom"),
+            collateral_enabled,
+            ccy_list: ccy_list.into_iter().map(Into::into).collect(),
+        }
+    }
+
+    /// Create a collateral-assets request with an explicit OKX `type` value.
+    pub fn new(collateral_type: impl Into<Cow<'a, str>>, collateral_enabled: bool) -> Self {
+        Self {
+            collateral_type: collateral_type.into(),
+            collateral_enabled,
+            ccy_list: Vec::new(),
+        }
+    }
+
+    /// Set the currency list for a custom collateral-assets request.
+    pub fn currencies<I, C>(mut self, ccy_list: I) -> Self
+    where
+        I: IntoIterator<Item = C>,
+        C: Into<Cow<'a, str>>,
+    {
+        self.ccy_list = ccy_list.into_iter().map(Into::into).collect();
+        self
+    }
+}
+
 /// Request for [`set_greeks`](crate::api::account::Account::set_greeks).
 #[derive(Debug, Clone, Serialize)]
 pub struct SetGreeksRequest<'a> {

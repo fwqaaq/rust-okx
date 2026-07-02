@@ -207,6 +207,22 @@ pub struct AccountInstrument {
     pub settle_ccy: String,
 }
 
+/// Result of updating collateral assets.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SetCollateralAssetsResult {
+    /// OKX collateral-assets update type.
+    #[serde(rename = "type", default)]
+    pub collateral_type: String,
+    /// Currency list included in the update.
+    #[serde(default)]
+    pub ccy_list: Vec<String>,
+    /// Whether assets are enabled as collateral.
+    #[serde(default)]
+    pub collateral_enabled: bool,
+}
+
 /// Result of updating the greeks display type.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]

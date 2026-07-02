@@ -8,6 +8,7 @@ fn account_configuration_mutations_todo() {
     // API: POST /api/v5/account/set-isolated-mode
     // API: POST /api/v5/account/set-auto-loan
     // API: POST /api/v5/account/set-account-level
+    // API: POST /api/v5/account/set-collateral-assets
     // API: POST /api/v5/account/activate-option
     // API: POST /api/v5/account/set-auto-repay
     // API: POST /api/v5/account/set-auto-earn
@@ -41,6 +42,7 @@ fn account_calculation_and_uncovered_reads_todo() {
     // API: GET /api/v5/account/position-tiers
     // API: GET /api/v5/account/risk-state
     // API: POST /api/v5/account/position-builder
+    // API: POST /api/v5/account/set-riskOffset-amt
     // STATUS: TODO — needs deterministic fixtures, IDs, account eligibility, or avoids triggering server-side archive generation / time-limited download-link workflows.
     todo!("add endpoint-specific fixtures before promoting these to live tests");
 }

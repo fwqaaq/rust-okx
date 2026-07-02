@@ -50,7 +50,7 @@
 - [x] POST /api/v5/account/set-auto-loan
 - [x] POST /api/v5/account/set-account-level
 - [x] POST /api/v5/account/activate-option
-- [ ] POST /api/v5/account/set-collateral-assets
+- [x] POST /api/v5/account/set-collateral-assets
 - [ ] GET /api/v5/account/collateral-assets
 - [ ] GET /api/v5/account/precheck-set-delta-neutral
 - [x] POST /api/v5/account/position-builder
