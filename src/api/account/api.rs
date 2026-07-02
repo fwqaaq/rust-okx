@@ -170,6 +170,21 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(SET_POSITION_MODE, request, true).await
     }
 
+    /// Set whether all or custom assets are used as collateral.
+    ///
+    /// `POST /api/v5/account/set-collateral-assets`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_collateral_assets(
+        &self,
+        request: &SetCollateralAssetsRequest<'_>,
+    ) -> Result<Vec<SetCollateralAssetsResult>, Error> {
+        self.client.post(SET_COLLATERAL_ASSETS, request, true).await
+    }
+
     /// Set leverage for an instrument or currency.
     ///
     /// `POST /api/v5/account/set-leverage`. Authenticated.

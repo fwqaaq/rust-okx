@@ -4,8 +4,8 @@ use crate::test_util::MockTransport;
 use super::super::{
     AccountInstrumentsRequest, AdjustLeverageInfoRequest, AdjustMarginRequest, BalanceRequest,
     FeeRatesRequest, LeverageRequest, MaxAvailableSizeRequest, MaxOrderSizeRequest,
-    SetAccountLevelRequest, SetGreeksRequest, SetIsolatedModeRequest, SetLeverageRequest,
-    SetPositionModeRequest,
+    SetAccountLevelRequest, SetCollateralAssetsRequest, SetGreeksRequest, SetIsolatedModeRequest,
+    SetLeverageRequest, SetPositionModeRequest,
 };
 use super::signed_client;
 
@@ -27,6 +27,55 @@ async fn set_position_mode_posts_body() {
     assert!(req.uri.ends_with("/api/v5/account/set-position-mode"));
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["posMode"], "net_mode");
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn set_collateral_assets_posts_all_body() {
+    let body = r#"{"code":"0","msg":"","data":[{"type":"all","ccyList":["BTC","ETH"],"collateralEnabled":true}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = SetCollateralAssetsRequest::all(true);
+
+    let result = client
+        .account()
+        .set_collateral_assets(&request)
+        .await
+        .unwrap();
+    assert_eq!(result[0].collateral_type, "all");
+    assert_eq!(result[0].ccy_list, ["BTC", "ETH"]);
+    assert!(result[0].collateral_enabled);
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req.uri.ends_with("/api/v5/account/set-collateral-assets"));
+    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
+    assert_eq!(sent["type"], "all");
+    assert_eq!(sent["collateralEnabled"], true);
+    assert!(sent.get("ccyList").is_none());
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn set_collateral_assets_posts_custom_body() {
+    let body = r#"{"code":"0","msg":"","data":[{"type":"custom","ccyList":["BTC","ETH"],"collateralEnabled":false}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = SetCollateralAssetsRequest::custom(["BTC", "ETH"], false);
+
+    client
+        .account()
+        .set_collateral_assets(&request)
+        .await
+        .unwrap();
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req.uri.ends_with("/api/v5/account/set-collateral-assets"));
+    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
+    assert_eq!(sent["type"], "custom");
+    assert_eq!(sent["collateralEnabled"], false);
+    assert_eq!(sent["ccyList"], serde_json::json!(["BTC", "ETH"]));
     assert!(req.is_signed());
 }
 
