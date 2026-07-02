@@ -31,10 +31,7 @@ pub async fn fetch_rest_snapshot(client: &OkxClient, inst_id: &str, bar: &str) -
     let positions = async {
         client
             .account()
-            .get_positions(&PositionsRequest {
-                inst_id: Some(inst_id),
-                ..Default::default()
-            })
+            .get_positions(&PositionsRequest::new().inst_id(inst_id))
             .await
             .unwrap_or_default()
     };
@@ -48,11 +45,7 @@ pub async fn fetch_rest_snapshot(client: &OkxClient, inst_id: &str, bar: &str) -
     let candles = async {
         client
             .market()
-            .get_candlesticks(&CandlesRequest {
-                inst_id,
-                bar: Some(bar),
-                limit: Some(120),
-            })
+            .get_candlesticks(&CandlesRequest::new(inst_id).bar(bar).limit(120))
             .await
             .unwrap_or_default()
             .into_iter()
@@ -320,7 +313,7 @@ async fn market_ws_task(inst_id: String, tx: mpsc::Sender<AppMsg>) -> Result<()>
 }
 
 async fn watchlist_ws_task(instruments: Vec<String>, tx: mpsc::Sender<AppMsg>) -> Result<()> {
-    let args: Vec<_> = instruments.iter().map(|id| market::tickers(id)).collect();
+    let args: Vec<_> = instruments.iter().map(market::tickers).collect();
     let mut ws = OkxWs::public().connect().await?;
     ws.subscribe(&args).await?;
 

@@ -116,10 +116,10 @@ impl<'a> SimulatedMarginRequest<'a> {
 }
 
 /// Query parameters for account position tiers.
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct AccountPositionTiersRequest<'a> {
-    #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
-    inst_type: Option<InstType>,
+    #[serde(rename = "instType")]
+    inst_type: InstType,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
     underlying: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
@@ -127,15 +127,16 @@ pub struct AccountPositionTiersRequest<'a> {
 }
 
 impl<'a> AccountPositionTiersRequest<'a> {
-    /// Create an empty account position-tiers query.
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Set the instrument type filter.
-    pub fn inst_type(mut self, inst_type: InstType) -> Self {
-        self.inst_type = Some(inst_type);
-        self
+    /// Create an account position-tiers query with the documented required instrument type.
+    ///
+    /// Set either [`Self::underlying`] or [`Self::inst_family`]. OKX uses
+    /// `instFamily` first when both are provided.
+    pub fn new(inst_type: InstType) -> Self {
+        Self {
+            inst_type,
+            underlying: None,
+            inst_family: None,
+        }
     }
 
     /// Set the underlying filter.

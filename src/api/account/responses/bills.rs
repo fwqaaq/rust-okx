@@ -32,10 +32,82 @@ pub struct AccountBill {
     pub sub_type: String,
     /// Balance change.
     #[serde(default)]
+    pub bal_chg: NumberString,
+    /// Quantity.
+    #[serde(default)]
     pub sz: NumberString,
     /// Balance after the change.
     #[serde(default)]
     pub bal: NumberString,
+    /// Balance change at the position level.
+    #[serde(default)]
+    pub pos_bal_chg: NumberString,
+    /// Balance at the position level.
+    #[serde(default)]
+    pub pos_bal: NumberString,
+    /// Price related to the bill subtype.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Profit and loss.
+    #[serde(default)]
+    pub pnl: NumberString,
+    /// Fee.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Auto earn amount.
+    #[serde(default)]
+    pub earn_amt: NumberString,
+    /// Auto earn APR.
+    #[serde(default)]
+    pub earn_apr: NumberString,
+    /// Order ID.
+    #[serde(default)]
+    pub ord_id: String,
+    /// Liquidity taker or maker.
+    #[serde(default)]
+    pub exec_type: String,
+    /// The remitting account.
+    #[serde(default)]
+    pub from: String,
+    /// The beneficiary account.
+    #[serde(default)]
+    pub to: String,
+    /// Notes.
+    #[serde(default)]
+    pub notes: String,
+    /// Interest.
+    #[serde(default)]
+    pub interest: NumberString,
+    /// Order tag.
+    #[serde(default)]
+    pub tag: String,
+    /// Last filled time.
+    #[serde(default)]
+    pub fill_time: NumberString,
+    /// Last traded ID.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Client Order ID.
+    #[serde(default)]
+    pub cl_ord_id: String,
+    /// Index price at the moment of trade execution.
+    #[serde(default)]
+    pub fill_idx_px: NumberString,
+    /// Mark price when filled.
+    #[serde(default)]
+    pub fill_mark_px: NumberString,
+    /// Implied volatility when filled.
+    #[serde(default)]
+    pub fill_px_vol: NumberString,
+    /// Options price when filled, in USD.
+    #[serde(default)]
+    pub fill_px_usd: NumberString,
+    /// Forward price when filled.
+    #[serde(default)]
+    pub fill_fwd_px: NumberString,
+    /// Mark volatility when filled.
+    #[serde(default)]
+    pub fill_mark_vol: NumberString,
     /// Timestamp (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,

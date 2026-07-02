@@ -286,10 +286,8 @@ pub struct FeeRatesRequest<'a> {
     inst_type: InstType,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
     inst_id: Option<Cow<'a, str>>,
-    #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
-    underlying: Option<Cow<'a, str>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    category: Option<Cow<'a, str>>,
+    #[serde(rename = "groupId", skip_serializing_if = "Option::is_none")]
+    group_id: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
     inst_family: Option<Cow<'a, str>>,
 }
@@ -300,8 +298,7 @@ impl<'a> FeeRatesRequest<'a> {
         Self {
             inst_type,
             inst_id: None,
-            underlying: None,
-            category: None,
+            group_id: None,
             inst_family: None,
         }
     }
@@ -312,15 +309,11 @@ impl<'a> FeeRatesRequest<'a> {
         self
     }
 
-    /// Set the underlying.
-    pub fn underlying(mut self, underlying: impl Into<Cow<'a, str>>) -> Self {
-        self.underlying = Some(underlying.into());
-        self
-    }
-
-    /// Set the fee category.
-    pub fn category(mut self, category: impl Into<Cow<'a, str>>) -> Self {
-        self.category = Some(category.into());
+    /// Set the instrument trading fee group ID.
+    ///
+    /// OKX accepts only one of `groupId` and `instId`/`instFamily`.
+    pub fn group_id(mut self, group_id: impl Into<Cow<'a, str>>) -> Self {
+        self.group_id = Some(group_id.into());
         self
     }
 

@@ -25,6 +25,48 @@ pub struct AccountConfig {
     /// API key permissions, comma-separated (e.g. `"read_only,trade,withdraw"`).
     #[serde(default)]
     pub perm: String,
+    /// Fee-rate level.
+    #[serde(default)]
+    pub level: String,
+    /// Temporary fee-rate level.
+    #[serde(default)]
+    pub level_tmp: String,
+    /// Contract isolated margin mode.
+    #[serde(default)]
+    pub ct_iso_mode: String,
+    /// Margin isolated margin mode.
+    #[serde(default)]
+    pub mgn_iso_mode: String,
+    /// Spot offset type.
+    #[serde(default)]
+    pub spot_offset_type: String,
+    /// Role type.
+    #[serde(default)]
+    pub role_type: String,
+    /// Lead-trading instruments.
+    #[serde(default)]
+    pub trader_insts: Vec<String>,
+    /// Spot role type.
+    #[serde(default)]
+    pub spot_role_type: String,
+    /// Spot lead-trading instruments.
+    #[serde(default)]
+    pub spot_trader_insts: Vec<String>,
+    /// Option authorization flag.
+    #[serde(default)]
+    pub op_auth: String,
+    /// API key IP whitelist.
+    #[serde(default)]
+    pub ip: String,
+    /// Main account UID.
+    #[serde(default)]
+    pub main_uid: String,
+    /// KYC level.
+    #[serde(default)]
+    pub kyc_lv: String,
+    /// API key label.
+    #[serde(default)]
+    pub label: String,
 }
 
 /// Result of setting position mode.
@@ -126,23 +168,60 @@ pub struct MaxAvailableSize {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct FeeRate {
+    /// Fee-rate level.
+    #[serde(default)]
+    pub level: String,
+    /// Fee groups for this instrument type.
+    #[serde(default)]
+    pub fee_group: Vec<FeeGroup>,
+    /// Delivery fee rate.
+    #[serde(default)]
+    pub delivery: NumberString,
+    /// Fee rate for exercising the option.
+    #[serde(default)]
+    pub exercise: NumberString,
     /// Instrument type.
     pub inst_type: InstType,
-    /// Instrument ID.
-    #[serde(default)]
-    pub inst_id: String,
-    /// Fee category.
-    #[serde(default)]
-    pub category: String,
-    /// Maker fee rate.
-    #[serde(default)]
-    pub maker: NumberString,
-    /// Taker fee rate.
-    #[serde(default)]
-    pub taker: NumberString,
     /// Timestamp (Unix milliseconds).
     #[serde(default)]
     pub ts: NumberString,
+    /// Taker fee rate.
+    #[serde(default)]
+    pub taker: NumberString,
+    /// Maker fee rate.
+    #[serde(default)]
+    pub maker: NumberString,
+    /// Taker fee rate for USDC-margined contracts.
+    #[serde(default)]
+    pub taker_usdc: NumberString,
+    /// Maker fee rate for USDC-margined contracts.
+    #[serde(default)]
+    pub maker_usdc: NumberString,
+    /// Trading rule type.
+    #[serde(default)]
+    pub rule_type: String,
+    /// Settlement fee rate for event contracts.
+    #[serde(default)]
+    pub settle: NumberString,
+}
+
+/// Fee-rate group row nested in [`FeeRate`].
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct FeeGroup {
+    /// Taker fee rate.
+    #[serde(default)]
+    pub taker: NumberString,
+    /// Maker fee rate.
+    #[serde(default)]
+    pub maker: NumberString,
+    /// Instrument trading fee group ID.
+    #[serde(default)]
+    pub group_id: String,
+    /// ELP maker effective fee rate.
+    #[serde(default)]
+    pub elp_maker: NumberString,
 }
 
 /// Maximum withdrawal amount for a currency.

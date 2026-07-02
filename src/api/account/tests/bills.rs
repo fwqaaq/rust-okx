@@ -21,13 +21,21 @@ async fn get_account_bills_uses_builder_query() {
         .inst_type(InstType::Spot)
         .currency("USDT")
         .bill_type("1")
+        .begin("1597026383000")
+        .end("1597026384000")
         .limit(1);
 
     let bills = client.account().get_account_bills(&request).await.unwrap();
     assert_eq!(bills[0].bill_id, "12344");
+    assert_eq!(bills[0].bal_chg.as_str(), "-10");
+    assert_eq!(bills[0].exec_type, "T");
+    assert_eq!(bills[0].fee.as_str(), "-0.001468");
 
     let req = mock.captured();
-    assert_eq!(req.query(), Some("instType=SPOT&ccy=USDT&type=1&limit=1"));
+    assert_eq!(
+        req.query(),
+        Some("instType=SPOT&ccy=USDT&type=1&begin=1597026383000&end=1597026384000&limit=1")
+    );
     assert!(req.is_signed());
 }
 

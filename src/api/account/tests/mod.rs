@@ -34,7 +34,7 @@ async fn demo_trading_sets_simulated_header() {
         {"uid":"12345","acctLv":"2","posMode":"net_mode","greeksType":"PA","autoLoan":false,
          "level":"Lv1","levelTmp":"","ctIsoMode":"automatic","mgnIsoMode":"automatic",
          "spotOffsetType":"","roleType":"0","traderInsts":[],"spotRoleType":"0","spotTraderInsts":[],
-         "opAuth":"0","ip":"","perm":"read_only,trade","mainUid":"","kycLv":"1","label":"","ip":""}]}"#;
+         "opAuth":"0","ip":"","perm":"read_only,trade","mainUid":"","kycLv":"1","label":""}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone())
         .credentials(Credentials::new("key", "secret", "pass"))
