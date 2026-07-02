@@ -200,6 +200,21 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(GET_LEVERAGE, request, true).await
     }
 
+    /// Estimate account state after adjusting leverage.
+    ///
+    /// `GET /api/v5/account/adjust-leverage-info`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn get_adjust_leverage_info(
+        &self,
+        request: &AdjustLeverageInfoRequest<'_>,
+    ) -> Result<Vec<AdjustLeverageInfo>, Error> {
+        self.client.get(ADJUST_LEVERAGE_INFO, request, true).await
+    }
+
     /// Retrieve maximum tradable size for an instrument.
     ///
     /// `GET /api/v5/account/max-size`. Authenticated.

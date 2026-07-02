@@ -1,7 +1,8 @@
 use crate::common::{demo_client, live_client};
 use rust_okx::api::account::{
-    AccountInstrumentsRequest, BalanceRequest, BillSubtypesRequest, BillsRequest, FeeRatesRequest,
-    LeverageRequest, MaxAvailableSizeRequest, PositionRiskRequest, PositionsRequest,
+    AccountInstrumentsRequest, AdjustLeverageInfoRequest, BalanceRequest, BillSubtypesRequest,
+    BillsRequest, FeeRatesRequest, LeverageRequest, MaxAvailableSizeRequest, PositionRiskRequest,
+    PositionsRequest,
 };
 use rust_okx::model::{InstType, TradeMode};
 use rust_okx::{Error, OkxClient};
@@ -82,6 +83,16 @@ async fn read_only_suite(client: &OkxClient, label: &str) {
             .account()
             .get_leverage(&LeverageRequest::new(TradeMode::Cross).inst_id("BTC-USDT-SWAP")),
         "account/leverage-info"
+    );
+
+    // API: GET /api/v5/account/adjust-leverage-info
+    // STATUS: LIVE/MODE-TODO — read-only but account-mode and product dependent.
+    live_or_mode_todo!(
+        client.account().get_adjust_leverage_info(
+            &AdjustLeverageInfoRequest::new(InstType::Swap, TradeMode::Cross, "5")
+                .inst_id("BTC-USDT-SWAP"),
+        ),
+        "account/adjust-leverage-info"
     );
 
     // API: GET /api/v5/account/max-avail-size

@@ -54,6 +54,43 @@ pub struct LeverageInfo {
     pub lever: NumberString,
 }
 
+/// Estimated impact and limits for a leverage adjustment.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct AdjustLeverageInfo {
+    /// Estimated margin in quote currency that can be transferred out.
+    #[serde(default)]
+    pub est_avail_quote_trans: NumberString,
+    /// Estimated margin that can be transferred out.
+    #[serde(default)]
+    pub est_avail_trans: NumberString,
+    /// Estimated liquidation price.
+    #[serde(default)]
+    pub est_liq_px: NumberString,
+    /// Estimated maximum amount / contract quantity.
+    #[serde(default)]
+    pub est_max_amt: NumberString,
+    /// Estimated margin needed by the position.
+    #[serde(default)]
+    pub est_mgn: NumberString,
+    /// Estimated margin in quote currency needed by the position.
+    #[serde(default)]
+    pub est_quote_mgn: NumberString,
+    /// Estimated maximum quote-currency loan amount for margin.
+    #[serde(default)]
+    pub est_quote_max_amt: NumberString,
+    /// Whether pending orders exist.
+    #[serde(default)]
+    pub exist_ord: bool,
+    /// Maximum leverage.
+    #[serde(default)]
+    pub max_lever: NumberString,
+    /// Minimum leverage.
+    #[serde(default)]
+    pub min_lever: NumberString,
+}
+
 /// Maximum order size information.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]

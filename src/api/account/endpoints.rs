@@ -9,6 +9,7 @@ pub(super) const SUBTYPES: &str = "/api/v5/account/subtypes";
 pub(super) const SET_POSITION_MODE: &str = "/api/v5/account/set-position-mode";
 pub(super) const SET_LEVERAGE: &str = "/api/v5/account/set-leverage";
 pub(super) const GET_LEVERAGE: &str = "/api/v5/account/leverage-info";
+pub(super) const ADJUST_LEVERAGE_INFO: &str = "/api/v5/account/adjust-leverage-info";
 pub(super) const MAX_ORDER_SIZE: &str = "/api/v5/account/max-size";
 pub(super) const MAX_AVAILABLE_SIZE: &str = "/api/v5/account/max-avail-size";
 pub(super) const ADJUST_MARGIN: &str = "/api/v5/account/position/margin-balance";

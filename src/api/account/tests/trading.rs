@@ -2,9 +2,10 @@ use crate::model::{InstType, PositionSide, TradeMode};
 use crate::test_util::MockTransport;
 
 use super::super::{
-    AccountInstrumentsRequest, AdjustMarginRequest, BalanceRequest, FeeRatesRequest,
-    LeverageRequest, MaxAvailableSizeRequest, MaxOrderSizeRequest, SetAccountLevelRequest,
-    SetGreeksRequest, SetIsolatedModeRequest, SetLeverageRequest, SetPositionModeRequest,
+    AccountInstrumentsRequest, AdjustLeverageInfoRequest, AdjustMarginRequest, BalanceRequest,
+    FeeRatesRequest, LeverageRequest, MaxAvailableSizeRequest, MaxOrderSizeRequest,
+    SetAccountLevelRequest, SetGreeksRequest, SetIsolatedModeRequest, SetLeverageRequest,
+    SetPositionModeRequest,
 };
 use super::signed_client;
 
@@ -64,6 +65,40 @@ async fn get_leverage_uses_builder_query() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("mgnMode=cross&instId=BTC-USDT-SWAP"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn get_adjust_leverage_info_uses_builder_query() {
+    let body = r#"{"code":"0","msg":"","data":[{
+        "estAvailQuoteTrans":"","estAvailTrans":"1.1398040558348279",
+        "estLiqPx":"","estMaxAmt":"10.6095865868904898",
+        "estMgn":"0.0701959441651721","estQuoteMgn":"",
+        "estQuoteMaxAmt":"176889.6871254563042714","existOrd":false,
+        "maxLever":"10","minLever":"0.01"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = AdjustLeverageInfoRequest::new(InstType::Margin, TradeMode::Isolated, "5")
+        .inst_id("BTC-USDT")
+        .currency("BTC")
+        .position_side(PositionSide::Net);
+
+    let result = client
+        .account()
+        .get_adjust_leverage_info(&request)
+        .await
+        .unwrap();
+    assert_eq!(result[0].est_avail_trans.as_str(), "1.1398040558348279");
+    assert!(!result[0].exist_ord);
+    assert_eq!(result[0].max_lever.as_str(), "10");
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::GET);
+    assert_eq!(
+        req.query(),
+        Some("instType=MARGIN&mgnMode=isolated&lever=5&instId=BTC-USDT&ccy=BTC&posSide=net")
+    );
+    assert!(req.uri.contains("/api/v5/account/adjust-leverage-info?"));
     assert!(req.is_signed());
 }
 
