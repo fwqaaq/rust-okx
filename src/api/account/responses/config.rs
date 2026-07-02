@@ -131,18 +131,58 @@ pub struct FeeRate {
     /// Instrument ID.
     #[serde(default)]
     pub inst_id: String,
+    /// Fee-rate level.
+    #[serde(default)]
+    pub level: String,
     /// Fee category.
     #[serde(default)]
     pub category: String,
+    /// Fee groups for this instrument type.
+    #[serde(default)]
+    pub fee_group: Vec<FeeGroup>,
+    /// Fiat fee-rate rows.
+    #[serde(default)]
+    pub fiat: Vec<serde_json::Value>,
+    /// Maker fee rate.
+    #[serde(default)]
+    pub maker: NumberString,
+    /// Maker fee rate for USDT-margined contracts.
+    #[serde(default)]
+    pub maker_u: NumberString,
+    /// Maker fee rate for USDC-margined contracts.
+    #[serde(default)]
+    pub maker_usdc: NumberString,
+    /// Taker fee rate.
+    #[serde(default)]
+    pub taker: NumberString,
+    /// Taker fee rate for USDT-margined contracts.
+    #[serde(default)]
+    pub taker_u: NumberString,
+    /// Taker fee rate for USDC-margined contracts.
+    #[serde(default)]
+    pub taker_usdc: NumberString,
+    /// Rule type.
+    #[serde(default)]
+    pub rule_type: String,
+    /// Timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// Fee-rate group row nested in [`FeeRate`].
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct FeeGroup {
+    /// Instrument trading fee group ID.
+    #[serde(default)]
+    pub group_id: String,
     /// Maker fee rate.
     #[serde(default)]
     pub maker: NumberString,
     /// Taker fee rate.
     #[serde(default)]
     pub taker: NumberString,
-    /// Timestamp (Unix milliseconds).
-    #[serde(default)]
-    pub ts: NumberString,
 }
 
 /// Maximum withdrawal amount for a currency.

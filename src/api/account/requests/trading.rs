@@ -286,6 +286,8 @@ pub struct FeeRatesRequest<'a> {
     inst_type: InstType,
     #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
     inst_id: Option<Cow<'a, str>>,
+    #[serde(rename = "groupId", skip_serializing_if = "Option::is_none")]
+    group_id: Option<Cow<'a, str>>,
     #[serde(rename = "uly", skip_serializing_if = "Option::is_none")]
     underlying: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -300,6 +302,7 @@ impl<'a> FeeRatesRequest<'a> {
         Self {
             inst_type,
             inst_id: None,
+            group_id: None,
             underlying: None,
             category: None,
             inst_family: None,
@@ -309,6 +312,15 @@ impl<'a> FeeRatesRequest<'a> {
     /// Set the instrument ID.
     pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
+        self
+    }
+
+    /// Set the instrument trading fee group ID.
+    ///
+    /// OKX accepts either `instId` or `groupId` for applicable instrument
+    /// types; callers should not pass both.
+    pub fn group_id(mut self, group_id: impl Into<Cow<'a, str>>) -> Self {
+        self.group_id = Some(group_id.into());
         self
     }
 

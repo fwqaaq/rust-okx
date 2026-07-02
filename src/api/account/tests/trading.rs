@@ -190,6 +190,8 @@ async fn get_max_avail_size_uses_builder_query() {
 async fn get_fee_rates_uses_builder_query() {
     let body = r#"{"code":"0","msg":"","data":[{
         "instType":"SPOT","instId":"BTC-USDT","uly":"","category":"1",
+        "level":"Lv1","feeGroup":[{"groupId":"1","maker":"-0.0008","taker":"-0.001"}],
+        "fiat":[],"ruleType":"normal",
         "delivery":"","exercise":"","maker":"-0.0008","makerU":"","makerUSDC":"",
         "taker":"0.001","takerU":"","takerUSDC":"","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
@@ -198,9 +200,28 @@ async fn get_fee_rates_uses_builder_query() {
 
     let result = client.account().get_fee_rates(&request).await.unwrap();
     assert_eq!(result[0].maker.as_str(), "-0.0008");
+    assert_eq!(result[0].level, "Lv1");
+    assert_eq!(result[0].fee_group[0].group_id, "1");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SPOT&instId=BTC-USDT"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn get_fee_rates_can_query_group_id() {
+    let body = r#"{"code":"0","msg":"","data":[{
+        "instType":"SPOT","level":"Lv1","category":"1","feeGroup":[],
+        "fiat":[],"maker":"-0.0008","taker":"0.001","ruleType":"normal","ts":"1597026383085"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = FeeRatesRequest::new(InstType::Spot).group_id("1");
+
+    let result = client.account().get_fee_rates(&request).await.unwrap();
+    assert_eq!(result[0].rule_type, "normal");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instType=SPOT&groupId=1"));
     assert!(req.is_signed());
 }
 
