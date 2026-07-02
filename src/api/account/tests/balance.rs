@@ -27,8 +27,11 @@ async fn get_balance_signs_request_and_parses() {
         .await
         .unwrap();
     assert_eq!(balances[0].total_eq.as_str(), "11827.8008");
+    assert_eq!(balances[0].iso_eq.as_str(), "3372.2942371050594");
     assert_eq!(balances[0].details[0].ccy, "BTC");
     assert_eq!(balances[0].details[0].avail_bal.as_str(), "9000");
+    assert_eq!(balances[0].details[0].eq_usd.as_str(), "10000");
+    assert_eq!(balances[0].details[0].ord_frozen.as_str(), "0");
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::GET);
@@ -60,7 +63,8 @@ async fn get_positions_passes_filters() {
         .get_positions(
             &PositionsRequest::new()
                 .inst_type(InstType::Futures)
-                .inst_id("ETH-USD-210430"),
+                .inst_id("ETH-USD-210430")
+                .position_id("307173036051017730"),
         )
         .await
         .unwrap();
@@ -68,7 +72,10 @@ async fn get_positions_passes_filters() {
     assert_eq!(positions[0].pos_side, PositionSide::Long);
 
     let req = mock.captured();
-    assert_eq!(req.query(), Some("instType=FUTURES&instId=ETH-USD-210430"));
+    assert_eq!(
+        req.query(),
+        Some("instType=FUTURES&instId=ETH-USD-210430&posId=307173036051017730")
+    );
     assert!(req.is_signed());
 }
 
@@ -111,6 +118,8 @@ async fn get_account_config_signs_and_parses() {
     let config = client.account().get_account_config().await.unwrap();
     assert_eq!(config[0].pos_mode, "net_mode");
     assert_eq!(config[0].acct_lv, "2");
+    assert_eq!(config[0].level, "Lv1");
+    assert_eq!(config[0].ct_iso_mode, "automatic");
 
     let req = mock.captured();
     assert!(req.uri.ends_with("/api/v5/account/config"));

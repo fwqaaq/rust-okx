@@ -25,6 +25,48 @@ pub struct AccountConfig {
     /// API key permissions, comma-separated (e.g. `"read_only,trade,withdraw"`).
     #[serde(default)]
     pub perm: String,
+    /// Fee-rate level.
+    #[serde(default)]
+    pub level: String,
+    /// Temporary fee-rate level.
+    #[serde(default)]
+    pub level_tmp: String,
+    /// Contract isolated margin mode.
+    #[serde(default)]
+    pub ct_iso_mode: String,
+    /// Margin isolated margin mode.
+    #[serde(default)]
+    pub mgn_iso_mode: String,
+    /// Spot offset type.
+    #[serde(default)]
+    pub spot_offset_type: String,
+    /// Role type.
+    #[serde(default)]
+    pub role_type: String,
+    /// Lead-trading instruments.
+    #[serde(default)]
+    pub trader_insts: Vec<String>,
+    /// Spot role type.
+    #[serde(default)]
+    pub spot_role_type: String,
+    /// Spot lead-trading instruments.
+    #[serde(default)]
+    pub spot_trader_insts: Vec<String>,
+    /// Option authorization flag.
+    #[serde(default)]
+    pub op_auth: String,
+    /// API key IP whitelist.
+    #[serde(default)]
+    pub ip: String,
+    /// Main account UID.
+    #[serde(default)]
+    pub main_uid: String,
+    /// KYC level.
+    #[serde(default)]
+    pub kyc_lv: String,
+    /// API key label.
+    #[serde(default)]
+    pub label: String,
 }
 
 /// Result of setting position mode.

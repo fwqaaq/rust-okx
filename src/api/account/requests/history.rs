@@ -24,6 +24,10 @@ pub struct BillsRequest<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     before: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    begin: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    end: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<u32>,
 }
 
@@ -78,6 +82,18 @@ impl<'a> BillsRequest<'a> {
     /// Return records before this pagination cursor.
     pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
+        self
+    }
+
+    /// Set the begin timestamp filter.
+    pub fn begin(mut self, begin: impl Into<Cow<'a, str>>) -> Self {
+        self.begin = Some(begin.into());
+        self
+    }
+
+    /// Set the end timestamp filter.
+    pub fn end(mut self, end: impl Into<Cow<'a, str>>) -> Self {
+        self.end = Some(end.into());
         self
     }
 

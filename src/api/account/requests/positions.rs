@@ -14,6 +14,8 @@ pub struct PositionsRequest<'a> {
     inst_type: Option<InstType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     inst_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pos_id: Option<Cow<'a, str>>,
 }
 
 impl<'a> PositionsRequest<'a> {
@@ -31,6 +33,12 @@ impl<'a> PositionsRequest<'a> {
     /// Set the instrument ID filter.
     pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
         self.inst_id = Some(inst_id.into());
+        self
+    }
+
+    /// Set the position ID filter.
+    pub fn position_id(mut self, pos_id: impl Into<Cow<'a, str>>) -> Self {
+        self.pos_id = Some(pos_id.into());
         self
     }
 }
