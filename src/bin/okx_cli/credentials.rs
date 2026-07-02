@@ -106,11 +106,9 @@ fn prompt_hidden(msg: &str) -> String {
                     print!("*");
                     io::stdout().flush().ok();
                 }
-                KeyCode::Backspace => {
-                    if input.pop().is_some() {
-                        print!("\x08 \x08");
-                        io::stdout().flush().ok();
-                    }
+                KeyCode::Backspace if input.pop().is_some() => {
+                    print!("\x08 \x08");
+                    io::stdout().flush().ok();
                 }
                 _ => {}
             }

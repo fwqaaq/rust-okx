@@ -189,6 +189,7 @@ impl TaskHandles {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn run_tui(
     terminal: &mut Terminal<CrosstermBackend<std::io::Stdout>>,
     app: &mut App,

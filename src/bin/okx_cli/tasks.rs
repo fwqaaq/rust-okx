@@ -313,7 +313,7 @@ async fn market_ws_task(inst_id: String, tx: mpsc::Sender<AppMsg>) -> Result<()>
 }
 
 async fn watchlist_ws_task(instruments: Vec<String>, tx: mpsc::Sender<AppMsg>) -> Result<()> {
-    let args: Vec<_> = instruments.iter().map(|id| market::tickers(id)).collect();
+    let args: Vec<_> = instruments.iter().map(market::tickers).collect();
     let mut ws = OkxWs::public().connect().await?;
     ws.subscribe(&args).await?;
 
