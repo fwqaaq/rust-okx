@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **153/342 (44.7%)**
+> Progress: **155/342 (45.3%)**
 
 ## Account
 
@@ -29,7 +29,7 @@
 - [x] GET /api/v5/account/max-avail-size
 - [x] POST /api/v5/account/position/margin-balance
 - [x] GET /api/v5/account/leverage-info
-- [ ] GET /api/v5/account/adjust-leverage-info
+- [x] GET /api/v5/account/adjust-leverage-info
 - [x] GET /api/v5/account/max-loan
 - [x] GET /api/v5/account/trade-fee
 - [x] GET /api/v5/account/interest-accrued
@@ -46,7 +46,7 @@
 - [x] POST /api/v5/account/simulated_margin
 - [x] GET /api/v5/account/position-tiers
 - [x] GET /api/v5/account/risk-state
-- [ ] POST /api/v5/account/set-riskOffset-amt
+- [x] POST /api/v5/account/set-riskOffset-amt
 - [x] POST /api/v5/account/set-auto-loan
 - [x] POST /api/v5/account/set-account-level
 - [x] POST /api/v5/account/activate-option
@@ -63,7 +63,7 @@
 - [ ] POST /api/v5/account/mmp-reset
 - [ ] POST /api/v5/account/demo-adjust-balance
 
-<!-- Account: 37/50 implemented -->
+<!-- Account: 39/50 implemented -->
 
 ## Trade
 

@@ -27,6 +27,7 @@ pub(super) const GREEKS: &str = "/api/v5/account/greeks";
 pub(super) const POSITIONS_HISTORY: &str = "/api/v5/account/positions-history";
 pub(super) const ACCOUNT_POSITION_TIERS: &str = "/api/v5/account/position-tiers";
 pub(super) const RISK_STATE: &str = "/api/v5/account/risk-state";
+pub(super) const SET_RISK_OFFSET_AMOUNT: &str = "/api/v5/account/set-riskOffset-amt";
 pub(super) const SET_AUTO_LOAN: &str = "/api/v5/account/set-auto-loan";
 pub(super) const SET_ACCOUNT_LEVEL: &str = "/api/v5/account/set-account-level";
 pub(super) const ACTIVATE_OPTION: &str = "/api/v5/account/activate-option";

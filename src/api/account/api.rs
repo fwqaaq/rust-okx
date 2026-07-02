@@ -461,6 +461,25 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(RISK_STATE, &EmptyRequest {}, true).await
     }
 
+    /// Set the spot risk offset amount.
+    ///
+    /// `POST /api/v5/account/set-riskOffset-amt`. Authenticated.
+    ///
+    /// Only applicable to Portfolio Margin Mode.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_risk_offset_amount(
+        &self,
+        request: &SetRiskOffsetAmountRequest<'_>,
+    ) -> Result<Vec<SetRiskOffsetAmountResult>, Error> {
+        self.client
+            .post(SET_RISK_OFFSET_AMOUNT, request, true)
+            .await
+    }
+
     /// Set account auto-loan mode.
     ///
     /// `POST /api/v5/account/set-auto-loan`. Authenticated.
