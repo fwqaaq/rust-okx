@@ -35,8 +35,8 @@ async fn get_account_position_tiers_uses_builder_query() {
         "minSz":"0","maxSz":"100","mmrFactor":"0.1","imrFactor":"0.3","netDeltaAmount":"0.02"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = AccountPositionTiersRequest::new()
-        .inst_type(InstType::Option)
+    let request = AccountPositionTiersRequest::new(InstType::Option).underlying("BTC-USD");
+    assert_eq!(req.query(), Some("instType=OPTION&uly=BTC-USD"));
         .underlying("BTC-USD");
 
     let result = client
