@@ -106,21 +106,71 @@ pub struct BorrowRepayHistory {
     pub ts: NumberString,
 }
 
-/// Borrowing interest limit information.
+/// Borrowing interest and limit information, as returned by
+/// `GET /api/v5/account/interest-limits`.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct InterestLimit {
+    /// Current debt in USD.
+    #[serde(default)]
+    pub debt: NumberString,
+    /// Current interest in USD. Only applicable to Market loans.
+    #[serde(default)]
+    pub interest: NumberString,
+    /// Next deduct time (Unix milliseconds).
+    #[serde(default)]
+    pub next_discount_time: NumberString,
+    /// Next accrual time (Unix milliseconds).
+    #[serde(default)]
+    pub next_interest_time: NumberString,
+    /// VIP loan allocation for the current trading account (percent).
+    #[serde(default)]
+    pub loan_alloc: String,
+    /// Per-currency loan records.
+    #[serde(default)]
+    pub records: Vec<LoanRecord>,
+}
+
+/// Per-currency loan record nested in [`InterestLimit`].
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct LoanRecord {
+    /// Available loan amount.
+    #[serde(default)]
+    pub avail_loan: String,
+    /// Average borrow rate.
+    #[serde(default)]
+    pub avg_rate: String,
     /// Currency.
     #[serde(default)]
     pub ccy: String,
-    /// Interest rate.
+    /// Accrued interest.
     #[serde(default)]
-    pub rate: NumberString,
-    /// Loan quota.
+    pub interest: NumberString,
+    /// Total loan quota.
     #[serde(default)]
     pub loan_quota: NumberString,
-    /// Used loan quota.
+    /// Position loan.
     #[serde(default)]
-    pub used_loan: NumberString,
+    pub pos_loan: String,
+    /// Current borrow rate.
+    #[serde(default)]
+    pub rate: NumberString,
+    /// Remaining loan limit.
+    #[serde(default)]
+    pub surplus_lmt: NumberString,
+    /// Used loan limit.
+    #[serde(default)]
+    pub used_lmt: NumberString,
+    /// Used loan amount.
+    #[serde(default)]
+    pub used_loan: String,
+    /// Interest-free liability.
+    #[serde(default)]
+    pub interest_free_liab: String,
+    /// Potential borrowing amount.
+    #[serde(default)]
+    pub potential_borrowing_amt: String,
 }

@@ -72,8 +72,8 @@ async fn get_interest_rate_queries_currency() {
 #[tokio::test]
 async fn get_interest_limits_uses_builder_query() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "ccy":"BTC","rate":"0.00007","loanQuota":"10","usedLoan":"0.01",
-        "interest":"0.001","surplusLmt":"9.99","surplusLmtDetails":{"allAcctRemainingQuota":"9.99","curAcctRemainingQuota":"9.99","platRemainingQuota":"9.99"}}]}"#;
+        "debt":"0.5","interest":"0.001","loanAlloc":"","nextDiscountTime":"1729490400000","nextInterestTime":"1729490400000",
+        "records":[{"ccy":"BTC","rate":"0.00007","loanQuota":"10","usedLoan":"0.01","interest":"0.001","surplusLmt":"9.99","surplusLmtDetails":{"allAcctRemainingQuota":"9.99","curAcctRemainingQuota":"9.99","platRemainingQuota":"9.99"}}]}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = InterestLimitsRequest::new().limit_type("1").currency("BTC");
@@ -83,7 +83,8 @@ async fn get_interest_limits_uses_builder_query() {
         .get_interest_limits(&request)
         .await
         .unwrap();
-    assert_eq!(result[0].loan_quota.as_str(), "10");
+    assert_eq!(result[0].debt.as_str(), "0.5");
+    assert_eq!(result[0].records[0].loan_quota.as_str(), "10");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("type=1&ccy=BTC"));
@@ -151,7 +152,7 @@ async fn get_spot_borrow_repay_history_sends_signed_request() {
 
 #[tokio::test]
 async fn set_auto_loan_posts_body() {
-    let body = r#"{"code":"0","msg":"","data":[{"autoLoan":"true"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"autoLoan":true}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
@@ -160,7 +161,7 @@ async fn set_auto_loan_posts_body() {
         .set_auto_loan(&SetAutoLoanRequest::new(true))
         .await
         .unwrap();
-    assert_eq!(result[0].auto_loan, "true");
+    assert!(result[0].auto_loan);
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::POST);

@@ -18,3 +18,5 @@ pub(super) const INTEREST_RATE_LOAN_QUOTA: &str = "/api/v5/public/interest-rate-
 pub(super) const INSTRUMENT_TICK_BANDS: &str = "/api/v5/public/instrument-tick-bands";
 pub(super) const OPTION_TRADES: &str = "/api/v5/public/option-trades";
 pub(super) const MARKET_DATA_HISTORY: &str = "/api/v5/public/market-data-history";
+pub(super) const MM_INSTRUMENT_TYPES: &str = "/api/v5/public/mm-instrument-types";
+pub(super) const ECONOMIC_CALENDAR: &str = "/api/v5/public/economic-calendar";

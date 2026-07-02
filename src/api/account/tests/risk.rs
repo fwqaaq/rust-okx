@@ -120,12 +120,13 @@ async fn set_risk_offset_amount_posts_body() {
 #[tokio::test]
 async fn position_builder_posts_body_and_omits_unset_fields() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "acctLv":"2","adjEq":"10000","imr":"3174.99","mmr":"126.39","mr":"0","notionalUsd":"0",
-        "riskUnit":"USD","ts":"1629453864251",
-        "posData":[{
-            "instType":"SWAP","instId":"BTC-USDT-SWAP","pos":"1","avgPx":"42000","upl":"2",
-            "delta":"1","gamma":"0","vega":"0","theta":"0"}],
-        "assetData":[{"ccy":"USDT","eq":"10000","borrowMmd":"","borrowImr":""}]}]}"#;
+        "eq":"10000","totalMmr":"126.39","totalImr":"3174.99","borrowMmr":"0","derivMmr":"126.39",
+        "marginRatio":"79.12","upl":"2","acctLever":"1.5","ts":"1629453864251",
+        "assets":[{"ccy":"USDT","availEq":"10000","spotInUse":"0","borrowMmr":"","borrowImr":""}],
+        "riskUnitData":[{
+            "riskUnit":"BTC","mmrBf":"","mmr":"126.39","imrBf":"","imr":"3174.99","upl":"2",
+            "mr1":"100","mr2":"0","mr3":"0","mr4":"0","mr5":"0","mr6":"126.39","mr7":"0","mr8":"0","mr9":"0",
+            "mr1Scenarios":{"volSame":{"0":"0","0.08":"-776.27"},"volShockUp":{},"volShockDown":{}}}]}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = PositionBuilderRequest::new()
@@ -135,8 +136,19 @@ async fn position_builder_posts_body_and_omits_unset_fields() {
         .simulated_assets(vec![SimulatedAsset::new("USDT").equity("10000")]);
 
     let result = client.account().position_builder(&request).await.unwrap();
-    assert_eq!(result[0].pos_data[0].inst_id, "BTC-USDT-SWAP");
-    assert_eq!(result[0].asset_data[0].eq.as_str(), "10000");
+    assert_eq!(result[0].eq.as_str(), "10000");
+    assert_eq!(result[0].assets[0].ccy, "USDT");
+    assert_eq!(result[0].risk_unit_data[0].risk_unit, "BTC");
+    assert_eq!(result[0].risk_unit_data[0].mmr.as_str(), "126.39");
+    assert_eq!(
+        result[0].risk_unit_data[0]
+            .mr1_scenarios
+            .as_ref()
+            .unwrap()
+            .vol_same["0.08"]
+            .as_str(),
+        "-776.27"
+    );
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::POST);

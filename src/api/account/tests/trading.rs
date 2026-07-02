@@ -385,12 +385,12 @@ async fn set_account_level_posts_body() {
 
 #[tokio::test]
 async fn activate_option_posts_empty_body() {
-    let body = r#"{"code":"0","msg":"","data":[{"result":"true"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"ts":"1600000000000"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
     let result = client.account().activate_option().await.unwrap();
-    assert_eq!(result[0].result, "true");
+    assert_eq!(result[0].ts.as_str(), "1600000000000");
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::POST);

@@ -1,20 +1,38 @@
 use crate::model::NumberString;
 use serde::Deserialize;
 
-/// Currency-level investment data returned by Staking/DeFi endpoints.
+/// Currency-level investment data returned by the Staking/DeFi offers endpoint.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct StakingDefiInvestData {
-    /// Value returned by OKX in the `ccy` field.
+    /// Investment currency, e.g. `BTC`.
     #[serde(default)]
     pub ccy: String,
-    /// Value returned by OKX in the `amt` field.
+    /// Available balance to invest.
     #[serde(default)]
-    pub amt: NumberString,
-    /// Value returned by OKX in the `earnings` field.
+    pub bal: NumberString,
+    /// Minimum subscription amount.
     #[serde(default)]
-    pub earnings: NumberString,
+    pub min_amt: NumberString,
+    /// Maximum available subscription amount.
+    #[serde(default)]
+    pub max_amt: NumberString,
+}
+
+/// Earning data returned by the Staking/DeFi offers endpoint.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct StakingDefiEarningData {
+    /// Earning currency, e.g. `BTC`.
+    #[serde(default)]
+    pub ccy: String,
+    /// Earning type.
+    ///
+    /// `0`: Estimated earning, `1`: Cumulative earning.
+    #[serde(default)]
+    pub earning_type: String,
 }
 
 /// Staking/DeFi offer row.
@@ -22,67 +40,170 @@ pub struct StakingDefiInvestData {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct StakingDefiOffer {
+    /// Currency type, e.g. `BTC`.
+    #[serde(default)]
+    pub ccy: String,
     /// Value returned by OKX in the `productId` field.
     #[serde(default)]
     pub product_id: String,
-    /// Value returned by OKX in the `protocolType` field.
+    /// Protocol name.
+    #[serde(default)]
+    pub protocol: String,
+    /// Protocol type.
+    ///
+    /// `defi`: on-chain earn.
     #[serde(default)]
     pub protocol_type: String,
-    /// Value returned by OKX in the `name` field.
-    #[serde(default)]
-    pub name: String,
-    /// Value returned by OKX in the `ccy` field.
-    #[serde(default)]
-    pub ccy: String,
-    /// Value returned by OKX in the `term` field.
+    /// Protocol term.
+    ///
+    /// Returns the days of a fixed term, or `0` for a flexible product.
     #[serde(default)]
     pub term: String,
-    /// Value returned by OKX in the `apy` field.
+    /// Estimated annualization. `0.07` represents 7%.
     #[serde(default)]
     pub apy: NumberString,
-    /// Value returned by OKX in the `state` field.
+    /// Whether the protocol supports early redemption.
     #[serde(default)]
-    pub state: String,
-    /// Value returned by OKX in the `investData` field.
+    pub early_redeem: bool,
+    /// Current target currency information available for investment.
     #[serde(default)]
     pub invest_data: Vec<StakingDefiInvestData>,
+    /// Earning data.
+    #[serde(default)]
+    pub earning_data: Vec<StakingDefiEarningData>,
+    /// Product state.
+    ///
+    /// `purchasable`: Purchasable, `sold_out`: Sold out,
+    /// `Stop`: Suspension of subscription.
+    #[serde(default)]
+    pub state: String,
+    /// Redemption period, format `[min time, max time]` where `H`: Hour, `D`: Day.
+    ///
+    /// e.g. `["1H","24H"]` or `["14D","14D"]`.
+    #[serde(default)]
+    pub redeem_period: Vec<String>,
+    /// Fast redemption daily limit.
+    ///
+    /// Returns `''` if fast redemption is not supported.
+    #[serde(default)]
+    pub fast_redemption_daily_limit: NumberString,
 }
 
-/// Staking/DeFi order row.
+/// Currency-level investment data returned by the Staking/DeFi order endpoints
+/// (active orders and order history).
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct StakingDefiOrderInvestData {
+    /// Investment currency, e.g. `BTC`.
+    #[serde(default)]
+    pub ccy: String,
+    /// Invested amount.
+    #[serde(default)]
+    pub amt: NumberString,
+}
+
+/// Earning data returned by the Staking/DeFi order endpoints.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct StakingDefiOrderEarningData {
+    /// Earning currency, e.g. `BTC`.
+    #[serde(default)]
+    pub ccy: String,
+    /// Earning type.
+    ///
+    /// `0`: Estimated earning, `1`: Cumulative earning.
+    #[serde(default)]
+    pub earning_type: String,
+    /// Earning amount. Returned by the active-orders endpoint.
+    #[serde(default)]
+    pub earnings: NumberString,
+    /// Cumulative earning of redeemed orders. Returned by the order-history
+    /// endpoint; only valid when the order is in a redemption state.
+    #[serde(default)]
+    pub realized_earnings: NumberString,
+}
+
+/// Fast redemption data returned by the Staking/DeFi active-orders endpoint.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct StakingDefiFastRedemptionData {
+    /// Currency, e.g. `BTC`.
+    #[serde(default)]
+    pub ccy: String,
+    /// Redeeming amount.
+    #[serde(default)]
+    pub redeeming_amt: NumberString,
+}
+
+/// Staking/DeFi order row, returned by both the active-orders and order-history
+/// endpoints.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct StakingDefiOrder {
-    /// Value returned by OKX in the `ordId` field.
-    #[serde(default)]
-    pub ord_id: String,
-    /// Value returned by OKX in the `productId` field.
-    #[serde(default)]
-    pub product_id: String,
-    /// Value returned by OKX in the `protocolType` field.
-    #[serde(default)]
-    pub protocol_type: String,
-    /// Value returned by OKX in the `ccy` field.
+    /// Currency, e.g. `BTC`.
     #[serde(default)]
     pub ccy: String,
-    /// Value returned by OKX in the `amt` field.
+    /// Order ID.
     #[serde(default)]
-    pub amt: NumberString,
-    /// Value returned by OKX in the `state` field.
+    pub ord_id: String,
+    /// Product ID.
+    #[serde(default)]
+    pub product_id: String,
+    /// Order state.
+    ///
+    /// Active orders: `8`: Pending, `13`: Cancelling, `9`: Onchain,
+    /// `1`: Earning, `2`: Redeeming.
+    /// Order history: `3`: Completed (including canceled and redeemed).
     #[serde(default)]
     pub state: String,
-    /// Value returned by OKX in the `term` field.
+    /// Protocol.
+    #[serde(default)]
+    pub protocol: String,
+    /// Protocol type.
+    ///
+    /// `defi`: on-chain earn.
+    #[serde(default)]
+    pub protocol_type: String,
+    /// Protocol term.
+    ///
+    /// Returns the days of a fixed term, or `0` for a flexible product.
     #[serde(default)]
     pub term: String,
-    /// Value returned by OKX in the `apy` field.
+    /// Estimated APY. `0.07` represents 7%. Retained to 4 decimal places
+    /// (truncated).
     #[serde(default)]
     pub apy: NumberString,
-    /// Value returned by OKX in the `cTime` field.
+    /// Investment data.
     #[serde(default)]
-    pub c_time: NumberString,
-    /// Value returned by OKX in the `uTime` field.
+    pub invest_data: Vec<StakingDefiOrderInvestData>,
+    /// Earning data.
     #[serde(default)]
-    pub u_time: NumberString,
+    pub earning_data: Vec<StakingDefiOrderEarningData>,
+    /// Fast redemption data. Only returned by the active-orders endpoint.
+    #[serde(default)]
+    pub fast_redemption_data: Vec<StakingDefiFastRedemptionData>,
+    /// Order purchased time, Unix timestamp in milliseconds, e.g.
+    /// `1597026383085`.
+    #[serde(default)]
+    pub purchased_time: NumberString,
+    /// Estimated redemption settlement time. Only returned by the active-orders
+    /// endpoint.
+    #[serde(default)]
+    pub est_settlement_time: NumberString,
+    /// Deadline for cancellation of a redemption application. Only returned by
+    /// the active-orders endpoint.
+    #[serde(default)]
+    pub cancel_redemption_deadline: NumberString,
+    /// Order redeemed time. Only returned by the order-history endpoint.
+    #[serde(default)]
+    pub redeemed_time: NumberString,
+    /// Order tag.
+    #[serde(default)]
+    pub tag: String,
 }
 
 /// Staking product-info row.
@@ -155,31 +276,48 @@ pub struct StakingBalance {
     /// Value returned by OKX in the `amt` field.
     #[serde(default)]
     pub amt: NumberString,
-    /// Value returned by OKX in the `earnings` field.
+    /// Value returned by OKX in the `latestInterestAccrual` field.
     #[serde(default)]
-    pub earnings: NumberString,
+    pub latest_interest_accrual: NumberString,
+    /// Value returned by OKX in the `totalInterestAccrual` field.
+    #[serde(default)]
+    pub total_interest_accrual: NumberString,
+    /// Value returned by OKX in the `ts` field. Present for ETH balance;
+    /// absent for SOL balance.
+    #[serde(default)]
+    pub ts: NumberString,
 }
 
-/// Staking history row.
+/// Staking purchase/redeem history row.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct StakingHistory {
-    /// Value returned by OKX in the `ccy` field.
-    #[serde(default)]
-    pub ccy: String,
-    /// Value returned by OKX in the `amt` field.
-    #[serde(default)]
-    pub amt: NumberString,
     /// Value returned by OKX in the `type` field.
     #[serde(default, rename = "type")]
     pub event_type: String,
-    /// Value returned by OKX in the `state` field.
+    /// Value returned by OKX in the `amt` field.
     #[serde(default)]
-    pub state: String,
-    /// Value returned by OKX in the `ts` field.
+    pub amt: NumberString,
+    /// Value returned by OKX in the `redeemingAmt` field.
     #[serde(default)]
-    pub ts: NumberString,
+    pub redeeming_amt: NumberString,
+    /// Value returned by OKX in the `status` field.
+    #[serde(default)]
+    pub status: String,
+    /// Value returned by OKX in the `ordId` field. Present for ETH history;
+    /// absent for SOL history.
+    #[serde(default)]
+    pub ord_id: String,
+    /// Value returned by OKX in the `requestTime` field.
+    #[serde(default)]
+    pub request_time: NumberString,
+    /// Value returned by OKX in the `completedTime` field.
+    #[serde(default)]
+    pub completed_time: NumberString,
+    /// Value returned by OKX in the `estCompletedTime` field.
+    #[serde(default)]
+    pub est_completed_time: NumberString,
 }
 
 /// Staking APY-history row.
@@ -187,12 +325,9 @@ pub struct StakingHistory {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct StakingApyHistory {
-    /// Value returned by OKX in the `ccy` field.
+    /// Value returned by OKX in the `rate` field.
     #[serde(default)]
-    pub ccy: String,
-    /// Value returned by OKX in the `apy` field.
-    #[serde(default)]
-    pub apy: NumberString,
+    pub rate: NumberString,
     /// Value returned by OKX in the `ts` field.
     #[serde(default)]
     pub ts: NumberString,

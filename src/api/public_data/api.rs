@@ -291,4 +291,35 @@ impl<'a, T: Transport> PublicData<'a, T> {
     ) -> Result<Vec<MarketDataHistory>, Error> {
         self.client.get(MARKET_DATA_HISTORY, request, false).await
     }
+
+    /// Retrieve MM Program instrument-type classifications.
+    ///
+    /// `GET /api/v5/public/mm-instrument-types`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_mm_instrument_types(
+        &self,
+        request: &MmInstrumentTypesRequest<'_>,
+    ) -> Result<Vec<MmInstrumentType>, Error> {
+        self.client.get(MM_INSTRUMENT_TYPES, request, false).await
+    }
+
+    /// Retrieve macro-economic calendar data within the last three months.
+    ///
+    /// `GET /api/v5/public/economic-calendar`. Authenticated: this endpoint
+    /// requires signing and is only supported in the production environment.
+    /// Historical data older than three months requires trading fee tier VIP1
+    /// or above.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_economic_calendar(
+        &self,
+        request: &EconomicCalendarRequest<'_>,
+    ) -> Result<Vec<EconomicCalendar>, Error> {
+        self.client.get(ECONOMIC_CALENDAR, request, true).await
+    }
 }

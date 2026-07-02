@@ -192,10 +192,10 @@ pub struct FeeRate {
     #[serde(default)]
     pub maker: NumberString,
     /// Taker fee rate for USDC-margined contracts.
-    #[serde(default)]
+    #[serde(rename = "takerUSDC", default)]
     pub taker_usdc: NumberString,
     /// Maker fee rate for USDC-margined contracts.
-    #[serde(default)]
+    #[serde(rename = "makerUSDC", default)]
     pub maker_usdc: NumberString,
     /// Trading rule type.
     #[serde(default)]
@@ -330,9 +330,9 @@ pub struct SetIsolatedModeResult {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct SetAutoLoanResult {
-    /// Auto-loan setting as returned by OKX.
+    /// Whether auto-loan is enabled. OKX returns this as a JSON boolean.
     #[serde(default)]
-    pub auto_loan: String,
+    pub auto_loan: bool,
 }
 
 /// Result of updating account level.
@@ -350,7 +350,7 @@ pub struct SetAccountLevelResult {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct ActivateOptionResult {
-    /// OKX result marker, when returned.
+    /// Activation time (Unix milliseconds).
     #[serde(default)]
-    pub result: String,
+    pub ts: NumberString,
 }

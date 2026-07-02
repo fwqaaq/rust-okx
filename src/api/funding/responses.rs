@@ -101,12 +101,21 @@ pub struct TransferResult {
     /// Transfer ID.
     #[serde(default, rename = "transId")]
     pub trans_id: String,
+    /// Client-supplied ID.
+    #[serde(default, rename = "clientId")]
+    pub client_id: String,
     /// Currency code.
     #[serde(default)]
     pub ccy: String,
+    /// The remitting account.
+    #[serde(default, rename = "from")]
+    pub from_account: String,
     /// Transfer amount.
     #[serde(default)]
     pub amt: NumberString,
+    /// The beneficiary account.
+    #[serde(default)]
+    pub to: String,
 }
 
 /// Funds-transfer state.
@@ -117,21 +126,30 @@ pub struct TransferState {
     /// Transfer ID.
     #[serde(default, rename = "transId")]
     pub trans_id: String,
-    /// Transfer state.
-    #[serde(default)]
-    pub state: String,
+    /// Client-supplied ID.
+    #[serde(default, rename = "clientId")]
+    pub client_id: String,
     /// Currency code.
     #[serde(default)]
     pub ccy: String,
     /// Transfer amount.
     #[serde(default)]
     pub amt: NumberString,
+    /// Transfer type.
+    #[serde(default, rename = "type")]
+    pub transfer_type: String,
     /// Source account.
     #[serde(default, rename = "from")]
     pub from_account: String,
     /// Destination account.
     #[serde(default)]
     pub to: String,
+    /// Name of the sub-account.
+    #[serde(default, rename = "subAcct")]
+    pub sub_account: String,
+    /// Transfer state.
+    #[serde(default)]
+    pub state: String,
 }
 
 /// Withdrawal result.

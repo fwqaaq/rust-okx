@@ -355,6 +355,74 @@ pub struct MarketDataHistory {
     pub ts: NumberString,
 }
 
+/// MM Program instrument-type classification row.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct MmInstrumentType {
+    /// Value returned by OKX in the `instId` field.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Value returned by OKX in the `instType` field.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Value returned by OKX in the `pairType` field (MM Program classification type).
+    #[serde(default)]
+    pub pair_type: String,
+}
+
+/// Macro-economic calendar row.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct EconomicCalendar {
+    /// Value returned by OKX in the `calendarId` field.
+    #[serde(default)]
+    pub calendar_id: String,
+    /// Value returned by OKX in the `date` field (Unix milliseconds).
+    #[serde(default)]
+    pub date: NumberString,
+    /// Value returned by OKX in the `region` field.
+    #[serde(default)]
+    pub region: String,
+    /// Value returned by OKX in the `category` field.
+    #[serde(default)]
+    pub category: String,
+    /// Value returned by OKX in the `event` field.
+    #[serde(default)]
+    pub event: String,
+    /// Value returned by OKX in the `refDate` field (Unix milliseconds).
+    #[serde(default)]
+    pub ref_date: NumberString,
+    /// Value returned by OKX in the `actual` field.
+    #[serde(default)]
+    pub actual: String,
+    /// Value returned by OKX in the `previous` field.
+    #[serde(default)]
+    pub previous: String,
+    /// Value returned by OKX in the `forecast` field.
+    #[serde(default)]
+    pub forecast: String,
+    /// Value returned by OKX in the `dateSpan` field.
+    #[serde(default)]
+    pub date_span: String,
+    /// Value returned by OKX in the `importance` field.
+    #[serde(default)]
+    pub importance: String,
+    /// Value returned by OKX in the `uTime` field (Unix milliseconds).
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Value returned by OKX in the `prevInitial` field.
+    #[serde(default)]
+    pub prev_initial: String,
+    /// Value returned by OKX in the `ccy` field.
+    #[serde(default)]
+    pub ccy: String,
+    /// Value returned by OKX in the `unit` field.
+    #[serde(default)]
+    pub unit: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

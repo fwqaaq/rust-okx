@@ -162,8 +162,7 @@ impl<'a> SubAccountMaxWithdrawalRequest<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CreateSubAccountRequest<'a> {
     sub_acct: Cow<'a, str>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    r#type: Option<Cow<'a, str>>,
+    r#type: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     label: Option<Cow<'a, str>>,
     /// Password is security-sensitive; kept as owned `String`.
@@ -172,20 +171,17 @@ pub struct CreateSubAccountRequest<'a> {
 }
 
 impl<'a> CreateSubAccountRequest<'a> {
-    /// Create a sub-account with the given name.
-    pub fn new(sub_acct: impl Into<Cow<'a, str>>) -> Self {
+    /// Create a sub-account with the given name and type.
+    ///
+    /// `sub_type` is required by OKX: `"1"` = standard sub-account,
+    /// `"5"` = custody trading (Copper), `"12"` = custody trading (Komainu).
+    pub fn new(sub_acct: impl Into<Cow<'a, str>>, sub_type: impl Into<Cow<'a, str>>) -> Self {
         Self {
             sub_acct: sub_acct.into(),
-            r#type: None,
+            r#type: sub_type.into(),
             label: None,
             pwd: None,
         }
-    }
-
-    /// Set the sub-account type.
-    pub fn sub_type(mut self, sub_type: impl Into<Cow<'a, str>>) -> Self {
-        self.r#type = Some(sub_type.into());
-        self
     }
 
     /// Set a display label for the sub-account.

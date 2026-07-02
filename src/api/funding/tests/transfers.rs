@@ -7,15 +7,18 @@ use super::signed_client;
 
 #[tokio::test]
 async fn funds_transfer_posts_signed_body() {
-    let body = r#"{"code":"0","msg":"","data":[{"transId":"754147","ccy":"USDT","amt":"1.5"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"transId":"754147","clientId":"cli-1","ccy":"USDT","from":"6","amt":"1.5","to":"18"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = FundsTransferRequest::new("USDT", "1.5", "6", "18");
 
     let rows = client.funding().funds_transfer(&request).await.unwrap();
     assert_eq!(rows[0].trans_id, "754147");
+    assert_eq!(rows[0].client_id, "cli-1");
     assert_eq!(rows[0].ccy, "USDT");
+    assert_eq!(rows[0].from_account, "6");
     assert_eq!(rows[0].amt.as_str(), "1.5");
+    assert_eq!(rows[0].to, "18");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::POST);
@@ -32,16 +35,19 @@ async fn funds_transfer_posts_signed_body() {
 #[tokio::test]
 async fn transfer_state_queries_trans_id() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "transId":"754147","state":"success","ccy":"USDT","amt":"1.5",
-        "from":"6","to":"18"}]}"#;
+        "transId":"754147","clientId":"cli-1","state":"success","ccy":"USDT","amt":"1.5",
+        "type":"0","from":"6","to":"18","subAcct":"sub-1"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
     let request = TransferStateRequest::new("754147");
     let rows = client.funding().transfer_state(&request).await.unwrap();
     assert_eq!(rows[0].trans_id, "754147");
+    assert_eq!(rows[0].client_id, "cli-1");
     assert_eq!(rows[0].state, "success");
+    assert_eq!(rows[0].transfer_type, "0");
     assert_eq!(rows[0].from_account, "6");
+    assert_eq!(rows[0].sub_account, "sub-1");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);

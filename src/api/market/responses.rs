@@ -94,6 +94,9 @@ pub struct OrderBook {
     pub bids: Vec<OrderBookLevel>,
     /// Snapshot timestamp (Unix milliseconds).
     pub ts: NumberString,
+    /// Sequence ID of the current message (returned as a JSON number).
+    #[serde(default)]
+    pub seq_id: i64,
 }
 
 /// A single price level in an [`OrderBook`].
@@ -309,6 +312,9 @@ pub struct PlatformVolume {
     /// 24-hour volume in CNY.
     #[serde(default)]
     pub vol_cny: NumberString,
+    /// Timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
 }
 
 /// The components that make up an OKX index.
@@ -319,6 +325,9 @@ pub struct IndexComponents {
     /// Index name.
     #[serde(default)]
     pub index: String,
+    /// Latest index price.
+    #[serde(default)]
+    pub last: NumberString,
     /// Component list.
     #[serde(default)]
     pub components: Vec<IndexComponent>,

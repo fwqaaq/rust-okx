@@ -108,13 +108,16 @@ async fn eth_cancel_redeem() {
 
 #[tokio::test]
 async fn eth_balance_sends_signed_request() {
-    let body = r#"{"code":"0","msg":"","data":[{"ccy":"ETH","amt":"1.5","earnings":"0.01"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"ccy":"BETH","amt":"1.5","latestInterestAccrual":"0.001","totalInterestAccrual":"0.01","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
     let rows = client.finance().eth_staking().balance().await.unwrap();
-    assert_eq!(rows[0].ccy, "ETH");
+    assert_eq!(rows[0].ccy, "BETH");
     assert_eq!(rows[0].amt.as_str(), "1.5");
+    assert_eq!(rows[0].latest_interest_accrual.as_str(), "0.001");
+    assert_eq!(rows[0].total_interest_accrual.as_str(), "0.01");
+    assert_eq!(rows[0].ts.as_str(), "1597026383085");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
@@ -128,7 +131,7 @@ async fn eth_balance_sends_signed_request() {
 
 #[tokio::test]
 async fn eth_purchase_redeem_history_uses_builder_query() {
-    let body = r#"{"code":"0","msg":"","data":[{"ccy":"ETH","amt":"0.1","type":"purchase","state":"3","ts":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"amt":"0.62666630","completedTime":"1683413171000","estCompletedTime":"","redeemingAmt":"","requestTime":"1683413171000","status":"success","type":"purchase","ordId":"123"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = FinanceHistoryRequest::new().limit(5);
@@ -139,8 +142,12 @@ async fn eth_purchase_redeem_history_uses_builder_query() {
         .purchase_redeem_history(&request)
         .await
         .unwrap();
-    assert_eq!(rows[0].ccy, "ETH");
     assert_eq!(rows[0].event_type, "purchase");
+    assert_eq!(rows[0].amt.as_str(), "0.62666630");
+    assert_eq!(rows[0].status, "success");
+    assert_eq!(rows[0].ord_id, "123");
+    assert_eq!(rows[0].request_time.as_str(), "1683413171000");
+    assert_eq!(rows[0].completed_time.as_str(), "1683413171000");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
@@ -150,8 +157,7 @@ async fn eth_purchase_redeem_history_uses_builder_query() {
 
 #[tokio::test]
 async fn eth_apy_history_is_not_signed() {
-    let body =
-        r#"{"code":"0","msg":"","data":[{"ccy":"ETH","apy":"0.0223","ts":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"rate":"0.0223","ts":"1597026383085"}]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
 
@@ -162,8 +168,8 @@ async fn eth_apy_history_is_not_signed() {
         .apy_history(&request)
         .await
         .unwrap();
-    assert_eq!(rows[0].ccy, "ETH");
-    assert_eq!(rows[0].apy.as_str(), "0.0223");
+    assert_eq!(rows[0].rate.as_str(), "0.0223");
+    assert_eq!(rows[0].ts.as_str(), "1597026383085");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);

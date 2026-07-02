@@ -32,7 +32,7 @@ async fn create_subaccount_posts_signed_body() {
     let body = r#"{"code":"0","msg":"","data":[{"label":"123456 ","subAcct":"subAccount002","ts":"1744875304520","uid":"698827017768230914"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request = CreateSubAccountRequest::new("subAccount002").label("123456");
+    let request = CreateSubAccountRequest::new("subAccount002", "1").label("123456");
 
     let rows = client
         .sub_account()
@@ -51,6 +51,7 @@ async fn create_subaccount_posts_signed_body() {
     assert!(req.is_signed());
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["subAcct"], "subAccount002");
+    assert_eq!(sent["type"], "1");
     assert_eq!(sent["label"], "123456");
 }
 

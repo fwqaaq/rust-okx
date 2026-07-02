@@ -9,16 +9,23 @@ use super::signed_client;
 #[tokio::test]
 async fn get_order_queries_and_parses() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "instType":"SPOT","instId":"BTC-USDT","ccy":"","ordId":"312269865356374016",
-        "clOrdId":"b15","tag":"","px":"59200","sz":"0.1","pnl":"0","ordType":"limit",
-        "side":"buy","posSide":"net","tdMode":"cash","accFillSz":"0.1","fillPx":"59200",
-        "tradeId":"123","fillSz":"0.1","fillTime":"1597026383085","avgPx":"59200",
-        "state":"filled","lever":"","tpTriggerPx":"","tpOrdPx":"","slTriggerPx":"",
-        "slOrdPx":"","feeCcy":"USDT","fee":"-0.01","rebateCcy":"USDT","rebate":"0",
-        "attachAlgoClOrdId":"","lastPx":"59200","source":"","cancelSource":"","category":"normal",
-        "isTpLimit":"false","uTime":"1597026383085","cTime":"1597026383085",
-        "reqId":"","amendResult":"","reduceOnly":"false","quickMgnType":"","algoClOrdId":"",
-        "algoId":""}]}"#;
+        "instType":"SPOT","instId":"BTC-USDT","tgtCcy":"","ccy":"","ordId":"312269865356374016",
+        "clOrdId":"b15","tag":"","px":"59200","pxUsd":"","pxVol":"","pxType":"","sz":"0.1",
+        "pnl":"0","ordType":"limit","side":"buy","posSide":"net","tdMode":"cash",
+        "accFillSz":"0.1","fillPx":"59200","tradeId":"123","fillSz":"0.1",
+        "fillTime":"1597026383085","avgPx":"59200","state":"filled","stpId":"","stpMode":"",
+        "lever":"","attachAlgoClOrdId":"","tpTriggerPx":"","tpTriggerPxType":"","tpOrdPx":"",
+        "slTriggerPx":"","slTriggerPxType":"","slOrdPx":"",
+        "attachAlgoOrds":[{"attachAlgoId":"a1","attachAlgoClOrdId":"c1","tpOrdKind":"condition",
+        "tpTriggerPx":"60000","tpTriggerRatio":"","tpTriggerPxType":"last","tpOrdPx":"-1",
+        "slTriggerPx":"58000","slTriggerRatio":"","slTriggerPxType":"last","slOrdPx":"-1",
+        "sz":"0.1","amendPxOnTriggerType":"0","callbackRatio":"","callbackSpread":"",
+        "activePx":"","failCode":"","failReason":""}],
+        "linkedAlgoOrd":{"algoId":"777"},
+        "feeCcy":"USDT","fee":"-0.01","rebateCcy":"USDT","rebate":"0","source":"","category":"normal",
+        "reduceOnly":"false","isTpLimit":"false","cancelSource":"","cancelSourceReason":"",
+        "quickMgnType":"","algoClOrdId":"","algoId":"","uTime":"1597026383085",
+        "cTime":"1597026383085","tradeQuoteCcy":"USDT","outcome":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
@@ -27,6 +34,16 @@ async fn get_order_queries_and_parses() {
     assert_eq!(orders[0].ord_id, "312269865356374016");
     assert_eq!(orders[0].state, OrderState::Filled);
     assert_eq!(orders[0].side, OrderSide::Buy);
+    assert_eq!(orders[0].inst_type, "SPOT");
+    assert_eq!(orders[0].trade_quote_ccy, "USDT");
+    assert_eq!(orders[0].category, "normal");
+    assert_eq!(orders[0].attach_algo_ords.len(), 1);
+    assert_eq!(orders[0].attach_algo_ords[0].attach_algo_id, "a1");
+    assert_eq!(
+        orders[0].attach_algo_ords[0].tp_trigger_px.as_str(),
+        "60000"
+    );
+    assert_eq!(orders[0].linked_algo_ord.as_ref().unwrap().algo_id, "777");
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::GET);
@@ -114,11 +131,11 @@ async fn get_orders_history_archive_uses_builder_query() {
 async fn get_fills_uses_builder_query() {
     let body = r#"{"code":"0","msg":"","data":[{
         "instType":"SPOT","instId":"BTC-USDT","tradeId":"123","ordId":"312269865356374016",
-        "clOrdId":"b15","billId":"12344","tag":"","fillPx":"59200","fillSz":"0.1",
-        "fillIdxPx":"","fillPriceVol":"","fillFwdPx":"","fillPnl":"0","side":"buy",
-        "posSide":"net","billId":"","execType":"T","feeCcy":"USDT","fee":"-0.059",
-        "ts":"1597026383085","tsFillTime":"1597026383085","fillTime":"1597026383085",
-        "fillMarkVol":"","fillMarkPx":"","fillFwdPx":"","tradeQuoteCcy":"USDT"}]}"#;
+        "clOrdId":"b15","billId":"12344","subType":"1","tag":"","fillPx":"59200","fillSz":"0.1",
+        "fillIdxPx":"","fillPnl":"0","fillPxVol":"","fillPxUsd":"","fillMarkVol":"",
+        "fillFwdPx":"","fillMarkPx":"","side":"buy","posSide":"net","execType":"T",
+        "feeCcy":"USDT","fee":"-0.059","feeRate":"-0.001","ts":"1597026383085",
+        "fillTime":"1597026383085","tradeQuoteCcy":"USDT"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = FillsRequest::new()
@@ -127,6 +144,11 @@ async fn get_fills_uses_builder_query() {
 
     let fills = client.trade().get_fills(&request).await.unwrap();
     assert_eq!(fills[0].trade_id, "123");
+    assert_eq!(fills[0].bill_id, "12344");
+    assert_eq!(fills[0].sub_type, "1");
+    assert_eq!(fills[0].exec_type, "T");
+    assert_eq!(fills[0].fee_rate.as_str(), "-0.001");
+    assert_eq!(fills[0].trade_quote_ccy, "USDT");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SPOT&ordId=312269865356374016"));
@@ -151,6 +173,9 @@ async fn get_fills_history_uses_builder_query() {
 
     let fills = client.trade().get_fills_history(&request).await.unwrap();
     assert_eq!(fills[0].fee.as_str(), "-0.00000192834");
+    assert_eq!(fills[0].sub_type, "1");
+    assert_eq!(fills[0].bill_id, "680800019754098688");
+    assert_eq!(fills[0].trade_quote_ccy, "USDT");
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instType=SPOT&begin=100&end=200&limit=1"));

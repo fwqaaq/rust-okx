@@ -1,73 +1,27 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
 
 use crate::model::NumberString;
 
-/// Per-currency loan record within an account risk-state response.
-#[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct LoanRecord {
-    /// Available loan amount.
-    #[serde(default)]
-    pub avail_loan: String,
-    /// Average borrow rate.
-    #[serde(default)]
-    pub avg_rate: String,
-    /// Currency.
-    #[serde(default)]
-    pub ccy: String,
-    /// Accrued interest.
-    #[serde(default)]
-    pub interest: NumberString,
-    /// Total loan quota.
-    #[serde(default)]
-    pub loan_quota: NumberString,
-    /// Position loan.
-    #[serde(default)]
-    pub pos_loan: String,
-    /// Current borrow rate.
-    #[serde(default)]
-    pub rate: NumberString,
-    /// Remaining loan limit.
-    #[serde(default)]
-    pub surplus_lmt: NumberString,
-    /// Used loan limit.
-    #[serde(default)]
-    pub used_lmt: NumberString,
-    /// Used loan amount.
-    #[serde(default)]
-    pub used_loan: String,
-    /// Interest-free liability.
-    #[serde(default)]
-    pub interest_free_liab: String,
-    /// Potential borrowing amount.
-    #[serde(default)]
-    pub potential_borrowing_amt: String,
-}
-
-/// Account risk state (loan allocation summary).
+/// Account risk state, as returned by `GET /api/v5/account/risk-state`.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct RiskState {
-    /// Total debt.
+    /// Account risk status in auto-borrow mode. `true` if the account is
+    /// currently in a specific risk state.
     #[serde(default)]
-    pub debt: NumberString,
-    /// Total accrued interest.
+    pub at_risk: bool,
+    /// Derivatives risk unit list.
     #[serde(default)]
-    pub interest: NumberString,
-    /// Loan allocation string.
+    pub at_risk_idx: Vec<String>,
+    /// Margin risk unit list.
     #[serde(default)]
-    pub loan_alloc: String,
-    /// Timestamp of next discount event (Unix milliseconds).
+    pub at_risk_mgn: Vec<String>,
+    /// Timestamp (Unix milliseconds).
     #[serde(default)]
-    pub next_discount_time: NumberString,
-    /// Timestamp of next interest accrual (Unix milliseconds).
-    #[serde(default)]
-    pub next_interest_time: NumberString,
-    /// Per-currency loan records.
-    #[serde(default)]
-    pub records: Vec<LoanRecord>,
+    pub ts: NumberString,
 }
 
 /// Simulated margin calculation result.
@@ -144,24 +98,19 @@ pub struct Greek {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct AccountPositionTier {
-    /// Instrument type.
-    #[serde(default)]
-    pub inst_type: String,
-    /// Underlying.
+    /// Underlying. Applicable to `FUTURES`/`SWAP`/`OPTION`.
     #[serde(default)]
     pub uly: String,
-    /// Instrument family.
+    /// Instrument family. Applicable to `FUTURES`/`SWAP`/`OPTION`.
     #[serde(default)]
     pub inst_family: String,
-    /// Position type.
-    #[serde(default)]
-    pub pos_type: String,
-    /// Minimum size in the tier.
-    #[serde(default)]
-    pub min_sz: NumberString,
-    /// Maximum size in the tier.
+    /// Max number of positions.
     #[serde(default)]
     pub max_sz: NumberString,
+    /// Limitation of position type. Only applicable to cross `OPTION` under
+    /// portfolio margin mode.
+    #[serde(default)]
+    pub pos_type: String,
 }
 
 /// Result of setting the spot risk offset amount.
@@ -177,65 +126,147 @@ pub struct SetRiskOffsetAmountResult {
     pub cl_spot_in_use_amt: NumberString,
 }
 
-/// Position-builder result.
+/// Position-builder result, as returned by
+/// `POST /api/v5/account/position-builder`.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct PositionBuilderResult {
-    /// Account level used for the calculation.
+    /// Adjusted equity (USD) for the account.
     #[serde(default)]
-    pub acct_lv: String,
-    /// Adjusted / effective equity.
+    pub eq: NumberString,
+    /// Total MMR (USD) for the account.
     #[serde(default)]
-    pub adj_eq: NumberString,
-    /// Initial margin requirement.
+    pub total_mmr: NumberString,
+    /// Total IMR (USD) for the account.
     #[serde(default)]
-    pub imr: NumberString,
-    /// Maintenance margin requirement.
+    pub total_imr: NumberString,
+    /// Borrow MMR (USD) for the account.
     #[serde(default)]
-    pub mmr: NumberString,
-    /// Margin ratio.
+    pub borrow_mmr: NumberString,
+    /// Derivatives MMR (USD) for the account.
     #[serde(default)]
-    pub mr: NumberString,
-    /// Simulated or real position data.
+    pub deriv_mmr: NumberString,
+    /// Cross maintenance margin ratio for the account.
     #[serde(default)]
-    pub pos_data: Vec<PositionBuilderPosition>,
-    /// Simulated or real asset data.
-    #[serde(default)]
-    pub asset_data: Vec<PositionBuilderAsset>,
-}
-
-/// Position row returned by position builder.
-#[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct PositionBuilderPosition {
-    /// Instrument type.
-    #[serde(default)]
-    pub inst_type: String,
-    /// Instrument ID.
-    #[serde(default)]
-    pub inst_id: String,
-    /// Position size.
-    #[serde(default)]
-    pub pos: NumberString,
-    /// Average price.
-    #[serde(default)]
-    pub avg_px: NumberString,
-    /// Unrealized PnL.
+    pub margin_ratio: NumberString,
+    /// UPL for the account.
     #[serde(default)]
     pub upl: NumberString,
+    /// Leverage of the account.
+    #[serde(default)]
+    pub acct_lever: NumberString,
+    /// Update time for the account, Unix timestamp format in milliseconds,
+    /// e.g. `1597026383085`.
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Asset info.
+    #[serde(default)]
+    pub assets: Vec<PositionBuilderAsset>,
+    /// Risk unit info.
+    #[serde(default)]
+    pub risk_unit_data: Vec<PositionBuilderRiskUnit>,
 }
 
-/// Asset row returned by position builder.
+/// Asset info returned by position builder.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct PositionBuilderAsset {
-    /// Currency.
+    /// Currency, e.g. `BTC`.
     #[serde(default)]
     pub ccy: String,
-    /// Equity.
+    /// Currency equity.
     #[serde(default)]
-    pub eq: NumberString,
+    pub avail_eq: NumberString,
+    /// Spot in use.
+    #[serde(default)]
+    pub spot_in_use: NumberString,
+    /// Borrowing MMR (USD). (Deprecated)
+    #[serde(default)]
+    pub borrow_mmr: NumberString,
+    /// Borrowing IMR (USD).
+    #[serde(default)]
+    pub borrow_imr: NumberString,
+}
+
+/// Risk unit info returned by position builder.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct PositionBuilderRiskUnit {
+    /// Risk unit, e.g. `BTC`.
+    #[serde(default)]
+    pub risk_unit: String,
+    /// Risk unit MMR before volatility (USD). Returns `""` if users don't
+    /// pass in `idxVol`.
+    #[serde(default)]
+    pub mmr_bf: NumberString,
+    /// Risk unit MMR (USD).
+    #[serde(default)]
+    pub mmr: NumberString,
+    /// Risk unit IMR before volatility (USD). Returns `""` if users don't
+    /// pass in `idxVol`.
+    #[serde(default)]
+    pub imr_bf: NumberString,
+    /// Risk unit IMR (USD).
+    #[serde(default)]
+    pub imr: NumberString,
+    /// Risk unit UPL (USD).
+    #[serde(default)]
+    pub upl: NumberString,
+    /// Stress testing value of spot and volatility (all derivatives, and
+    /// spot trading in spot-derivatives risk offset mode).
+    #[serde(default)]
+    pub mr1: NumberString,
+    /// Stress testing value of time value of money (TVM) (for options).
+    #[serde(default)]
+    pub mr2: NumberString,
+    /// Stress testing value of volatility span (for options).
+    #[serde(default)]
+    pub mr3: NumberString,
+    /// Stress testing value of basis (for all derivatives).
+    #[serde(default)]
+    pub mr4: NumberString,
+    /// Stress testing value of interest rate risk (for options).
+    #[serde(default)]
+    pub mr5: NumberString,
+    /// Stress testing value of extremely volatile markets (for all
+    /// derivatives, and spot trading in spot-derivatives risk offset mode).
+    #[serde(default)]
+    pub mr6: NumberString,
+    /// Stress testing value of position reduction cost (for all derivatives).
+    #[serde(default)]
+    pub mr7: NumberString,
+    /// Borrowing MMR/IMR.
+    #[serde(default)]
+    pub mr8: NumberString,
+    /// USDT-USDC-USD hedge risk.
+    #[serde(default)]
+    pub mr9: NumberString,
+    /// MR1 scenario analysis.
+    #[serde(default)]
+    pub mr1_scenarios: Option<PositionBuilderMr1Scenarios>,
+}
+
+/// MR1 scenario analysis for a risk unit.
+///
+/// Each scenario maps a price volatility ratio (in percentage, e.g. `0.01`
+/// representing 1%) to the P&L under stress tests, measured in USD.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct PositionBuilderMr1Scenarios {
+    /// P&L of stress tests under different price volatility ratios when
+    /// volatility shocks down.
+    #[serde(default)]
+    pub vol_shock_down: HashMap<String, NumberString>,
+    /// P&L of stress tests under different price volatility ratios when
+    /// volatility keeps the same.
+    #[serde(default)]
+    pub vol_same: HashMap<String, NumberString>,
+    /// P&L of stress tests under different price volatility ratios when
+    /// volatility shocks up.
+    #[serde(default)]
+    pub vol_shock_up: HashMap<String, NumberString>,
 }

@@ -166,6 +166,86 @@ impl<'a> MarketDataHistoryRequest<'a> {
     }
 }
 
+/// Query parameters for `GET /api/v5/public/mm-instrument-types`.
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct MmInstrumentTypesRequest<'a> {
+    #[serde(rename = "instType", skip_serializing_if = "Option::is_none")]
+    inst_type: Option<Cow<'a, str>>,
+    #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
+    inst_id: Option<Cow<'a, str>>,
+}
+
+impl<'a> MmInstrumentTypesRequest<'a> {
+    /// Create an unfiltered MM instrument-types query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Restrict results to one instrument type (`SPOT` or `SWAP`).
+    pub fn inst_type(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_type = Some(value.into());
+        self
+    }
+
+    /// Restrict results to one instrument ID, e.g. `BTC-USDT-SWAP`.
+    pub fn inst_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_id = Some(value.into());
+        self
+    }
+}
+
+/// Query parameters for `GET /api/v5/public/economic-calendar`.
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct EconomicCalendarRequest<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    region: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    importance: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    before: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    after: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<Cow<'a, str>>,
+}
+
+impl<'a> EconomicCalendarRequest<'a> {
+    /// Create an unfiltered economic-calendar query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Restrict results to one country, region, or entity, e.g. `united_states`.
+    pub fn region(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.region = Some(value.into());
+        self
+    }
+
+    /// Restrict results to one importance level (`1` low, `2` medium, `3` high).
+    pub fn importance(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.importance = Some(value.into());
+        self
+    }
+
+    /// Return records newer than this `date` timestamp (Unix milliseconds).
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.before = Some(value.into());
+        self
+    }
+
+    /// Return records earlier than this `date` timestamp (Unix milliseconds).
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.after = Some(value.into());
+        self
+    }
+
+    /// Set the number of results per request. The maximum and default are 100.
+    pub fn limit(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.limit = Some(value.into());
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -55,15 +55,18 @@ pub struct SpotBorrowRepayHistory {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct SetAutoEarnResult {
+    /// Auto earn type. `0`: auto earn (auto lend, auto staking); `1`: auto earn (USDG earn).
+    #[serde(default)]
+    pub earn_type: String,
     /// Value returned by OKX in the `ccy` field.
     #[serde(default)]
     pub ccy: String,
-    /// Value returned by OKX in the `autoEarn` field.
+    /// Auto earn operation action, e.g. `turn_on`/`turn_off` (deprecated).
     #[serde(default)]
-    pub auto_earn: bool,
-    /// Value returned by OKX in the `minRate` field.
+    pub action: String,
+    /// Minimum lending APR (deprecated).
     #[serde(default)]
-    pub min_rate: NumberString,
+    pub apr: NumberString,
 }
 
 #[cfg(test)]

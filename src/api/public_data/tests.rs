@@ -1,6 +1,6 @@
-use crate::OkxClient;
 use crate::model::InstType;
 use crate::test_util::MockTransport;
+use crate::{Credentials, OkxClient};
 
 use super::{CurrencyRequest, InstIdRequest, InstrumentsRequest};
 
@@ -389,6 +389,58 @@ async fn public_edge_requests_use_typed_queries() {
         Some("module=1&instType=SPOT&instIdList=BTC-USDT&dateAggrType=1D")
     );
     assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_mm_instrument_types_uses_typed_query() {
+    let body = r#"{"code":"0","msg":"","data":[
+        {"instId":"BTC-USDT-SWAP","instType":"SWAP","pairType":"A"},
+        {"instId":"XAU-USDT-SWAP","instType":"SWAP","pairType":"B-TradFi"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = super::MmInstrumentTypesRequest::new().inst_type("SWAP");
+
+    let rows = client
+        .public_data()
+        .get_mm_instrument_types(&request)
+        .await
+        .unwrap();
+    assert_eq!(rows[0].inst_id, "BTC-USDT-SWAP");
+    assert_eq!(rows[1].pair_type, "B-TradFi");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instType=SWAP"));
+    assert!(!req.is_signed(), "public endpoint must not be signed");
+}
+
+#[tokio::test]
+async fn get_economic_calendar_signs_request_and_parses() {
+    let body = r#"{"code":"0","msg":"","data":[
+        {"actual":"7.8%","calendarId":"330631","category":"Harmonised Inflation Rate YoY",
+         "ccy":"","date":"1700121600000","dateSpan":"0","event":"Harmonised Inflation Rate YoY",
+         "forecast":"7.8%","importance":"1","prevInitial":"","previous":"9%",
+         "refDate":"1698710400000","region":"Slovakia","uTime":"1700121605007","unit":"%"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone())
+        .credentials(Credentials::new("key", "secret", "pass"))
+        .build();
+    let request = super::EconomicCalendarRequest::new()
+        .region("slovakia")
+        .importance("1")
+        .limit("100");
+
+    let rows = client
+        .public_data()
+        .get_economic_calendar(&request)
+        .await
+        .unwrap();
+    assert_eq!(rows[0].calendar_id, "330631");
+    assert_eq!(rows[0].previous, "9%");
+    assert_eq!(rows[0].date.as_str(), "1700121600000");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("region=slovakia&importance=1&limit=100"));
+    assert!(req.is_signed(), "economic-calendar requires authentication");
 }
 
 #[test]

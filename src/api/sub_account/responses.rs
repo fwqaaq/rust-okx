@@ -145,6 +145,9 @@ pub struct SubAccountTradingBalance {
     /// Adjusted equity in USD.
     #[serde(default)]
     pub adj_eq: NumberString,
+    /// Available equity in USD (Multi-currency margin / Portfolio margin).
+    #[serde(default)]
+    pub avail_eq: NumberString,
     /// Total equity in USD.
     #[serde(default)]
     pub total_eq: NumberString,

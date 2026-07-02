@@ -41,8 +41,10 @@ impl<'a> DepositAddressRequest<'a> {
 /// Request for [`transfer_state`](crate::api::funding::Funding::transfer_state).
 #[derive(Debug, Clone, Serialize)]
 pub struct TransferStateRequest<'a> {
-    #[serde(rename = "transId")]
-    trans_id: Cow<'a, str>,
+    #[serde(rename = "transId", skip_serializing_if = "Option::is_none")]
+    trans_id: Option<Cow<'a, str>>,
+    #[serde(rename = "clientId", skip_serializing_if = "Option::is_none")]
+    client_id: Option<Cow<'a, str>>,
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
     transfer_type: Option<Cow<'a, str>>,
 }
@@ -51,9 +53,25 @@ impl<'a> TransferStateRequest<'a> {
     /// Create a transfer-state query for a transfer ID.
     pub fn new(trans_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            trans_id: trans_id.into(),
+            trans_id: Some(trans_id.into()),
+            client_id: None,
             transfer_type: None,
         }
+    }
+
+    /// Create a transfer-state query for a client-supplied ID.
+    pub fn with_client_id(client_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            trans_id: None,
+            client_id: Some(client_id.into()),
+            transfer_type: None,
+        }
+    }
+
+    /// Set the client-supplied ID.
+    pub fn client_id(mut self, client_id: impl Into<Cow<'a, str>>) -> Self {
+        self.client_id = Some(client_id.into());
+        self
     }
 
     /// Set the transfer type filter.
@@ -92,12 +110,12 @@ pub struct FundsTransferRequest<'a> {
     transfer_type: Option<Cow<'a, str>>,
     #[serde(rename = "subAcct", skip_serializing_if = "Option::is_none")]
     sub_account: Option<Cow<'a, str>>,
-    #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
-    inst_id: Option<Cow<'a, str>>,
-    #[serde(rename = "toInstId", skip_serializing_if = "Option::is_none")]
-    to_inst_id: Option<Cow<'a, str>>,
     #[serde(rename = "loanTrans", skip_serializing_if = "Option::is_none")]
     loan_transfer: Option<Cow<'a, str>>,
+    #[serde(rename = "omitPosRisk", skip_serializing_if = "Option::is_none")]
+    omit_pos_risk: Option<Cow<'a, str>>,
+    #[serde(rename = "clientId", skip_serializing_if = "Option::is_none")]
+    client_id: Option<Cow<'a, str>>,
 }
 
 impl<'a> FundsTransferRequest<'a> {
@@ -115,9 +133,9 @@ impl<'a> FundsTransferRequest<'a> {
             to: to.into(),
             transfer_type: None,
             sub_account: None,
-            inst_id: None,
-            to_inst_id: None,
             loan_transfer: None,
+            omit_pos_risk: None,
+            client_id: None,
         }
     }
 
@@ -133,21 +151,21 @@ impl<'a> FundsTransferRequest<'a> {
         self
     }
 
-    /// Set source instrument ID.
-    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
-        self.inst_id = Some(inst_id.into());
-        self
-    }
-
-    /// Set destination instrument ID.
-    pub fn to_inst_id(mut self, to_inst_id: impl Into<Cow<'a, str>>) -> Self {
-        self.to_inst_id = Some(to_inst_id.into());
-        self
-    }
-
     /// Set whether this is a loan transfer.
     pub fn loan_transfer(mut self, loan_transfer: impl Into<Cow<'a, str>>) -> Self {
         self.loan_transfer = Some(loan_transfer.into());
+        self
+    }
+
+    /// Set whether to ignore position risk (Portfolio margin).
+    pub fn omit_pos_risk(mut self, omit_pos_risk: impl Into<Cow<'a, str>>) -> Self {
+        self.omit_pos_risk = Some(omit_pos_risk.into());
+        self
+    }
+
+    /// Set the client-supplied transfer ID.
+    pub fn client_id(mut self, client_id: impl Into<Cow<'a, str>>) -> Self {
+        self.client_id = Some(client_id.into());
         self
     }
 }

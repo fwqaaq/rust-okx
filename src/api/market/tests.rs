@@ -86,6 +86,7 @@ async fn get_orderbook_parses_levels_and_passes_depth() {
     assert_eq!(book.asks[0].price.as_str(), "41006.8");
     assert_eq!(book.asks[0].order_count.as_str(), "1");
     assert_eq!(book.bids[0].size.as_str(), "0.30178218");
+    assert_eq!(book.seq_id, 3235851742);
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instId=BTC-USDT&sz=5"));

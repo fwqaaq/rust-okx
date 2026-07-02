@@ -129,12 +129,13 @@ async fn get_account_config_signs_and_parses() {
 
 #[tokio::test]
 async fn get_risk_state_signs_and_parses() {
-    let body = r#"{"code":"0","data":[{"debt":"0.85893159114900247077000000000000","interest":"0.00000000000000000000000000000000","loanAlloc":"","nextDiscountTime":"1729490400000","nextInterestTime":"1729490400000","records":[{"availLoan":"","avgRate":"","ccy":"BTC","interest":"0","loanQuota":"175.00000000","posLoan":"","rate":"0.0000276","surplusLmt":"175.00000000","surplusLmtDetails":{},"usedLmt":"0.00000000","usedLoan":"","interestFreeLiab":"","potentialBorrowingAmt":""}]}],"msg":""}"#;
+    let body = r#"{"code":"0","data":[{"atRisk":false,"atRiskIdx":[],"atRiskMgn":[],"ts":"1635745078794"}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
     let result = client.account().get_risk_state().await.unwrap();
-    assert_eq!(result[0].records[0].ccy, "BTC");
+    assert!(!result[0].at_risk);
+    assert_eq!(result[0].ts.as_str(), "1635745078794");
 
     let req = mock.captured();
     assert!(req.uri.ends_with("/api/v5/account/risk-state"));

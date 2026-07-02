@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **155/342 (45.3%)**
+> Progress: **170/396 (42.9%)**
 
 ## Account
 
@@ -62,8 +62,12 @@
 - [ ] POST /api/v5/account/mmp-config
 - [ ] POST /api/v5/account/mmp-reset
 - [ ] POST /api/v5/account/demo-adjust-balance
+- [ ] GET /api/v5/account/set-account-switch-precheck
+- [ ] POST /api/v5/account/account-level-switch-preset
+- [ ] POST /api/v5/account/position-builder-graph
+- [ ] POST /api/v5/account/set-trading-config
 
-<!-- Account: 39/50 implemented -->
+<!-- Account: 40/54 implemented -->
 
 ## Trade
 
@@ -130,8 +134,12 @@
 - [x] GET /api/v5/market/block-tickers
 - [x] GET /api/v5/market/option/instrument-family-trades
 - [ ] GET /api/v5/market/call-auction-details
+- [ ] GET /api/v5/market/books-sbe
+- [ ] GET /api/v5/market/sprd-candles
+- [ ] GET /api/v5/market/sprd-history-candles
+- [ ] GET /api/v5/market/sprd-ticker
 
-<!-- Market Data: 16/21 implemented -->
+<!-- Market Data: 16/25 implemented -->
 
 ## Public Data
 
@@ -154,13 +162,17 @@
 - [x] GET /api/v5/public/instrument-tick-bands
 - [x] GET /api/v5/public/option-trades
 - [x] GET /api/v5/public/market-data-history
-- [ ] GET /api/v5/public/economic-calendar
+- [x] GET /api/v5/public/economic-calendar
 - [ ] GET /api/v5/public/premium-history
 - [ ] GET /api/v5/public/event-contract/series
 - [ ] GET /api/v5/public/event-contract/events
 - [ ] GET /api/v5/public/event-contract/markets
+- [ ] GET /api/v5/public/block-trades
+- [ ] GET /api/v5/public/estimated-settlement-info
+- [x] GET /api/v5/public/mm-instrument-types
+- [ ] GET /api/v5/public/settlement-history
 
-<!-- Public Data: 19/25 implemented -->
+<!-- Public Data: 19/28 implemented -->
 
 ## Trading Data
 
@@ -176,8 +188,11 @@
 - [ ] GET /api/v5/rubik/stat/option/open-interest-volume-expiry
 - [ ] GET /api/v5/rubik/stat/option/open-interest-volume-strike
 - [ ] GET /api/v5/rubik/stat/option/taker-block-volume
+- [ ] GET /api/v5/rubik/stat/contracts/long-short-account-ratio-contract-top-trader
+- [ ] GET /api/v5/rubik/stat/contracts/long-short-position-ratio-contract-top-trader
+- [ ] GET /api/v5/rubik/stat/taker-volume-contract
 
-<!-- Trading Data: 0/12 implemented -->
+<!-- Trading Data: 0/15 implemented -->
 
 ## Funding Account
 
@@ -319,6 +334,14 @@
 
 <!-- Financial Product — Stable Rewards: 0/6 implemented -->
 
+## Financial Product — OKUSD
+
+- [ ] GET /api/v5/finance/okusd/limits
+- [ ] POST /api/v5/finance/okusd/subscribe
+- [ ] POST /api/v5/finance/okusd/redeem
+
+<!-- Financial Product — OKUSD: 0/3 implemented -->
+
 ## Loan — Flexible Loan
 
 - [x] GET /api/v5/finance/flexible-loan/borrow-currencies
@@ -355,19 +378,18 @@
 - [ ] GET /api/v5/rfq/mmp-config
 - [ ] POST /api/v5/rfq/mmp-config
 - [ ] POST /api/v5/rfq/mmp-reset
+- [ ] POST /api/v5/rfq/cancel-all-after
 
-<!-- Block Trading / RFQ: 0/21 implemented -->
+<!-- Block Trading / RFQ: 0/22 implemented -->
 
 ## Spread Trading
 
 - [ ] GET /api/v5/sprd/spreads
 - [ ] GET /api/v5/sprd/books
-- [ ] GET /api/v5/sprd/ticker
 - [ ] GET /api/v5/sprd/public-trades
-- [ ] GET /api/v5/sprd/candles
-- [ ] GET /api/v5/sprd/history-candles
 - [ ] POST /api/v5/sprd/order
 - [ ] POST /api/v5/sprd/cancel-order
+- [ ] POST /api/v5/sprd/cancel-all-after
 - [ ] POST /api/v5/sprd/mass-cancel
 - [ ] POST /api/v5/sprd/amend-order
 - [ ] GET /api/v5/sprd/order
@@ -376,7 +398,8 @@
 - [ ] GET /api/v5/sprd/orders-history-archive
 - [ ] GET /api/v5/sprd/trades
 
-<!-- Spread Trading: 0/15 implemented -->
+<!-- Spread Trading: 0/13 implemented -->
+<!-- Note: sprd/ticker, sprd/candles, sprd/history-candles were relocated by OKX to market/sprd-ticker, market/sprd-candles, market/sprd-history-candles (see Market Data). -->
 
 ## Trading Bot — Grid
 
@@ -399,8 +422,12 @@
 - [ ] POST /api/v5/tradingBot/grid/order-instant-trigger
 - [ ] POST /api/v5/tradingBot/grid/amend-order-instant-trigger
 - [ ] POST /api/v5/tradingBot/grid/stop-order-instant-trigger
+- [ ] GET /api/v5/tradingBot/grid/grid-quantity
+- [ ] POST /api/v5/tradingBot/grid/amend-algo-basic-param
+- [ ] POST /api/v5/tradingBot/grid/copy-order-algo
+- [ ] GET /api/v5/tradingBot/public/rsi-back-testing
 
-<!-- Trading Bot — Grid: 0/19 implemented -->
+<!-- Trading Bot — Grid: 0/23 implemented -->
 
 ## Trading Bot — Recurring Buy
 
@@ -411,8 +438,14 @@
 - [ ] GET /api/v5/tradingBot/recurring/orders-algo-history
 - [ ] GET /api/v5/tradingBot/recurring/orders-algo-details
 - [ ] GET /api/v5/tradingBot/recurring/sub-orders
+- [ ] POST /api/v5/tradingBot/recurring/add-investment
+- [ ] POST /api/v5/tradingBot/recurring/amend-price-range
+- [ ] POST /api/v5/tradingBot/recurring/amend-recurring-amount
+- [ ] POST /api/v5/tradingBot/recurring/amend-recurring-time
+- [ ] POST /api/v5/tradingBot/recurring/pause
+- [ ] POST /api/v5/tradingBot/recurring/restart
 
-<!-- Trading Bot — Recurring Buy: 0/7 implemented -->
+<!-- Trading Bot — Recurring Buy: 0/13 implemented -->
 
 ## Trading Bot — Signal
 
@@ -425,8 +458,34 @@
 - [ ] GET /api/v5/tradingBot/signal/orders-algo-history
 - [ ] GET /api/v5/tradingBot/signal/sub-orders
 - [ ] POST /api/v5/tradingBot/signal/cancel-sub-order
+- [ ] GET /api/v5/tradingBot/signal/event-history
+- [ ] GET /api/v5/tradingBot/signal/positions
+- [ ] GET /api/v5/tradingBot/signal/positions-history
+- [ ] POST /api/v5/tradingBot/signal/amendTPSL
+- [ ] POST /api/v5/tradingBot/signal/close-position
+- [ ] POST /api/v5/tradingBot/signal/margin-balance
+- [ ] POST /api/v5/tradingBot/signal/set-instruments
+- [ ] POST /api/v5/tradingBot/signal/sub-order
 
-<!-- Trading Bot — Signal: 0/9 implemented -->
+<!-- Trading Bot — Signal: 0/17 implemented -->
+
+## Trading Bot — DCA
+
+- [ ] POST /api/v5/tradingBot/dca/create
+- [ ] POST /api/v5/tradingBot/dca/amend-order-algo
+- [ ] POST /api/v5/tradingBot/dca/stop
+- [ ] POST /api/v5/tradingBot/dca/margin/add
+- [ ] POST /api/v5/tradingBot/dca/margin/reduce
+- [ ] POST /api/v5/tradingBot/dca/orders/manual-buy
+- [ ] POST /api/v5/tradingBot/dca/settings/reinvestment
+- [ ] POST /api/v5/tradingBot/dca/settings/take-profit
+- [ ] GET /api/v5/tradingBot/dca/orders
+- [ ] GET /api/v5/tradingBot/dca/ongoing-list
+- [ ] GET /api/v5/tradingBot/dca/history-list
+- [ ] GET /api/v5/tradingBot/dca/cycle-list
+- [ ] GET /api/v5/tradingBot/dca/position-details
+
+<!-- Trading Bot — DCA: 0/13 implemented -->
 
 ## Copy Trading
 
@@ -448,8 +507,18 @@
 - [ ] GET /api/v5/copytrading/public-current-subpositions
 - [ ] GET /api/v5/copytrading/public-subpositions-history
 - [ ] POST /api/v5/copytrade/create-sgl-link
+- [ ] GET /api/v5/copytrading/config
+- [ ] GET /api/v5/copytrading/copy-settings
+- [ ] GET /api/v5/copytrading/public-config
+- [ ] GET /api/v5/copytrading/public-copy-traders
+- [ ] GET /api/v5/copytrading/public-pnl
+- [ ] GET /api/v5/copytrading/public-weekly-pnl
+- [ ] GET /api/v5/copytrading/total-unrealized-profit-sharing
+- [ ] POST /api/v5/copytrading/amend-copy-settings
+- [ ] POST /api/v5/copytrading/amend-profit-sharing-ratio
+- [ ] POST /api/v5/copytrading/first-copy-settings
 
-<!-- Copy Trading: 0/18 implemented -->
+<!-- Copy Trading: 0/28 implemented -->
 
 ## Affiliate
 

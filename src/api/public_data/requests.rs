@@ -9,8 +9,12 @@ use crate::model::InstType;
 pub struct InstrumentsRequest<'a> {
     #[serde(rename = "instType")]
     inst_type: InstType,
+    #[serde(rename = "seriesId", skip_serializing_if = "Option::is_none")]
+    series_id: Option<Cow<'a, str>>,
     #[serde(rename = "instFamily", skip_serializing_if = "Option::is_none")]
     inst_family: Option<Cow<'a, str>>,
+    #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
+    inst_id: Option<Cow<'a, str>>,
 }
 
 impl<'a> InstrumentsRequest<'a> {
@@ -18,13 +22,29 @@ impl<'a> InstrumentsRequest<'a> {
     pub fn new(inst_type: InstType) -> Self {
         Self {
             inst_type,
+            series_id: None,
             inst_family: None,
+            inst_id: None,
         }
+    }
+
+    /// Set the series ID filter, e.g. `BTC-ABOVE-DAILY`.
+    ///
+    /// Required when `instType` is `EVENTS`.
+    pub fn series_id(mut self, series_id: impl Into<Cow<'a, str>>) -> Self {
+        self.series_id = Some(series_id.into());
+        self
     }
 
     /// Set the instrument family filter.
     pub fn inst_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
         self.inst_family = Some(inst_family.into());
+        self
+    }
+
+    /// Set the instrument ID filter.
+    pub fn inst_id(mut self, inst_id: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_id = Some(inst_id.into());
         self
     }
 }

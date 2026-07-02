@@ -12,9 +12,11 @@ use super::signed_client;
 #[tokio::test]
 async fn get_offers_sends_signed_query() {
     let body = r#"{"code":"0","msg":"","data":[{
-        "productId":"1234","protocolType":"staking","name":"ETH Staking",
-        "ccy":"ETH","term":"0","apy":"0.05","state":"purchasable",
-        "investData":[{"ccy":"ETH","amt":"0","earnings":"0"}]}]}"#;
+        "ccy":"DOT","productId":"101","protocol":"Polkadot","protocolType":"defi",
+        "term":"0","apy":"0.1767","earlyRedeem":false,"state":"purchasable",
+        "investData":[{"bal":"0","ccy":"DOT","maxAmt":"0","minAmt":"2"}],
+        "earningData":[{"ccy":"DOT","earningType":"0"}],
+        "redeemPeriod":["1H","24H"],"fastRedemptionDailyLimit":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = StakingDefiOffersRequest::new().protocol_type("staking");
@@ -25,8 +27,13 @@ async fn get_offers_sends_signed_query() {
         .get_offers(&request)
         .await
         .unwrap();
-    assert_eq!(rows[0].product_id, "1234");
-    assert_eq!(rows[0].protocol_type, "staking");
+    assert_eq!(rows[0].product_id, "101");
+    assert_eq!(rows[0].protocol_type, "defi");
+    assert_eq!(rows[0].protocol, "Polkadot");
+    assert!(!rows[0].early_redeem);
+    assert_eq!(rows[0].invest_data[0].min_amt.as_str(), "2");
+    assert_eq!(rows[0].earning_data[0].earning_type, "0");
+    assert_eq!(rows[0].redeem_period, ["1H", "24H"]);
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
@@ -111,7 +118,7 @@ async fn cancel_posts_signed_body() {
 
 #[tokio::test]
 async fn get_active_orders_sends_signed_query() {
-    let body = r#"{"code":"0","msg":"","data":[{"ordId":"1","productId":"1234","protocolType":"staking","ccy":"ETH","amt":"0.5","state":"1","term":"0","apy":"0.05","cTime":"1597026383085","uTime":"1597026383085"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"ccy":"ETH","ordId":"1","productId":"1234","state":"1","protocol":"eth-staking","protocolType":"staking","term":"0","apy":"0.05","investData":[{"ccy":"ETH","amt":"0.5"}],"earningData":[{"ccy":"ETH","earningType":"0","earnings":"0.01"}],"fastRedemptionData":[{"ccy":"ETH","redeemingAmt":"0.2"}],"purchasedTime":"1597026383085","estSettlementTime":"1597026383086","cancelRedemptionDeadline":"1597026383087","tag":"my-tag"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = StakingDefiActiveOrdersRequest::new().protocol_type("staking");
@@ -123,6 +130,17 @@ async fn get_active_orders_sends_signed_query() {
         .await
         .unwrap();
     assert_eq!(rows[0].ord_id, "1");
+    assert_eq!(rows[0].state, "1");
+    assert_eq!(rows[0].invest_data[0].ccy, "ETH");
+    assert_eq!(rows[0].invest_data[0].amt.as_str(), "0.5");
+    assert_eq!(rows[0].earning_data[0].earning_type, "0");
+    assert_eq!(rows[0].earning_data[0].earnings.as_str(), "0.01");
+    assert_eq!(
+        rows[0].fast_redemption_data[0].redeeming_amt.as_str(),
+        "0.2"
+    );
+    assert_eq!(rows[0].purchased_time.as_str(), "1597026383085");
+    assert_eq!(rows[0].tag, "my-tag");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
@@ -132,7 +150,7 @@ async fn get_active_orders_sends_signed_query() {
 
 #[tokio::test]
 async fn get_orders_history_sends_signed_query() {
-    let body = r#"{"code":"0","msg":"","data":[{"ordId":"1","productId":"1234","protocolType":"defi","ccy":"USDT","amt":"100","state":"5","term":"0","apy":"0.08","cTime":"1597026383085","uTime":"1597026383086"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"ccy":"USDT","ordId":"1","productId":"1234","state":"3","protocol":"defi-protocol","protocolType":"defi","term":"0","apy":"0.08","investData":[{"ccy":"USDT","amt":"100"}],"earningData":[{"ccy":"USDT","earningType":"1","realizedEarnings":"1.23"}],"purchasedTime":"1712908001000","redeemedTime":"1712914294000","tag":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = StakingDefiOrderHistoryRequest::new()
@@ -147,6 +165,11 @@ async fn get_orders_history_sends_signed_query() {
         .unwrap();
     assert_eq!(rows[0].ord_id, "1");
     assert_eq!(rows[0].protocol_type, "defi");
+    assert_eq!(rows[0].state, "3");
+    assert_eq!(rows[0].invest_data[0].amt.as_str(), "100");
+    assert_eq!(rows[0].earning_data[0].earning_type, "1");
+    assert_eq!(rows[0].earning_data[0].realized_earnings.as_str(), "1.23");
+    assert_eq!(rows[0].redeemed_time.as_str(), "1712914294000");
 
     let req = mock.captured();
     assert_eq!(req.method, Method::GET);
