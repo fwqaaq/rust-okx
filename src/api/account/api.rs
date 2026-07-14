@@ -694,4 +694,25 @@ impl<'a, T: Transport> Account<'a, T> {
     ) -> Result<Vec<ResetMmpStatusResult>, Error> {
         self.client.post(MMP_RESET, request, true).await
     }
+
+    /// Increase or reduce balances in the demo trading environment.
+    ///
+    /// `POST /api/v5/account/demo-adjust-balance`. Authenticated.
+    ///
+    /// Build the client with
+    /// [`demo_trading(true)`](crate::OkxClientBuilder::demo_trading) before
+    /// calling this demo-only endpoint.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-adjust-demo-account-balance).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn adjust_demo_account_balance(
+        &self,
+        request: &DemoAdjustBalanceRequest<'_>,
+    ) -> Result<Vec<DemoAdjustBalanceResult>, Error> {
+        self.client.post(DEMO_ADJUST_BALANCE, request, true).await
+    }
 }
