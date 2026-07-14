@@ -4,9 +4,8 @@ use crate::test_util::MockTransport;
 use super::super::{
     AccountInstrumentsRequest, AdjustLeverageInfoRequest, AdjustMarginRequest, BalanceRequest,
     FeeRatesRequest, GetCollateralAssetsRequest, LeverageRequest, MaxAvailableSizeRequest,
-    MaxOrderSizeRequest,
-    SetAccountLevelRequest, SetCollateralAssetsRequest, SetGreeksRequest, SetIsolatedModeRequest,
-    SetLeverageRequest, SetPositionModeRequest,
+    MaxOrderSizeRequest, SetAccountLevelRequest, SetCollateralAssetsRequest, SetGreeksRequest,
+    SetIsolatedModeRequest, SetLeverageRequest, SetPositionModeRequest,
 };
 use super::signed_client;
 

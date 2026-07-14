@@ -1,6 +1,4 @@
-use crate::api::account::{
-    GetMmpConfigRequest, ResetMmpStatusRequest, SetMmpConfigRequest,
-};
+use crate::api::account::{GetMmpConfigRequest, ResetMmpStatusRequest, SetMmpConfigRequest};
 use crate::model::InstType;
 use crate::test_util::MockTransport;
 
@@ -59,11 +57,7 @@ async fn reset_mmp_status_posts_documented_body() {
     let client = signed_client(mock.clone());
     let request = ResetMmpStatusRequest::new("BTC-USD").instrument_type(InstType::Option);
 
-    let result = client
-        .account()
-        .reset_mmp_status(&request)
-        .await
-        .unwrap();
+    let result = client.account().reset_mmp_status(&request).await.unwrap();
     assert!(result[0].result);
 
     let req = mock.captured();
