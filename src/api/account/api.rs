@@ -634,4 +634,24 @@ impl<'a, T: Transport> Account<'a, T> {
     ) -> Result<Vec<SetAutoEarnResult>, Error> {
         self.client.post(SET_AUTO_EARN, request, true).await
     }
+
+    /// Reset Market Maker Protection status after MMP is triggered.
+    ///
+    /// `POST /api/v5/account/mmp-reset`. Authenticated.
+    ///
+    /// This endpoint applies to options in Portfolio Margin mode and requires
+    /// MMP privilege.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-reset-mmp-status).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn reset_mmp_status(
+        &self,
+        request: &ResetMmpStatusRequest<'_>,
+    ) -> Result<Vec<ResetMmpStatusResult>, Error> {
+        self.client.post(MMP_RESET, request, true).await
+    }
 }
