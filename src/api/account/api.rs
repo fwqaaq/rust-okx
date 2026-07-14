@@ -635,6 +635,26 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(SET_AUTO_EARN, request, true).await
     }
 
+    /// Configure Market Maker Protection for an option instrument family.
+    ///
+    /// `POST /api/v5/account/mmp-config`. Authenticated.
+    ///
+    /// This endpoint applies to options in Portfolio Margin mode and requires
+    /// MMP privilege.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-mmp).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_mmp_config(
+        &self,
+        request: &SetMmpConfigRequest<'_>,
+    ) -> Result<Vec<SetMmpConfigResult>, Error> {
+        self.client.post(MMP_CONFIG, request, true).await
+    }
+
     /// Reset Market Maker Protection status after MMP is triggered.
     ///
     /// `POST /api/v5/account/mmp-reset`. Authenticated.

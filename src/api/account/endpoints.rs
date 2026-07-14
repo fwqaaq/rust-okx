@@ -38,4 +38,5 @@ pub(super) const SPOT_MANUAL_BORROW_REPAY: &str = "/api/v5/account/spot-manual-b
 pub(super) const SET_AUTO_REPAY: &str = "/api/v5/account/set-auto-repay";
 pub(super) const SPOT_BORROW_REPAY_HISTORY: &str = "/api/v5/account/spot-borrow-repay-history";
 pub(super) const SET_AUTO_EARN: &str = "/api/v5/account/set-auto-earn";
+pub(super) const MMP_CONFIG: &str = "/api/v5/account/mmp-config";
 pub(super) const MMP_RESET: &str = "/api/v5/account/mmp-reset";
