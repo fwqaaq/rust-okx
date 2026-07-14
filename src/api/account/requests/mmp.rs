@@ -4,6 +4,27 @@ use serde::Serialize;
 
 use crate::model::InstType;
 
+/// Query parameters for [`get_mmp_config`](crate::api::account::Account::get_mmp_config).
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetMmpConfigRequest<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    inst_family: Option<Cow<'a, str>>,
+}
+
+impl<'a> GetMmpConfigRequest<'a> {
+    /// Create an unfiltered MMP configuration query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Filter by instrument family.
+    pub fn instrument_family(mut self, inst_family: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_family = Some(inst_family.into());
+        self
+    }
+}
+
 /// Request body for [`set_mmp_config`](crate::api::account::Account::set_mmp_config).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]

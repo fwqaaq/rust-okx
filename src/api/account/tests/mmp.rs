@@ -1,8 +1,32 @@
-use crate::api::account::{ResetMmpStatusRequest, SetMmpConfigRequest};
+use crate::api::account::{
+    GetMmpConfigRequest, ResetMmpStatusRequest, SetMmpConfigRequest,
+};
 use crate::model::InstType;
 use crate::test_util::MockTransport;
 
 use super::signed_client;
+
+#[tokio::test]
+async fn get_mmp_config_uses_documented_query() {
+    let body = r#"{"code":"0","msg":"","data":[{"frozenInterval":"2000","instFamily":"ETH-USD","mmpFrozen":true,"mmpFrozenUntil":"1000","qtyLimit":"10","timeInterval":"5000"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = GetMmpConfigRequest::new().instrument_family("ETH-USD");
+
+    let result = client.account().get_mmp_config(&request).await.unwrap();
+    assert_eq!(result[0].inst_family, "ETH-USD");
+    assert!(result[0].mmp_frozen);
+    assert_eq!(result[0].mmp_frozen_until.as_str(), "1000");
+    assert_eq!(result[0].time_interval.as_str(), "5000");
+    assert_eq!(result[0].frozen_interval.as_str(), "2000");
+    assert_eq!(result[0].qty_limit.as_str(), "10");
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::GET);
+    assert_eq!(req.query(), Some("instFamily=ETH-USD"));
+    assert!(req.uri.contains("/api/v5/account/mmp-config?"));
+    assert!(req.is_signed());
+}
 
 #[tokio::test]
 async fn set_mmp_config_posts_documented_body() {
