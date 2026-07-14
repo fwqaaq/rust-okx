@@ -185,6 +185,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(SET_COLLATERAL_ASSETS, request, true).await
     }
 
+    /// Retrieve currencies and their collateral settings.
+    ///
+    /// `GET /api/v5/account/collateral-assets`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-collateral-assets).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn get_collateral_assets(
+        &self,
+        request: &GetCollateralAssetsRequest<'_>,
+    ) -> Result<Vec<CollateralAsset>, Error> {
+        self.client.get(COLLATERAL_ASSETS, request, true).await
+    }
+
     /// Set leverage for an instrument or currency.
     ///
     /// `POST /api/v5/account/set-leverage`. Authenticated.
