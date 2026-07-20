@@ -3,9 +3,9 @@ use crate::test_util::MockTransport;
 
 use super::super::{
     AccountInstrumentsRequest, AdjustLeverageInfoRequest, AdjustMarginRequest, BalanceRequest,
-    FeeRatesRequest, LeverageRequest, MaxAvailableSizeRequest, MaxOrderSizeRequest,
-    SetAccountLevelRequest, SetCollateralAssetsRequest, SetGreeksRequest, SetIsolatedModeRequest,
-    SetLeverageRequest, SetPositionModeRequest,
+    FeeRatesRequest, GetCollateralAssetsRequest, LeverageRequest, MaxAvailableSizeRequest,
+    MaxOrderSizeRequest, SetAccountLevelRequest, SetCollateralAssetsRequest, SetGreeksRequest,
+    SetIsolatedModeRequest, SetLeverageRequest, SetPositionModeRequest,
 };
 use super::signed_client;
 
@@ -76,6 +76,32 @@ async fn set_collateral_assets_posts_custom_body() {
     assert_eq!(sent["type"], "custom");
     assert_eq!(sent["collateralEnabled"], false);
     assert_eq!(sent["ccyList"], serde_json::json!(["BTC", "ETH"]));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn get_collateral_assets_uses_documented_query() {
+    let body = r#"{"code":"0","msg":"","data":[{"ccy":"BTC","collateralEnabled":true},{"ccy":"ETH","collateralEnabled":false}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = GetCollateralAssetsRequest::new()
+        .currency("BTC,ETH")
+        .collateral_enabled(true);
+
+    let result = client
+        .account()
+        .get_collateral_assets(&request)
+        .await
+        .unwrap();
+    assert_eq!(result[0].ccy, "BTC");
+    assert!(result[0].collateral_enabled);
+    assert_eq!(result[1].ccy, "ETH");
+    assert!(!result[1].collateral_enabled);
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::GET);
+    assert_eq!(req.query(), Some("ccy=BTC%2CETH&collateralEnabled=true"));
+    assert!(req.uri.contains("/api/v5/account/collateral-assets?"));
     assert!(req.is_signed());
 }
 

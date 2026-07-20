@@ -4,6 +4,8 @@ use crate::{Credentials, OkxClient};
 mod balance;
 mod bills;
 mod borrowing;
+mod demo;
+mod mmp;
 mod risk;
 mod trading;
 

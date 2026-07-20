@@ -79,6 +79,19 @@ pub struct SetPositionModeResult {
     pub pos_mode: String,
 }
 
+/// Collateral setting for an account currency.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct CollateralAsset {
+    /// Currency, e.g. `BTC`.
+    #[serde(default)]
+    pub ccy: String,
+    /// Whether the currency is enabled as collateral.
+    #[serde(default)]
+    pub collateral_enabled: bool,
+}
+
 /// Leverage information.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]

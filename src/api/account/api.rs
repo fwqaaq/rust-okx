@@ -185,6 +185,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(SET_COLLATERAL_ASSETS, request, true).await
     }
 
+    /// Retrieve currencies and their collateral settings.
+    ///
+    /// `GET /api/v5/account/collateral-assets`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-collateral-assets).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn get_collateral_assets(
+        &self,
+        request: &GetCollateralAssetsRequest<'_>,
+    ) -> Result<Vec<CollateralAsset>, Error> {
+        self.client.get(COLLATERAL_ASSETS, request, true).await
+    }
+
     /// Set leverage for an instrument or currency.
     ///
     /// `POST /api/v5/account/set-leverage`. Authenticated.
@@ -616,5 +633,86 @@ impl<'a, T: Transport> Account<'a, T> {
         request: &SetAutoEarnRequest<'_>,
     ) -> Result<Vec<SetAutoEarnResult>, Error> {
         self.client.post(SET_AUTO_EARN, request, true).await
+    }
+
+    /// Retrieve Market Maker Protection configuration and trigger status.
+    ///
+    /// `GET /api/v5/account/mmp-config`. Authenticated.
+    ///
+    /// This endpoint applies to options in Portfolio Margin mode and requires
+    /// MMP privilege.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-mmp-config).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn get_mmp_config(
+        &self,
+        request: &GetMmpConfigRequest<'_>,
+    ) -> Result<Vec<MmpConfig>, Error> {
+        self.client.get(MMP_CONFIG, request, true).await
+    }
+
+    /// Configure Market Maker Protection for an option instrument family.
+    ///
+    /// `POST /api/v5/account/mmp-config`. Authenticated.
+    ///
+    /// This endpoint applies to options in Portfolio Margin mode and requires
+    /// MMP privilege.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-mmp).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_mmp_config(
+        &self,
+        request: &SetMmpConfigRequest<'_>,
+    ) -> Result<Vec<SetMmpConfigResult>, Error> {
+        self.client.post(MMP_CONFIG, request, true).await
+    }
+
+    /// Reset Market Maker Protection status after MMP is triggered.
+    ///
+    /// `POST /api/v5/account/mmp-reset`. Authenticated.
+    ///
+    /// This endpoint applies to options in Portfolio Margin mode and requires
+    /// MMP privilege.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-reset-mmp-status).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn reset_mmp_status(
+        &self,
+        request: &ResetMmpStatusRequest<'_>,
+    ) -> Result<Vec<ResetMmpStatusResult>, Error> {
+        self.client.post(MMP_RESET, request, true).await
+    }
+
+    /// Increase or reduce balances in the demo trading environment.
+    ///
+    /// `POST /api/v5/account/demo-adjust-balance`. Authenticated.
+    ///
+    /// Build the client with
+    /// [`demo_trading(true)`](crate::OkxClientBuilder::demo_trading) before
+    /// calling this demo-only endpoint.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-adjust-demo-account-balance).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn adjust_demo_account_balance(
+        &self,
+        request: &DemoAdjustBalanceRequest<'_>,
+    ) -> Result<Vec<DemoAdjustBalanceResult>, Error> {
+        self.client.post(DEMO_ADJUST_BALANCE, request, true).await
     }
 }

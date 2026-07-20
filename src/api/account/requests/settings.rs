@@ -72,6 +72,35 @@ impl<'a> SetCollateralAssetsRequest<'a> {
     }
 }
 
+/// Query parameters for [`get_collateral_assets`](crate::api::account::Account::get_collateral_assets).
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetCollateralAssetsRequest<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    ccy: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    collateral_enabled: Option<bool>,
+}
+
+impl<'a> GetCollateralAssetsRequest<'a> {
+    /// Create an unfiltered collateral-assets query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Filter by one currency or a comma-separated list of up to 20 currencies.
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
+        self.ccy = Some(ccy.into());
+        self
+    }
+
+    /// Filter by whether the asset is enabled as collateral.
+    pub fn collateral_enabled(mut self, collateral_enabled: bool) -> Self {
+        self.collateral_enabled = Some(collateral_enabled);
+        self
+    }
+}
+
 /// Request for [`set_greeks`](crate::api::account::Account::set_greeks).
 #[derive(Debug, Clone, Serialize)]
 pub struct SetGreeksRequest<'a> {
