@@ -37,3 +37,22 @@ impl<'a> SetSettleCurrencyRequest<'a> {
         }
     }
 }
+
+/// Request for [`set_fee_type`](crate::api::account::Account::set_fee_type).
+#[derive(Debug, Clone, Serialize)]
+pub struct SetFeeTypeRequest<'a> {
+    #[serde(rename = "feeType")]
+    fee_type: Cow<'a, str>,
+}
+
+impl<'a> SetFeeTypeRequest<'a> {
+    /// Create a spot fee-type update.
+    ///
+    /// OKX currently accepts `0` for fees in the obtained currency and `1`
+    /// for fees in the quote currency.
+    pub fn new(fee_type: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            fee_type: fee_type.into(),
+        }
+    }
+}

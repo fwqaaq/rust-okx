@@ -641,6 +641,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(SET_SETTLE_CURRENCY, request, true).await
     }
 
+    /// Set whether spot fees are charged in the obtained or quote currency.
+    ///
+    /// `POST /api/v5/account/set-fee-type`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-fee-type).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_fee_type(
+        &self,
+        request: &SetFeeTypeRequest<'_>,
+    ) -> Result<Vec<SetFeeTypeResult>, Error> {
+        self.client.post(SET_FEE_TYPE, request, true).await
+    }
+
     /// Manually borrow or repay spot liabilities.
     ///
     /// `POST /api/v5/account/spot-manual-borrow-repay`. Authenticated.

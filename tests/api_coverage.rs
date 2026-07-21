@@ -132,6 +132,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("POST", "/api/v5/account/set-auto-loan"),
     ("POST", "/api/v5/account/set-auto-repay"),
     ("POST", "/api/v5/account/set-collateral-assets"),
+    ("POST", "/api/v5/account/set-fee-type"),
     ("POST", "/api/v5/account/set-greeks"),
     ("POST", "/api/v5/account/set-isolated-mode"),
     ("POST", "/api/v5/account/set-leverage"),

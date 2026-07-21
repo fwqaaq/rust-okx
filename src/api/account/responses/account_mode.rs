@@ -40,3 +40,13 @@ pub struct SetSettleCurrencyResult {
     #[serde(default)]
     pub settle_ccy: String,
 }
+
+/// Result of setting the spot fee type.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SetFeeTypeResult {
+    /// Fee type selected by the account.
+    #[serde(default)]
+    pub fee_type: String,
+}
