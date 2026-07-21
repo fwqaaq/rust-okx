@@ -1,3 +1,4 @@
+mod account_mode;
 mod balances;
 mod bills;
 mod borrowing;
@@ -8,6 +9,7 @@ mod mmp;
 mod positions;
 mod risk;
 
+pub use account_mode::*;
 pub use balances::*;
 pub use bills::*;
 pub use borrowing::*;

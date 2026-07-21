@@ -1,3 +1,4 @@
+mod account_mode;
 mod balances;
 mod borrowing;
 mod demo;
@@ -9,6 +10,7 @@ mod risk;
 mod settings;
 mod trading;
 
+pub use account_mode::*;
 pub use balances::*;
 pub use borrowing::*;
 pub use demo::*;

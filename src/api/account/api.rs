@@ -202,6 +202,25 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(COLLATERAL_ASSETS, request, true).await
     }
 
+    /// Check whether the account can switch its delta-neutral strategy mode.
+    ///
+    /// `GET /api/v5/account/precheck-set-delta-neutral`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-precheck-set-delta-neutral).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn precheck_set_delta_neutral(
+        &self,
+        request: &PrecheckSetDeltaNeutralRequest<'_>,
+    ) -> Result<Vec<PrecheckSetDeltaNeutralResult>, Error> {
+        self.client
+            .get(PRECHECK_SET_DELTA_NEUTRAL, request, true)
+            .await
+    }
+
     /// Set leverage for an instrument or currency.
     ///
     /// `POST /api/v5/account/set-leverage`. Authenticated.

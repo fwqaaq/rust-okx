@@ -1,0 +1,33 @@
+use crate::api::account::PrecheckSetDeltaNeutralRequest;
+use crate::test_util::MockTransport;
+
+use super::signed_client;
+
+#[tokio::test]
+async fn precheck_set_delta_neutral_uses_documented_query() {
+    let body = r#"{"code":"0","msg":"","data":[{"unmatchedInfoCheck":[{"type":"delta_risk","deltaLever":"2","ordList":["123"],"posList":["456"]}]}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = PrecheckSetDeltaNeutralRequest::new("1");
+
+    let result = client
+        .account()
+        .precheck_set_delta_neutral(&request)
+        .await
+        .unwrap();
+    assert_eq!(result[0].unmatched_info_check[0].unmatched_type, "delta_risk");
+    assert_eq!(
+        result[0].unmatched_info_check[0].delta_lever.as_str(),
+        "2"
+    );
+    assert_eq!(result[0].unmatched_info_check[0].ord_list, ["123"]);
+    assert_eq!(result[0].unmatched_info_check[0].pos_list, ["456"]);
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::GET);
+    assert_eq!(req.query(), Some("stgyType=1"));
+    assert!(req
+        .uri
+        .contains("/api/v5/account/precheck-set-delta-neutral?"));
+    assert!(req.is_signed());
+}

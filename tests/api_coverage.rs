@@ -22,6 +22,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("GET", "/api/v5/account/position-tiers"),
     ("GET", "/api/v5/account/positions"),
     ("GET", "/api/v5/account/positions-history"),
+    ("GET", "/api/v5/account/precheck-set-delta-neutral"),
     ("GET", "/api/v5/account/risk-state"),
     ("GET", "/api/v5/account/spot-borrow-repay-history"),
     ("GET", "/api/v5/account/subtypes"),
