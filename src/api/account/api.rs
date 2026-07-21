@@ -658,6 +658,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(SET_FEE_TYPE, request, true).await
     }
 
+    /// Retrieve precheck information for an account-mode switch.
+    ///
+    /// `GET /api/v5/account/set-account-switch-precheck`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-precheck-account-mode-switch).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn precheck_account_switch(
+        &self,
+        request: &AccountSwitchPrecheckRequest<'_>,
+    ) -> Result<Vec<AccountSwitchPrecheckResult>, Error> {
+        self.client.get(ACCOUNT_SWITCH_PRECHECK, request, true).await
+    }
+
     /// Manually borrow or repay spot liabilities.
     ///
     /// `POST /api/v5/account/spot-manual-borrow-repay`. Authenticated.

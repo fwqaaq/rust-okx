@@ -40,6 +40,8 @@ pub(super) const MOVE_POSITIONS: &str = "/api/v5/account/move-positions";
 pub(super) const MOVE_POSITIONS_HISTORY: &str = "/api/v5/account/move-positions-history";
 pub(super) const SET_SETTLE_CURRENCY: &str = "/api/v5/account/set-settle-currency";
 pub(super) const SET_FEE_TYPE: &str = "/api/v5/account/set-fee-type";
+pub(super) const ACCOUNT_SWITCH_PRECHECK: &str =
+    "/api/v5/account/set-account-switch-precheck";
 pub(super) const SPOT_MANUAL_BORROW_REPAY: &str = "/api/v5/account/spot-manual-borrow-repay";
 pub(super) const SET_AUTO_REPAY: &str = "/api/v5/account/set-auto-repay";
 pub(super) const SPOT_BORROW_REPAY_HISTORY: &str = "/api/v5/account/spot-borrow-repay-history";

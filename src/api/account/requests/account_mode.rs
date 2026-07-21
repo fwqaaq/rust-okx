@@ -56,3 +56,20 @@ impl<'a> SetFeeTypeRequest<'a> {
         }
     }
 }
+
+/// Query parameters for
+/// [`precheck_account_switch`](crate::api::account::Account::precheck_account_switch).
+#[derive(Debug, Clone, Serialize)]
+pub struct AccountSwitchPrecheckRequest<'a> {
+    #[serde(rename = "acctLv")]
+    acct_lv: Cow<'a, str>,
+}
+
+impl<'a> AccountSwitchPrecheckRequest<'a> {
+    /// Create an account-mode switch precheck for the target account level.
+    pub fn new(acct_lv: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            acct_lv: acct_lv.into(),
+        }
+    }
+}
