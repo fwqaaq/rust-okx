@@ -107,3 +107,39 @@ impl<'a> AccountSwitchPresetRequest<'a> {
         self
     }
 }
+
+/// Request for updating an account trading configuration.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetTradingConfigRequest<'a> {
+    #[serde(rename = "type")]
+    config_type: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stgy_type: Option<Cow<'a, str>>,
+}
+
+impl<'a> SetTradingConfigRequest<'a> {
+    /// Create a trading-configuration request with an explicit OKX `type`.
+    pub fn new(config_type: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            config_type: config_type.into(),
+            stgy_type: None,
+        }
+    }
+
+    /// Create a delta-neutral strategy-mode update.
+    ///
+    /// OKX currently accepts `0` for general mode and `1` for delta-neutral mode.
+    pub fn strategy_mode(stgy_type: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            config_type: Cow::Borrowed("stgyType"),
+            stgy_type: Some(stgy_type.into()),
+        }
+    }
+
+    /// Set the strategy mode for a `stgyType` configuration update.
+    pub fn strategy_type(mut self, stgy_type: impl Into<Cow<'a, str>>) -> Self {
+        self.stgy_type = Some(stgy_type.into());
+        self
+    }
+}

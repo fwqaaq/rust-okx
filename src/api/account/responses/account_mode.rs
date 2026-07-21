@@ -186,3 +186,16 @@ pub struct AccountSwitchPresetResult {
     #[serde(default)]
     pub risk_offset_type: String,
 }
+
+/// Result of updating an account trading configuration.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SetTradingConfigResult {
+    /// Configuration type updated by the request.
+    #[serde(rename = "type", default)]
+    pub config_type: String,
+    /// Strategy mode (`0` for general mode, `1` for delta-neutral mode).
+    #[serde(default)]
+    pub stgy_type: String,
+}

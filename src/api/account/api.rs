@@ -709,6 +709,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(ACCOUNT_SWITCH_PRESET, request, true).await
     }
 
+    /// Update an account trading configuration.
+    ///
+    /// `POST /api/v5/account/set-trading-config`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-trading-config).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_trading_config(
+        &self,
+        request: &SetTradingConfigRequest<'_>,
+    ) -> Result<Vec<SetTradingConfigResult>, Error> {
+        self.client.post(SET_TRADING_CONFIG, request, true).await
+    }
+
     /// Manually borrow or repay spot liabilities.
     ///
     /// `POST /api/v5/account/spot-manual-borrow-repay`. Authenticated.

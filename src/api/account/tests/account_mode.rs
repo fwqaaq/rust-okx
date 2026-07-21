@@ -1,6 +1,6 @@
 use crate::api::account::{
     AccountSwitchPrecheckRequest, AccountSwitchPresetRequest, PrecheckSetDeltaNeutralRequest,
-    SetFeeTypeRequest, SetSettleCurrencyRequest,
+    SetFeeTypeRequest, SetSettleCurrencyRequest, SetTradingConfigRequest,
 };
 use crate::test_util::MockTransport;
 
@@ -131,5 +131,28 @@ async fn preset_account_switch_posts_documented_body() {
     assert_eq!(sent["acctLv"], "3");
     assert_eq!(sent["lever"], "10");
     assert!(sent.get("riskOffsetType").is_none());
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn set_trading_config_posts_strategy_mode() {
+    let body = r#"{"code":"0","msg":"","data":[{"type":"stgyType","stgyType":"1"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+
+    let result = client
+        .account()
+        .set_trading_config(&SetTradingConfigRequest::strategy_mode("1"))
+        .await
+        .unwrap();
+    assert_eq!(result[0].config_type, "stgyType");
+    assert_eq!(result[0].stgy_type, "1");
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req.uri.ends_with("/api/v5/account/set-trading-config"));
+    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
+    assert_eq!(sent["type"], "stgyType");
+    assert_eq!(sent["stgyType"], "1");
     assert!(req.is_signed());
 }

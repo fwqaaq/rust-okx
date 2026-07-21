@@ -7,6 +7,7 @@ fn account_configuration_mutations_todo() {
     // API: POST /api/v5/account/set-greeks
     // API: POST /api/v5/account/set-isolated-mode
     // API: POST /api/v5/account/set-settle-currency
+    // API: POST /api/v5/account/set-trading-config
     // API: POST /api/v5/account/set-auto-loan
     // API: POST /api/v5/account/set-account-level
     // API: POST /api/v5/account/account-level-switch-preset

@@ -142,6 +142,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("POST", "/api/v5/account/set-position-mode"),
     ("POST", "/api/v5/account/set-riskOffset-amt"),
     ("POST", "/api/v5/account/set-settle-currency"),
+    ("POST", "/api/v5/account/set-trading-config"),
     ("POST", "/api/v5/account/simulated_margin"),
     ("POST", "/api/v5/account/spot-manual-borrow-repay"),
     ("POST", "/api/v5/asset/cancel-withdrawal"),

@@ -45,6 +45,7 @@ pub(super) const ACCOUNT_SWITCH_PRECHECK: &str =
     "/api/v5/account/set-account-switch-precheck";
 pub(super) const ACCOUNT_SWITCH_PRESET: &str =
     "/api/v5/account/account-level-switch-preset";
+pub(super) const SET_TRADING_CONFIG: &str = "/api/v5/account/set-trading-config";
 pub(super) const SPOT_MANUAL_BORROW_REPAY: &str = "/api/v5/account/spot-manual-borrow-repay";
 pub(super) const SET_AUTO_REPAY: &str = "/api/v5/account/set-auto-repay";
 pub(super) const SPOT_BORROW_REPAY_HISTORY: &str = "/api/v5/account/spot-borrow-repay-history";
