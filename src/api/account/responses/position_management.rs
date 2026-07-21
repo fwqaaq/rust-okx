@@ -32,6 +32,7 @@ pub struct MovePositionsResult {
 
 /// Result for one position-transfer leg.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct MovePositionLegResult {
     /// Source-side result.
