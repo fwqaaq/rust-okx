@@ -167,3 +167,22 @@ pub struct AccountSwitchMarginDetail {
     #[serde(default)]
     pub mgn_ratio: NumberString,
 }
+
+/// Result of presetting account-mode switch parameters.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct AccountSwitchPresetResult {
+    /// Current account level.
+    #[serde(default)]
+    pub cur_acct_lv: String,
+    /// Target account level.
+    #[serde(default)]
+    pub acct_lv: String,
+    /// Leverage preset for cross-margin positions.
+    #[serde(default)]
+    pub lever: NumberString,
+    /// Deprecated risk-offset type returned by OKX.
+    #[serde(default)]
+    pub risk_offset_type: String,
+}

@@ -675,6 +675,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(ACCOUNT_SWITCH_PRECHECK, request, true).await
     }
 
+    /// Preset information required for an account-mode switch.
+    ///
+    /// `POST /api/v5/account/account-level-switch-preset`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-preset-account-mode-switch).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn preset_account_switch(
+        &self,
+        request: &AccountSwitchPresetRequest<'_>,
+    ) -> Result<Vec<AccountSwitchPresetResult>, Error> {
+        self.client.post(ACCOUNT_SWITCH_PRESET, request, true).await
+    }
+
     /// Manually borrow or repay spot liabilities.
     ///
     /// `POST /api/v5/account/spot-manual-borrow-repay`. Authenticated.

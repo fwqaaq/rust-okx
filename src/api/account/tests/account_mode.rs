@@ -1,6 +1,6 @@
 use crate::api::account::{
-    AccountSwitchPrecheckRequest, PrecheckSetDeltaNeutralRequest, SetFeeTypeRequest,
-    SetSettleCurrencyRequest,
+    AccountSwitchPrecheckRequest, AccountSwitchPresetRequest, PrecheckSetDeltaNeutralRequest,
+    SetFeeTypeRequest, SetSettleCurrencyRequest,
 };
 use crate::test_util::MockTransport;
 
@@ -103,5 +103,33 @@ async fn precheck_account_switch_decodes_margin_checks() {
     assert!(req
         .uri
         .contains("/api/v5/account/set-account-switch-precheck?"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn preset_account_switch_posts_documented_body() {
+    let body = r#"{"code":"0","msg":"","data":[{"acctLv":"3","curAcctLv":"4","lever":"10","riskOffsetType":""}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = AccountSwitchPresetRequest::new("3").leverage("10");
+
+    let result = client
+        .account()
+        .preset_account_switch(&request)
+        .await
+        .unwrap();
+    assert_eq!(result[0].cur_acct_lv, "4");
+    assert_eq!(result[0].acct_lv, "3");
+    assert_eq!(result[0].lever.as_str(), "10");
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req
+        .uri
+        .ends_with("/api/v5/account/account-level-switch-preset"));
+    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
+    assert_eq!(sent["acctLv"], "3");
+    assert_eq!(sent["lever"], "10");
+    assert!(sent.get("riskOffsetType").is_none());
     assert!(req.is_signed());
 }

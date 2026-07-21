@@ -73,3 +73,37 @@ impl<'a> AccountSwitchPrecheckRequest<'a> {
         }
     }
 }
+
+/// Request for presetting account-mode switch parameters.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountSwitchPresetRequest<'a> {
+    acct_lv: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    lever: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    risk_offset_type: Option<Cow<'a, str>>,
+}
+
+impl<'a> AccountSwitchPresetRequest<'a> {
+    /// Create a preset for the target account level.
+    pub fn new(acct_lv: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            acct_lv: acct_lv.into(),
+            lever: None,
+            risk_offset_type: None,
+        }
+    }
+
+    /// Set leverage for cross-margin contract positions after the switch.
+    pub fn leverage(mut self, lever: impl Into<Cow<'a, str>>) -> Self {
+        self.lever = Some(lever.into());
+        self
+    }
+
+    /// Set the deprecated OKX risk-offset type.
+    pub fn risk_offset_type(mut self, risk_offset_type: impl Into<Cow<'a, str>>) -> Self {
+        self.risk_offset_type = Some(risk_offset_type.into());
+        self
+    }
+}

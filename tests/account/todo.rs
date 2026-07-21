@@ -9,6 +9,7 @@ fn account_configuration_mutations_todo() {
     // API: POST /api/v5/account/set-settle-currency
     // API: POST /api/v5/account/set-auto-loan
     // API: POST /api/v5/account/set-account-level
+    // API: POST /api/v5/account/account-level-switch-preset
     // API: POST /api/v5/account/set-collateral-assets
     // API: POST /api/v5/account/set-fee-type
     // API: POST /api/v5/account/activate-option
