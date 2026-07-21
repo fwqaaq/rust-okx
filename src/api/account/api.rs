@@ -624,6 +624,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(MOVE_POSITIONS_HISTORY, request, true).await
     }
 
+    /// Set the settlement currency for USD-margined contracts.
+    ///
+    /// `POST /api/v5/account/set-settle-currency`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-settle-currency).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_settle_currency(
+        &self,
+        request: &SetSettleCurrencyRequest<'_>,
+    ) -> Result<Vec<SetSettleCurrencyResult>, Error> {
+        self.client.post(SET_SETTLE_CURRENCY, request, true).await
+    }
+
     /// Manually borrow or repay spot liabilities.
     ///
     /// `POST /api/v5/account/spot-manual-borrow-repay`. Authenticated.

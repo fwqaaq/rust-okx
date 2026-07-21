@@ -1,4 +1,4 @@
-use crate::api::account::PrecheckSetDeltaNeutralRequest;
+use crate::api::account::{PrecheckSetDeltaNeutralRequest, SetSettleCurrencyRequest};
 use crate::test_util::MockTransport;
 
 use super::signed_client;
@@ -29,5 +29,26 @@ async fn precheck_set_delta_neutral_uses_documented_query() {
     assert!(req
         .uri
         .contains("/api/v5/account/precheck-set-delta-neutral?"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn set_settle_currency_posts_documented_body() {
+    let body = r#"{"code":"0","msg":"","data":[{"settleCcy":"USDC"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+
+    let result = client
+        .account()
+        .set_settle_currency(&SetSettleCurrencyRequest::new("USDC"))
+        .await
+        .unwrap();
+    assert_eq!(result[0].settle_ccy, "USDC");
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req.uri.ends_with("/api/v5/account/set-settle-currency"));
+    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
+    assert_eq!(sent["settleCcy"], "USDC");
     assert!(req.is_signed());
 }

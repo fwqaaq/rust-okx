@@ -30,3 +30,13 @@ pub struct DeltaNeutralUnmatchedInfo {
     #[serde(default)]
     pub pos_list: Vec<String>,
 }
+
+/// Result of setting the settlement currency for USD-margined contracts.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SetSettleCurrencyResult {
+    /// Settlement currency selected by the account.
+    #[serde(default)]
+    pub settle_ccy: String,
+}

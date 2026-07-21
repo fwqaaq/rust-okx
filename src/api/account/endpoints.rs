@@ -38,6 +38,7 @@ pub(super) const ACTIVATE_OPTION: &str = "/api/v5/account/activate-option";
 pub(super) const POSITION_BUILDER: &str = "/api/v5/account/position-builder";
 pub(super) const MOVE_POSITIONS: &str = "/api/v5/account/move-positions";
 pub(super) const MOVE_POSITIONS_HISTORY: &str = "/api/v5/account/move-positions-history";
+pub(super) const SET_SETTLE_CURRENCY: &str = "/api/v5/account/set-settle-currency";
 pub(super) const SPOT_MANUAL_BORROW_REPAY: &str = "/api/v5/account/spot-manual-borrow-repay";
 pub(super) const SET_AUTO_REPAY: &str = "/api/v5/account/set-auto-repay";
 pub(super) const SPOT_BORROW_REPAY_HISTORY: &str = "/api/v5/account/spot-borrow-repay-history";

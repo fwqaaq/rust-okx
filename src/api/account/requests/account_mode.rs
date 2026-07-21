@@ -20,3 +20,20 @@ impl<'a> PrecheckSetDeltaNeutralRequest<'a> {
         }
     }
 }
+
+/// Request for
+/// [`set_settle_currency`](crate::api::account::Account::set_settle_currency).
+#[derive(Debug, Clone, Serialize)]
+pub struct SetSettleCurrencyRequest<'a> {
+    #[serde(rename = "settleCcy")]
+    settle_ccy: Cow<'a, str>,
+}
+
+impl<'a> SetSettleCurrencyRequest<'a> {
+    /// Create a settlement-currency update for USD-margined contracts.
+    pub fn new(settle_ccy: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            settle_ccy: settle_ccy.into(),
+        }
+    }
+}
