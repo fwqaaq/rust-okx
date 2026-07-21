@@ -18,20 +18,21 @@ async fn precheck_set_delta_neutral_uses_documented_query() {
         .precheck_set_delta_neutral(&request)
         .await
         .unwrap();
-    assert_eq!(result[0].unmatched_info_check[0].unmatched_type, "delta_risk");
     assert_eq!(
-        result[0].unmatched_info_check[0].delta_lever.as_str(),
-        "2"
+        result[0].unmatched_info_check[0].unmatched_type,
+        "delta_risk"
     );
+    assert_eq!(result[0].unmatched_info_check[0].delta_lever.as_str(), "2");
     assert_eq!(result[0].unmatched_info_check[0].ord_list, ["123"]);
     assert_eq!(result[0].unmatched_info_check[0].pos_list, ["456"]);
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::GET);
     assert_eq!(req.query(), Some("stgyType=1"));
-    assert!(req
-        .uri
-        .contains("/api/v5/account/precheck-set-delta-neutral?"));
+    assert!(
+        req.uri
+            .contains("/api/v5/account/precheck-set-delta-neutral?")
+    );
     assert!(req.is_signed());
 }
 
@@ -89,20 +90,26 @@ async fn precheck_account_switch_decodes_margin_checks() {
         .await
         .unwrap();
     assert_eq!(result[0].s_code, "4");
-    assert_eq!(result[0].unmatched_info_check[0].total_asset.as_str(), "1000");
+    assert_eq!(
+        result[0].unmatched_info_check[0].total_asset.as_str(),
+        "1000"
+    );
     assert_eq!(result[0].pos_tier_check[0].max_sz.as_str(), "50");
     assert!(result[0].mgn_bf.as_ref().unwrap().details.is_empty());
     assert_eq!(
-        result[0].mgn_aft.as_ref().unwrap().details[0].avail_eq.as_str(),
+        result[0].mgn_aft.as_ref().unwrap().details[0]
+            .avail_eq
+            .as_str(),
         "900"
     );
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::GET);
     assert_eq!(req.query(), Some("acctLv=3"));
-    assert!(req
-        .uri
-        .contains("/api/v5/account/set-account-switch-precheck?"));
+    assert!(
+        req.uri
+            .contains("/api/v5/account/set-account-switch-precheck?")
+    );
     assert!(req.is_signed());
 }
 
@@ -124,9 +131,10 @@ async fn preset_account_switch_posts_documented_body() {
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::POST);
-    assert!(req
-        .uri
-        .ends_with("/api/v5/account/account-level-switch-preset"));
+    assert!(
+        req.uri
+            .ends_with("/api/v5/account/account-level-switch-preset")
+    );
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["acctLv"], "3");
     assert_eq!(sent["lever"], "10");

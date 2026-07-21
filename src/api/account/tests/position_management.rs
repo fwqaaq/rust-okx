@@ -104,9 +104,7 @@ async fn position_builder_graph_posts_documented_body() {
 
     let req = mock.captured();
     assert_eq!(req.method, http::Method::POST);
-    assert!(req
-        .uri
-        .ends_with("/api/v5/account/position-builder-graph"));
+    assert!(req.uri.ends_with("/api/v5/account/position-builder-graph"));
     let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
     assert_eq!(sent["inclRealPosAndEq"], false);
     assert_eq!(sent["simPos"][0]["instId"], "BTC-USDT-SWAP");

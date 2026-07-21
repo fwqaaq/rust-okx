@@ -604,7 +604,9 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &PositionBuilderGraphRequest<'_>,
     ) -> Result<Vec<PositionBuilderGraphResult>, Error> {
-        self.client.post(POSITION_BUILDER_GRAPH, request, true).await
+        self.client
+            .post(POSITION_BUILDER_GRAPH, request, true)
+            .await
     }
 
     /// Move positions between the master account and a sub-account.
@@ -689,7 +691,9 @@ impl<'a, T: Transport> Account<'a, T> {
         &self,
         request: &AccountSwitchPrecheckRequest<'_>,
     ) -> Result<Vec<AccountSwitchPrecheckResult>, Error> {
-        self.client.get(ACCOUNT_SWITCH_PRECHECK, request, true).await
+        self.client
+            .get(ACCOUNT_SWITCH_PRECHECK, request, true)
+            .await
     }
 
     /// Preset information required for an account-mode switch.
