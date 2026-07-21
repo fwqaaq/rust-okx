@@ -97,3 +97,32 @@ pub struct MovePositionToResult {
     #[serde(default)]
     pub s_msg: String,
 }
+
+/// Position-builder trend graph result.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct PositionBuilderGraphResult {
+    /// Graph type.
+    #[serde(rename = "type", default)]
+    pub graph_type: String,
+    /// Maintenance-margin data, ordered by shock factor.
+    #[serde(default)]
+    pub mmr_data: Vec<PositionBuilderGraphPoint>,
+}
+
+/// One point in a position-builder MMR trend graph.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct PositionBuilderGraphPoint {
+    /// Price change ratio in the range -1 to 1.
+    #[serde(default)]
+    pub shock_factor: NumberString,
+    /// Maintenance margin at this price shock.
+    #[serde(default)]
+    pub mmr: NumberString,
+    /// Maintenance margin ratio at this price shock.
+    #[serde(default)]
+    pub mmr_ratio: NumberString,
+}

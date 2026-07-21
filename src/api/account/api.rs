@@ -590,6 +590,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(POSITION_BUILDER, request, true).await
     }
 
+    /// Build an MMR trend graph for simulated positions and assets.
+    ///
+    /// `POST /api/v5/account/position-builder-graph`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder-trend-graph).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn position_builder_graph(
+        &self,
+        request: &PositionBuilderGraphRequest<'_>,
+    ) -> Result<Vec<PositionBuilderGraphResult>, Error> {
+        self.client.post(POSITION_BUILDER_GRAPH, request, true).await
+    }
+
     /// Move positions between the master account and a sub-account.
     ///
     /// `POST /api/v5/account/move-positions`. Authenticated.

@@ -49,6 +49,7 @@ fn account_calculation_and_uncovered_reads_todo() {
     // API: GET /api/v5/account/risk-state
     // API: GET /api/v5/account/set-account-switch-precheck
     // API: POST /api/v5/account/position-builder
+    // API: POST /api/v5/account/position-builder-graph
     // API: POST /api/v5/account/set-riskOffset-amt
     // STATUS: TODO — needs deterministic fixtures, IDs, account eligibility, or avoids triggering server-side archive generation / time-limited download-link workflows.
     todo!("add endpoint-specific fixtures before promoting these to live tests");

@@ -128,6 +128,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("POST", "/api/v5/account/bills-history-archive"),
     ("POST", "/api/v5/account/move-positions"),
     ("POST", "/api/v5/account/position-builder"),
+    ("POST", "/api/v5/account/position-builder-graph"),
     ("POST", "/api/v5/account/position/margin-balance"),
     ("POST", "/api/v5/account/set-account-level"),
     ("POST", "/api/v5/account/set-auto-earn"),

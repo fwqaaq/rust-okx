@@ -1,6 +1,7 @@
 use crate::api::account::{
     MovePositionFrom, MovePositionLeg, MovePositionTo, MovePositionsHistoryRequest,
-    MovePositionsRequest,
+    MovePositionsRequest, PositionBuilderGraphAsset, PositionBuilderGraphMmrConfig,
+    PositionBuilderGraphPosition, PositionBuilderGraphRequest,
 };
 use crate::model::{OrderSide, PositionSide, TradeMode};
 use crate::test_util::MockTransport;
@@ -70,5 +71,51 @@ async fn get_move_positions_history_uses_documented_query() {
         Some("clientId=transfer1&beginTs=1734085000000&state=filled")
     );
     assert!(req.uri.contains("/api/v5/account/move-positions-history?"));
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn position_builder_graph_posts_documented_body() {
+    let body = r#"{"code":"0","msg":"","data":[{"type":"mmr","mmrData":[{"shockFactor":"-0.94","mmr":"1415.0254039225917","mmrRatio":"-47.45603627655477"}]}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = PositionBuilderGraphRequest::new(
+        PositionBuilderGraphMmrConfig::new()
+            .account_level("3")
+            .leverage("1"),
+    )
+    .include_real_positions_and_equity(false)
+    .simulated_positions(vec![PositionBuilderGraphPosition::new(
+        "BTC-USDT-SWAP",
+        "-10",
+        "100000",
+    )])
+    .simulated_assets(vec![PositionBuilderGraphAsset::new("USDT", "100")])
+    .greeks_type("CASH");
+
+    let result = client
+        .account()
+        .position_builder_graph(&request)
+        .await
+        .unwrap();
+    assert_eq!(result[0].graph_type, "mmr");
+    assert_eq!(result[0].mmr_data[0].shock_factor.as_str(), "-0.94");
+    assert_eq!(result[0].mmr_data[0].mmr.as_str(), "1415.0254039225917");
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::POST);
+    assert!(req
+        .uri
+        .ends_with("/api/v5/account/position-builder-graph"));
+    let sent: serde_json::Value = serde_json::from_str(req.body_str()).unwrap();
+    assert_eq!(sent["inclRealPosAndEq"], false);
+    assert_eq!(sent["simPos"][0]["instId"], "BTC-USDT-SWAP");
+    assert_eq!(sent["simPos"][0]["pos"], "-10");
+    assert_eq!(sent["simPos"][0]["avgPx"], "100000");
+    assert_eq!(sent["simAsset"][0]["amt"], "100");
+    assert_eq!(sent["greeksType"], "CASH");
+    assert_eq!(sent["type"], "mmr");
+    assert_eq!(sent["mmrConfig"]["acctLv"], "3");
+    assert_eq!(sent["mmrConfig"]["lever"], "1");
     assert!(req.is_signed());
 }
