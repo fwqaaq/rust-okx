@@ -607,6 +607,23 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.post(MOVE_POSITIONS, request, true).await
     }
 
+    /// Retrieve position-transfer details from the last three days.
+    ///
+    /// `GET /api/v5/account/move-positions-history`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-move-positions-history).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn get_move_positions_history(
+        &self,
+        request: &MovePositionsHistoryRequest<'_>,
+    ) -> Result<Vec<MovePositionsResult>, Error> {
+        self.client.get(MOVE_POSITIONS_HISTORY, request, true).await
+    }
+
     /// Manually borrow or repay spot liabilities.
     ///
     /// `POST /api/v5/account/spot-manual-borrow-repay`. Authenticated.

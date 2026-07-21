@@ -1,5 +1,6 @@
 use crate::api::account::{
-    MovePositionFrom, MovePositionLeg, MovePositionTo, MovePositionsRequest,
+    MovePositionFrom, MovePositionLeg, MovePositionTo, MovePositionsHistoryRequest,
+    MovePositionsRequest,
 };
 use crate::model::{OrderSide, PositionSide, TradeMode};
 use crate::test_util::MockTransport;
@@ -40,5 +41,34 @@ async fn move_positions_posts_documented_body() {
     assert_eq!(sent["legs"][0]["to"]["tdMode"], "cross");
     assert_eq!(sent["legs"][0]["to"]["posSide"], "net");
     assert!(sent["legs"][0]["to"].get("ccy").is_none());
+    assert!(req.is_signed());
+}
+
+#[tokio::test]
+async fn get_move_positions_history_uses_documented_query() {
+    let body = r#"{"code":"0","msg":"","data":[{"clientId":"transfer1","blockTdId":"2066393411110139648","state":"filled","ts":"1734085725000","fromAcct":"0","toAcct":"sub1","legs":[{"from":{"posId":"2065477911110792832","instId":"BTC-USD-SWAP","px":"100123.8","side":"sell","sz":"1"},"to":{"instId":"BTC-USD-SWAP","px":"100123.8","side":"buy","sz":"1","tdMode":"cross","posSide":"net","ccy":""}}]}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = MovePositionsHistoryRequest::new()
+        .client_id("transfer1")
+        .begin_timestamp("1734085000000")
+        .state("filled");
+
+    let result = client
+        .account()
+        .get_move_positions_history(&request)
+        .await
+        .unwrap();
+    assert_eq!(result[0].state, "filled");
+    assert_eq!(result[0].ts.as_str(), "1734085725000");
+    assert_eq!(result[0].legs[0].to.pos_side, PositionSide::Net);
+
+    let req = mock.captured();
+    assert_eq!(req.method, http::Method::GET);
+    assert_eq!(
+        req.query(),
+        Some("clientId=transfer1&beginTs=1734085000000&state=filled")
+    );
+    assert!(req.uri.contains("/api/v5/account/move-positions-history?"));
     assert!(req.is_signed());
 }

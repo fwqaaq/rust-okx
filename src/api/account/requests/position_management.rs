@@ -105,3 +105,64 @@ impl<'a> MovePositionsRequest<'a> {
         }
     }
 }
+
+/// Query parameters for retrieving position-transfer history.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MovePositionsHistoryRequest<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    block_td_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    client_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    begin_ts: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    end_ts: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    state: Option<Cow<'a, str>>,
+}
+
+impl<'a> MovePositionsHistoryRequest<'a> {
+    /// Create an unfiltered position-transfer history query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Filter by an OKX-generated block trade ID.
+    pub fn block_trade_id(mut self, block_td_id: impl Into<Cow<'a, str>>) -> Self {
+        self.block_td_id = Some(block_td_id.into());
+        self
+    }
+
+    /// Filter by a client-supplied transfer ID.
+    pub fn client_id(mut self, client_id: impl Into<Cow<'a, str>>) -> Self {
+        self.client_id = Some(client_id.into());
+        self
+    }
+
+    /// Set the inclusive beginning timestamp in Unix milliseconds.
+    pub fn begin_timestamp(mut self, begin_ts: impl Into<Cow<'a, str>>) -> Self {
+        self.begin_ts = Some(begin_ts.into());
+        self
+    }
+
+    /// Set the inclusive ending timestamp in Unix milliseconds.
+    pub fn end_timestamp(mut self, end_ts: impl Into<Cow<'a, str>>) -> Self {
+        self.end_ts = Some(end_ts.into());
+        self
+    }
+
+    /// Set the maximum number of rows to return. OKX allows up to 100.
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+
+    /// Filter by transfer state, such as `filled` or `pending`.
+    pub fn state(mut self, state: impl Into<Cow<'a, str>>) -> Self {
+        self.state = Some(state.into());
+        self
+    }
+}

@@ -37,6 +37,7 @@ fn account_calculation_and_uncovered_reads_todo() {
     // API: GET /api/v5/account/interest-accrued
     // API: GET /api/v5/account/interest-rate
     // API: GET /api/v5/account/max-withdrawal
+    // API: GET /api/v5/account/move-positions-history
     // API: GET /api/v5/account/interest-limits
     // API: POST /api/v5/account/simulated_margin
     // API: GET /api/v5/account/positions-history
