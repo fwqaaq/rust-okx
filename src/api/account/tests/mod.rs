@@ -7,6 +7,7 @@ mod bills;
 mod borrowing;
 mod demo;
 mod mmp;
+mod position_management;
 mod risk;
 mod trading;
 

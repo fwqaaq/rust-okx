@@ -7,6 +7,7 @@ mod demo;
 mod loans;
 mod mmp;
 mod positions;
+mod position_management;
 mod risk;
 
 pub use account_mode::*;
@@ -18,4 +19,5 @@ pub use demo::*;
 pub use loans::*;
 pub use mmp::*;
 pub use positions::*;
+pub use position_management::*;
 pub use risk::*;
