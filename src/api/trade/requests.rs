@@ -25,9 +25,11 @@ impl<'a> GetOrderRequest<'a> {
 
 mod advanced;
 mod algo;
+mod risk_controls;
 
 pub use advanced::*;
 pub use algo::*;
+pub use risk_controls::*;
 
 /// A request to place an order.
 ///

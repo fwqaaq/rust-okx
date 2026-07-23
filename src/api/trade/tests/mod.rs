@@ -5,6 +5,7 @@ mod advanced;
 mod algo;
 mod orders;
 mod queries;
+mod risk_controls;
 
 fn signed_client(mock: MockTransport) -> OkxClient<MockTransport> {
     OkxClient::with_transport(mock)

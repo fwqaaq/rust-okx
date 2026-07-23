@@ -27,6 +27,8 @@ fn advanced_trade_mutations_todo() {
     // API: POST /api/v5/trade/easy-convert
     // API: POST /api/v5/trade/one-click-repay
     // API: POST /api/v5/trade/one-click-repay-v2
+    // API: POST /api/v5/trade/cancel-all-after
+    // API: POST /api/v5/trade/mass-cancel
     // STATUS: TODO — unsafe for the default live suite.
     todo!("use demo support where available and strict real-asset caps otherwise");
 }

@@ -108,6 +108,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("GET", "/api/v5/public/price-limit"),
     ("GET", "/api/v5/public/time"),
     ("GET", "/api/v5/public/underlying"),
+    ("GET", "/api/v5/trade/account-rate-limit"),
     ("GET", "/api/v5/trade/easy-convert-currency-list"),
     ("GET", "/api/v5/trade/easy-convert-history"),
     ("GET", "/api/v5/trade/fills"),
@@ -168,14 +169,17 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("POST", "/api/v5/trade/amend-order"),
     ("POST", "/api/v5/trade/batch-orders"),
     ("POST", "/api/v5/trade/cancel-algos"),
+    ("POST", "/api/v5/trade/cancel-all-after"),
     ("POST", "/api/v5/trade/cancel-batch-orders"),
     ("POST", "/api/v5/trade/cancel-order"),
     ("POST", "/api/v5/trade/close-position"),
     ("POST", "/api/v5/trade/easy-convert"),
+    ("POST", "/api/v5/trade/mass-cancel"),
     ("POST", "/api/v5/trade/one-click-repay"),
     ("POST", "/api/v5/trade/one-click-repay-v2"),
     ("POST", "/api/v5/trade/order"),
     ("POST", "/api/v5/trade/order-algo"),
+    ("POST", "/api/v5/trade/order-precheck"),
 ];
 
 const ENDPOINT_SOURCES: &[&str] = &[
