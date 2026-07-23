@@ -23,10 +23,7 @@ pub struct OkusdSubscribeRequest<'a> {
 
 impl<'a> OkusdSubscribeRequest<'a> {
     /// Set the USDT amount and unique client order ID.
-    pub fn new(
-        amt: impl Into<Cow<'a, str>>,
-        cl_ord_id: impl Into<Cow<'a, str>>,
-    ) -> Self {
+    pub fn new(amt: impl Into<Cow<'a, str>>, cl_ord_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             amt: amt.into(),
             cl_ord_id: cl_ord_id.into(),
