@@ -531,8 +531,7 @@ async fn get_event_contract_series_parses_nested_settlement() {
     }],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
-    let request =
-        super::EventContractSeriesRequest::new().series_id("BTC-ABOVE-DAILY");
+    let request = super::EventContractSeriesRequest::new().series_id("BTC-ABOVE-DAILY");
 
     let rows = client
         .public_data()
@@ -610,9 +609,7 @@ async fn get_event_contract_markets_parses_all_documented_fields() {
     let req = mock.captured();
     assert_eq!(
         req.query(),
-        Some(
-            "seriesId=BTC-ABOVE-DAILY&eventId=BTC-ABOVE-DAILY-260224-1600"
-        )
+        Some("seriesId=BTC-ABOVE-DAILY&eventId=BTC-ABOVE-DAILY-260224-1600")
     );
     assert!(!req.is_signed());
 }
@@ -682,8 +679,7 @@ async fn get_settlement_history_parses_nested_details() {
     }],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
-    let request =
-        super::SettlementHistoryRequest::new("XRP-USD").limit("100");
+    let request = super::SettlementHistoryRequest::new("XRP-USD").limit("100");
 
     let rows = client
         .public_data()
