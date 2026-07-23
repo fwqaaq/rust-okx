@@ -70,9 +70,7 @@ impl<'a, T: Transport> TradingData<'a, T> {
         &self,
         request: &ContractTakerVolumeRequest<'_>,
     ) -> Result<Vec<TakerVolume>, Error> {
-        self.client
-            .get(CONTRACT_TAKER_VOLUME, request, false)
-            .await
+        self.client.get(CONTRACT_TAKER_VOLUME, request, false).await
     }
 
     /// Retrieve the margin long/short loan ratio.
@@ -196,9 +194,7 @@ impl<'a, T: Transport> TradingData<'a, T> {
         &self,
         request: &OptionHistoryRequest<'_>,
     ) -> Result<Vec<PutCallRatio>, Error> {
-        self.client
-            .get(OPTION_PUT_CALL_RATIO, request, false)
-            .await
+        self.client.get(OPTION_PUT_CALL_RATIO, request, false).await
     }
 
     /// Retrieve option open interest and volume by expiry.
