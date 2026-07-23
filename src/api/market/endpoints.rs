@@ -9,8 +9,7 @@ pub(super) const HISTORY_CANDLES: &str = "/api/v5/market/history-candles";
 pub(super) const INDEX_CANDLES: &str = "/api/v5/market/index-candles";
 pub(super) const HISTORY_INDEX_CANDLES: &str = "/api/v5/market/history-index-candles";
 pub(super) const MARK_PRICE_CANDLES: &str = "/api/v5/market/mark-price-candles";
-pub(super) const HISTORY_MARK_PRICE_CANDLES: &str =
-    "/api/v5/market/history-mark-price-candles";
+pub(super) const HISTORY_MARK_PRICE_CANDLES: &str = "/api/v5/market/history-mark-price-candles";
 pub(super) const TRADES: &str = "/api/v5/market/trades";
 pub(super) const HISTORY_TRADES: &str = "/api/v5/market/history-trades";
 pub(super) const PLATFORM_24_VOLUME: &str = "/api/v5/market/platform-24-volume";
