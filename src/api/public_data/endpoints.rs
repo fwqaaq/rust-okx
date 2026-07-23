@@ -25,6 +25,5 @@ pub(super) const EVENT_CONTRACT_SERIES: &str = "/api/v5/public/event-contract/se
 pub(super) const EVENT_CONTRACT_EVENTS: &str = "/api/v5/public/event-contract/events";
 pub(super) const EVENT_CONTRACT_MARKETS: &str = "/api/v5/public/event-contract/markets";
 pub(super) const BLOCK_TRADES: &str = "/api/v5/public/block-trades";
-pub(super) const ESTIMATED_SETTLEMENT_INFO: &str =
-    "/api/v5/public/estimated-settlement-info";
+pub(super) const ESTIMATED_SETTLEMENT_INFO: &str = "/api/v5/public/estimated-settlement-info";
 pub(super) const SETTLEMENT_HISTORY: &str = "/api/v5/public/settlement-history";
