@@ -166,9 +166,7 @@ impl<'a, T: Transport> Market<'a, T> {
         &self,
         request: &CandlesticksRequest<'_>,
     ) -> Result<Vec<IndexCandle>, Error> {
-        self.client
-            .get(HISTORY_INDEX_CANDLES, request, false)
-            .await
+        self.client.get(HISTORY_INDEX_CANDLES, request, false).await
     }
 
     /// Retrieve mark-price candlestick data.
