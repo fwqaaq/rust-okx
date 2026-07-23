@@ -196,6 +196,7 @@ const ENDPOINT_SOURCES: &[&str] = &[
     include_str!("../src/api/market/endpoints.rs"),
     include_str!("../src/api/public_data/endpoints.rs"),
     include_str!("../src/api/trade/endpoints.rs"),
+    include_str!("../src/api/trading_data/endpoints.rs"),
     include_str!("../src/api/convert/api.rs"),
 ];
 
@@ -227,6 +228,7 @@ const TEST_SOURCES: &[(&str, &str)] = &[
     ("public_data/todo.rs", include_str!("public_data/todo.rs")),
     ("trade/read_only.rs", include_str!("trade/read_only.rs")),
     ("trade/todo.rs", include_str!("trade/todo.rs")),
+    ("trading_data.rs", include_str!("trading_data.rs")),
     ("lifecycle_demo.rs", include_str!("lifecycle_demo.rs")),
 ];
 
