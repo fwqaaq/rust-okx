@@ -192,6 +192,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
 const ENDPOINT_SOURCES: &[&str] = &[
     include_str!("../src/api/account/endpoints.rs"),
     include_str!("../src/api/finance/endpoints.rs"),
+    include_str!("../src/api/fiat/endpoints.rs"),
     include_str!("../src/api/funding/endpoints.rs"),
     include_str!("../src/api/market/endpoints.rs"),
     include_str!("../src/api/public_data/endpoints.rs"),
@@ -208,6 +209,7 @@ const TEST_SOURCES: &[(&str, &str)] = &[
     ("convert/todo.rs", include_str!("convert/todo.rs")),
     ("finance/read_only.rs", include_str!("finance/read_only.rs")),
     ("finance/todo.rs", include_str!("finance/todo.rs")),
+    ("fiat.rs", include_str!("fiat.rs")),
     ("funding/read_only.rs", include_str!("funding/read_only.rs")),
     ("funding/todo.rs", include_str!("funding/todo.rs")),
     ("market/core.rs", include_str!("market/core.rs")),

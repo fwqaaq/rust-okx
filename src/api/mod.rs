@@ -6,6 +6,7 @@
 
 pub mod account;
 pub mod convert;
+pub mod fiat;
 pub mod finance;
 pub mod funding;
 pub mod market;
