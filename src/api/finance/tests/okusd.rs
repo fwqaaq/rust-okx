@@ -1,9 +1,7 @@
 use http::Method;
 
 use super::signed_client;
-use crate::api::finance::{
-    OkusdRedeemRequest, OkusdRedeemType, OkusdSubscribeRequest,
-};
+use crate::api::finance::{OkusdRedeemRequest, OkusdRedeemType, OkusdSubscribeRequest};
 use crate::test_util::MockTransport;
 
 #[tokio::test]
@@ -45,8 +43,7 @@ async fn redeem_matches_official_fast_example() {
     let body = r#"{"code":"0","msg":"","data":[{"ordId":"680012345678905678","clOrdId":"my-redeem-001","ccy":"OKUSD","amt":"1000.00000000","fee":"1.00000000","usdtAmt":"999.00000000","redeemType":"1","state":"success","estSettlementTime":"1718500010000","ts":"1718500000000"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request =
-        OkusdRedeemRequest::new("1000.00000000", OkusdRedeemType::Fast, "my-redeem-001");
+    let request = OkusdRedeemRequest::new("1000.00000000", OkusdRedeemType::Fast, "my-redeem-001");
 
     let rows = client.finance().okusd().redeem(&request).await.unwrap();
 
