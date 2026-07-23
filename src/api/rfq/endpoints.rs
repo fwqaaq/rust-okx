@@ -12,8 +12,7 @@ pub(super) const RFQS: &str = "/api/v5/rfq/rfqs";
 pub(super) const QUOTES: &str = "/api/v5/rfq/quotes";
 pub(super) const TRADES: &str = "/api/v5/rfq/trades";
 pub(super) const PUBLIC_TRADES: &str = "/api/v5/rfq/public-trades";
-pub(super) const MAKER_INSTRUMENT_SETTINGS: &str =
-    "/api/v5/rfq/maker-instrument-settings";
+pub(super) const MAKER_INSTRUMENT_SETTINGS: &str = "/api/v5/rfq/maker-instrument-settings";
 pub(super) const MMP_CONFIG: &str = "/api/v5/rfq/mmp-config";
 pub(super) const MMP_RESET: &str = "/api/v5/rfq/mmp-reset";
 pub(super) const CANCEL_ALL_AFTER: &str = "/api/v5/rfq/cancel-all-after";
