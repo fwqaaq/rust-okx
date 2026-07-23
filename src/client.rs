@@ -17,6 +17,7 @@ use crate::api::status::Status;
 use crate::api::sub_account::SubAccount;
 use crate::api::support::Support;
 use crate::api::trade::Trade;
+use crate::api::trading_data::TradingData;
 use crate::credentials::Credentials;
 use crate::error::{Error, RestError};
 use crate::model::OkxResponse;
@@ -107,6 +108,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access the (authenticated) trading endpoints.
     pub fn trade(&self) -> Trade<'_, T> {
         Trade::new(self)
+    }
+
+    /// Access the public trading-statistics endpoints.
+    pub fn trading_data(&self) -> TradingData<'_, T> {
+        TradingData::new(self)
     }
 
     /// Send a `GET` request, serializing `query` into the URL query string and
