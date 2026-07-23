@@ -4,7 +4,8 @@
 use std::sync::{Arc, Mutex};
 
 use bytes::Bytes;
-use http::{HeaderMap, Method};
+use http::header::CONTENT_TYPE;
+use http::{HeaderMap, HeaderValue, Method};
 
 use crate::transport::{Transport, TransportError};
 
@@ -46,6 +47,7 @@ impl CapturedRequest {
 pub(crate) struct MockTransport {
     status: u16,
     response: Bytes,
+    content_type: Option<HeaderValue>,
     captured: Arc<Mutex<Option<CapturedRequest>>>,
 }
 
@@ -55,8 +57,15 @@ impl MockTransport {
         Self {
             status: 200,
             response: Bytes::copy_from_slice(body.as_bytes()),
+            content_type: None,
             captured: Arc::new(Mutex::new(None)),
         }
+    }
+
+    /// Set the fixed response's `Content-Type` header.
+    pub fn with_content_type(mut self, content_type: &'static str) -> Self {
+        self.content_type = Some(HeaderValue::from_static(content_type));
+        self
     }
 
     /// The request that was sent. Panics if nothing was sent.
@@ -82,8 +91,11 @@ impl Transport for MockTransport {
             headers: parts.headers,
             body,
         });
-        let response = http::Response::builder()
-            .status(self.status)
+        let mut builder = http::Response::builder().status(self.status);
+        if let Some(content_type) = &self.content_type {
+            builder = builder.header(CONTENT_TYPE, content_type.clone());
+        }
+        let response = builder
             .body(self.response.clone())
             .expect("valid mock response");
         std::future::ready(Ok(response))
