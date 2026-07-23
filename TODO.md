@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **224/395 (56.7%)**
+> Progress: **237/395 (60.0%)**
 
 ## Account
 
@@ -230,21 +230,21 @@
 
 ## Fiat
 
-- [ ] GET /api/v5/fiat/deposit-payment-methods
-- [ ] GET /api/v5/fiat/withdrawal-payment-methods
-- [ ] POST /api/v5/fiat/create-withdrawal
-- [ ] POST /api/v5/fiat/cancel-withdrawal
-- [ ] GET /api/v5/fiat/withdrawal-order-history
-- [ ] GET /api/v5/fiat/withdrawal
-- [ ] GET /api/v5/fiat/deposit-order-history
-- [ ] GET /api/v5/fiat/deposit
-- [ ] GET /api/v5/fiat/buy-sell/currencies
-- [ ] GET /api/v5/fiat/buy-sell/currency-pair
-- [ ] POST /api/v5/fiat/buy-sell/quote
-- [ ] POST /api/v5/fiat/buy-sell/trade
-- [ ] GET /api/v5/fiat/buy-sell/history
+- [x] GET /api/v5/fiat/deposit-payment-methods
+- [x] GET /api/v5/fiat/withdrawal-payment-methods
+- [x] POST /api/v5/fiat/create-withdrawal
+- [x] POST /api/v5/fiat/cancel-withdrawal
+- [x] GET /api/v5/fiat/withdrawal-order-history
+- [x] GET /api/v5/fiat/withdrawal
+- [x] GET /api/v5/fiat/deposit-order-history
+- [x] GET /api/v5/fiat/deposit
+- [x] GET /api/v5/fiat/buy-sell/currencies
+- [x] GET /api/v5/fiat/buy-sell/currency-pair
+- [x] POST /api/v5/fiat/buy-sell/quote
+- [x] POST /api/v5/fiat/buy-sell/trade
+- [x] GET /api/v5/fiat/buy-sell/history
 
-<!-- Fiat: 0/13 implemented -->
+<!-- Fiat: 13/13 implemented -->
 
 ## Sub-account
 
