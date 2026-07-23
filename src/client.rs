@@ -21,6 +21,7 @@ use crate::api::sub_account::SubAccount;
 use crate::api::support::Support;
 use crate::api::trade::Trade;
 use crate::api::trading_data::TradingData;
+use crate::api::trading_bot::TradingBot;
 use crate::credentials::Credentials;
 use crate::error::{Error, RestError};
 use crate::model::OkxResponse;
@@ -131,6 +132,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access Nitro Spread trading endpoints.
     pub fn spread(&self) -> SpreadTrading<'_, T> {
         SpreadTrading::new(self)
+    }
+
+    /// Access trading-bot endpoint groups.
+    pub fn trading_bot(&self) -> TradingBot<'_, T> {
+        TradingBot::new(self)
     }
 
     /// Send a `GET` request, serializing `query` into the URL query string and
