@@ -156,9 +156,7 @@ impl<'a, T: Transport> Fiat<'a, T> {
         &self,
         request: &FiatBuySellPairRequest<'_>,
     ) -> Result<Vec<FiatBuySellPair>, Error> {
-        self.client
-            .get(BUY_SELL_CURRENCY_PAIR, request, true)
-            .await
+        self.client.get(BUY_SELL_CURRENCY_PAIR, request, true).await
     }
 
     /// Request a fiat buy/sell quote.
