@@ -4,6 +4,7 @@ use crate::{Credentials, OkxClient};
 mod dual_investment;
 mod eth_staking;
 mod flexible_loan;
+mod okusd;
 mod savings;
 mod stable_rewards;
 mod sol_staking;
