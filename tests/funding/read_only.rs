@@ -1,7 +1,8 @@
 use crate::common::{env_non_empty, live_client_or_skip};
 use rust_okx::api::funding::{
     CurrencyRequest, DepositAddressRequest, DepositHistoryRequest, DepositWithdrawStatusRequest,
-    FundingBillsRequest, TransferStateRequest, WithdrawalHistoryRequest,
+    FundingBillsHistoryRequest, FundingBillsRequest, TransferStateRequest,
+    WithdrawalHistoryRequest,
 };
 
 #[tokio::test]
@@ -89,6 +90,28 @@ async fn funding_address_and_history_endpoints_parse() {
         .await
         .expect("asset/bills");
     assert!(bills.iter().all(|row| !row.ccy.is_empty()));
+
+    // API: GET /api/v5/asset/bills-history
+    // STATUS: LIVE — authenticated, read-only.
+    let bills = client
+        .funding()
+        .get_bills_history(&FundingBillsHistoryRequest::new().limit(5))
+        .await
+        .expect("asset/bills-history");
+    assert!(bills.iter().all(|row| !row.ccy.is_empty()));
+
+    // API: GET /api/v5/asset/exchange-list
+    // STATUS: LIVE — public, read-only.
+    let exchanges = client
+        .funding()
+        .get_exchange_list()
+        .await
+        .expect("asset/exchange-list");
+    assert!(
+        exchanges
+            .iter()
+            .all(|row| !row.exchange_name.is_empty() && !row.exchange_id.is_empty())
+    );
 }
 
 #[tokio::test]
