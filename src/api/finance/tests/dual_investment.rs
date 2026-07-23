@@ -28,8 +28,7 @@ async fn catalog_and_products_match_official_examples() {
     let product_body = r#"{"code":"0","msg":"","data":[{"absYield":"0.00232413","annualizedYield":"0.0541","baseCcy":"BTC","quoteCcy":"USDT","expTime":"1774598400000","interestAccrualTime":"1773244800000","listTime":"1743150759000","maxSize":"6000000","minSize":"10","notionalCcy":"USDT","optType":"P","productId":"BTC-USDT-260327-54500-P","quoteTime":"1773243808703","redeemEndTime":"1774594800000","redeemStartTime":"1773244800000","stepSz":"1","tradeEndTime":"1774584000000","strike":"54500","uly":"BTC-USD"}]}"#;
     let mock = MockTransport::new(product_body);
     let client = signed_client(mock.clone());
-    let request =
-        DualInvestmentProductsRequest::new("BTC", "USDT", DualInvestmentOptionType::Call);
+    let request = DualInvestmentProductsRequest::new("BTC", "USDT", DualInvestmentOptionType::Call);
     let rows = client
         .finance()
         .dual_investment()
@@ -50,8 +49,7 @@ async fn quote_and_trade_match_official_examples() {
     let quote_body = r#"{"code":"0","msg":"","data":[{"absYield":"0.00135182","annualizedYield":"69.65","interestAccrualTime":"1773241200000","notionalSz":"0.001","notionalCcy":"BTC","productId":"BTC-USDT-260312-72000-C","quoteId":"qtbcDCD-QUOTE17732395560537636","validUntil":"1774584000000","idxPx":"69000"}]}"#;
     let mock = MockTransport::new(quote_body);
     let client = signed_client(mock.clone());
-    let request =
-        DualInvestmentQuoteRequest::new("BTC-USDT-260327-77000-C", "1.5", "BTC");
+    let request = DualInvestmentQuoteRequest::new("BTC-USDT-260327-77000-C", "1.5", "BTC");
     let rows = client
         .finance()
         .dual_investment()
@@ -96,7 +94,8 @@ async fn redeem_flow_and_status_match_official_examples() {
     assert_eq!(rows[0].redeem_sz.as_str(), "1.4856");
     assert_eq!(mock.captured().body_str(), r#"{"ordId":"987654321"}"#);
 
-    let state_body = r#"{"code":"0","msg":"","data":[{"ordId":"987654321","state":"pending_redeem_booking"}]}"#;
+    let state_body =
+        r#"{"code":"0","msg":"","data":[{"ordId":"987654321","state":"pending_redeem_booking"}]}"#;
     let mock = MockTransport::new(state_body);
     let client = signed_client(mock.clone());
     let rows = client
