@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **190/396 (48.0%)**
+> Progress: **198/395 (50.1%)**
 
 ## Account
 
@@ -117,29 +117,29 @@
 - [x] GET /api/v5/market/ticker
 - [x] GET /api/v5/market/index-tickers
 - [x] GET /api/v5/market/books
-- [ ] GET /api/v5/market/books-full
+- [x] GET /api/v5/market/books-full
 - [x] GET /api/v5/market/candles
 - [x] GET /api/v5/market/history-candles
 - [x] GET /api/v5/market/index-candles
-- [ ] GET /api/v5/market/history-index-candles
+- [x] GET /api/v5/market/history-index-candles
 - [x] GET /api/v5/market/mark-price-candles
-- [ ] GET /api/v5/market/history-mark-price-candles
+- [x] GET /api/v5/market/history-mark-price-candles
 - [x] GET /api/v5/market/trades
 - [x] GET /api/v5/market/history-trades
 - [x] GET /api/v5/market/platform-24-volume
 - [x] GET /api/v5/market/index-components
 - [x] GET /api/v5/market/exchange-rate
-- [ ] GET /api/v5/market/open-oracle
 - [x] GET /api/v5/market/block-ticker
 - [x] GET /api/v5/market/block-tickers
 - [x] GET /api/v5/market/option/instrument-family-trades
-- [ ] GET /api/v5/market/call-auction-details
-- [ ] GET /api/v5/market/books-sbe
-- [ ] GET /api/v5/market/sprd-candles
-- [ ] GET /api/v5/market/sprd-history-candles
-- [ ] GET /api/v5/market/sprd-ticker
+- [x] GET /api/v5/market/call-auction-details
+- [x] GET /api/v5/market/books-sbe
+- [x] GET /api/v5/market/sprd-candles
+- [x] GET /api/v5/market/sprd-history-candles
+- [x] GET /api/v5/market/sprd-ticker
 
-<!-- Market Data: 16/25 implemented -->
+<!-- Market Data: 24/24 implemented -->
+<!-- open-oracle is excluded: OKX took the endpoint offline on 2025-01-07. -->
 
 ## Public Data
 
