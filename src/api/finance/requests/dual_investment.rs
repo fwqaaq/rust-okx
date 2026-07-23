@@ -103,10 +103,7 @@ pub struct DualInvestmentRedeemRequest<'a> {
 
 impl<'a> DualInvestmentRedeemRequest<'a> {
     /// Select the order and redeem quote.
-    pub fn new(
-        ord_id: impl Into<Cow<'a, str>>,
-        quote_id: impl Into<Cow<'a, str>>,
-    ) -> Self {
+    pub fn new(ord_id: impl Into<Cow<'a, str>>, quote_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             ord_id: ord_id.into(),
             quote_id: quote_id.into(),
