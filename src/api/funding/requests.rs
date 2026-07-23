@@ -544,28 +544,40 @@ impl<'a> FundingBillsHistoryRequest<'a> {
 /// Month accepted by the monthly-statement endpoints.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub enum StatementMonth {
+    /// January.
     #[serde(rename = "Jan")]
     January,
+    /// February.
     #[serde(rename = "Feb")]
     February,
+    /// March.
     #[serde(rename = "Mar")]
     March,
+    /// April.
     #[serde(rename = "Apr")]
     April,
+    /// May.
     #[serde(rename = "May")]
     May,
+    /// June.
     #[serde(rename = "Jun")]
     June,
+    /// July.
     #[serde(rename = "Jul")]
     July,
+    /// August.
     #[serde(rename = "Aug")]
     August,
+    /// September.
     #[serde(rename = "Sep")]
     September,
+    /// October.
     #[serde(rename = "Oct")]
     October,
+    /// November.
     #[serde(rename = "Nov")]
     November,
+    /// December.
     #[serde(rename = "Dec")]
     December,
 }
