@@ -376,7 +376,9 @@ impl<'a, T: Transport> PublicData<'a, T> {
         &self,
         request: &EventContractMarketsRequest<'_>,
     ) -> Result<Vec<EventContractMarket>, Error> {
-        self.client.get(EVENT_CONTRACT_MARKETS, request, false).await
+        self.client
+            .get(EVENT_CONTRACT_MARKETS, request, false)
+            .await
     }
 
     /// Retrieve delayed public single-leg block trades for an instrument.
