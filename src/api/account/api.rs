@@ -202,6 +202,25 @@ impl<'a, T: Transport> Account<'a, T> {
         self.client.get(COLLATERAL_ASSETS, request, true).await
     }
 
+    /// Check whether the account can switch its delta-neutral strategy mode.
+    ///
+    /// `GET /api/v5/account/precheck-set-delta-neutral`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-precheck-set-delta-neutral).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn precheck_set_delta_neutral(
+        &self,
+        request: &PrecheckSetDeltaNeutralRequest<'_>,
+    ) -> Result<Vec<PrecheckSetDeltaNeutralResult>, Error> {
+        self.client
+            .get(PRECHECK_SET_DELTA_NEUTRAL, request, true)
+            .await
+    }
+
     /// Set leverage for an instrument or currency.
     ///
     /// `POST /api/v5/account/set-leverage`. Authenticated.
@@ -569,6 +588,146 @@ impl<'a, T: Transport> Account<'a, T> {
         request: &PositionBuilderRequest<'_>,
     ) -> Result<Vec<PositionBuilderResult>, Error> {
         self.client.post(POSITION_BUILDER, request, true).await
+    }
+
+    /// Build an MMR trend graph for simulated positions and assets.
+    ///
+    /// `POST /api/v5/account/position-builder-graph`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder-trend-graph).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn position_builder_graph(
+        &self,
+        request: &PositionBuilderGraphRequest<'_>,
+    ) -> Result<Vec<PositionBuilderGraphResult>, Error> {
+        self.client
+            .post(POSITION_BUILDER_GRAPH, request, true)
+            .await
+    }
+
+    /// Move positions between the master account and a sub-account.
+    ///
+    /// `POST /api/v5/account/move-positions`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-move-positions).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn move_positions(
+        &self,
+        request: &MovePositionsRequest<'_>,
+    ) -> Result<Vec<MovePositionsResult>, Error> {
+        self.client.post(MOVE_POSITIONS, request, true).await
+    }
+
+    /// Retrieve position-transfer details from the last three days.
+    ///
+    /// `GET /api/v5/account/move-positions-history`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-move-positions-history).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn get_move_positions_history(
+        &self,
+        request: &MovePositionsHistoryRequest<'_>,
+    ) -> Result<Vec<MovePositionsResult>, Error> {
+        self.client.get(MOVE_POSITIONS_HISTORY, request, true).await
+    }
+
+    /// Set the settlement currency for USD-margined contracts.
+    ///
+    /// `POST /api/v5/account/set-settle-currency`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-settle-currency).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_settle_currency(
+        &self,
+        request: &SetSettleCurrencyRequest<'_>,
+    ) -> Result<Vec<SetSettleCurrencyResult>, Error> {
+        self.client.post(SET_SETTLE_CURRENCY, request, true).await
+    }
+
+    /// Set whether spot fees are charged in the obtained or quote currency.
+    ///
+    /// `POST /api/v5/account/set-fee-type`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-fee-type).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_fee_type(
+        &self,
+        request: &SetFeeTypeRequest<'_>,
+    ) -> Result<Vec<SetFeeTypeResult>, Error> {
+        self.client.post(SET_FEE_TYPE, request, true).await
+    }
+
+    /// Retrieve precheck information for an account-mode switch.
+    ///
+    /// `GET /api/v5/account/set-account-switch-precheck`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-precheck-account-mode-switch).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn precheck_account_switch(
+        &self,
+        request: &AccountSwitchPrecheckRequest<'_>,
+    ) -> Result<Vec<AccountSwitchPrecheckResult>, Error> {
+        self.client
+            .get(ACCOUNT_SWITCH_PRECHECK, request, true)
+            .await
+    }
+
+    /// Preset information required for an account-mode switch.
+    ///
+    /// `POST /api/v5/account/account-level-switch-preset`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-preset-account-mode-switch).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn preset_account_switch(
+        &self,
+        request: &AccountSwitchPresetRequest<'_>,
+    ) -> Result<Vec<AccountSwitchPresetResult>, Error> {
+        self.client.post(ACCOUNT_SWITCH_PRESET, request, true).await
+    }
+
+    /// Update an account trading configuration.
+    ///
+    /// `POST /api/v5/account/set-trading-config`. Authenticated.
+    ///
+    /// See the [OKX API documentation](https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-trading-config).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Configuration`](crate::RestError::Configuration) if no credentials are set,
+    /// [`RestError::Okx`](crate::RestError::Okx) on a non-zero OKX code, or transport/decode errors.
+    pub async fn set_trading_config(
+        &self,
+        request: &SetTradingConfigRequest<'_>,
+    ) -> Result<Vec<SetTradingConfigResult>, Error> {
+        self.client.post(SET_TRADING_CONFIG, request, true).await
     }
 
     /// Manually borrow or repay spot liabilities.

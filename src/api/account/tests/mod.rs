@@ -1,11 +1,13 @@
 use crate::test_util::MockTransport;
 use crate::{Credentials, OkxClient};
 
+mod account_mode;
 mod balance;
 mod bills;
 mod borrowing;
 mod demo;
 mod mmp;
+mod position_management;
 mod risk;
 mod trading;
 

@@ -1,20 +1,24 @@
+mod account_mode;
 mod balances;
 mod borrowing;
 mod demo;
 mod history;
 mod loans;
 mod mmp;
+mod position_management;
 mod positions;
 mod risk;
 mod settings;
 mod trading;
 
+pub use account_mode::*;
 pub use balances::*;
 pub use borrowing::*;
 pub use demo::*;
 pub use history::*;
 pub use loans::*;
 pub use mmp::*;
+pub use position_management::*;
 pub use positions::*;
 pub use risk::*;
 pub use settings::*;

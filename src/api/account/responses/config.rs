@@ -40,6 +40,9 @@ pub struct AccountConfig {
     /// Spot offset type.
     #[serde(default)]
     pub spot_offset_type: String,
+    /// Trading strategy mode (`0` for general mode, `1` for delta-neutral mode).
+    #[serde(default)]
+    pub stgy_type: String,
     /// Role type.
     #[serde(default)]
     pub role_type: String,
