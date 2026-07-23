@@ -6,8 +6,8 @@ mod eth_staking;
 mod flexible_loan;
 mod okusd;
 mod savings;
-mod stable_rewards;
 mod sol_staking;
+mod stable_rewards;
 mod staking_defi;
 
 fn signed_client(mock: MockTransport) -> OkxClient<MockTransport> {
