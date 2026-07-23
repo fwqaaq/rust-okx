@@ -5,7 +5,6 @@ mod dual_investment;
 mod eth_staking;
 mod flexible_loan;
 mod savings;
-mod stable_rewards;
 mod sol_staking;
 mod staking_defi;
 
