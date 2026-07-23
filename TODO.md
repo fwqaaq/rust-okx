@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **198/395 (50.1%)**
+> Progress: **205/395 (51.9%)**
 
 ## Account
 
@@ -163,16 +163,16 @@
 - [x] GET /api/v5/public/option-trades
 - [x] GET /api/v5/public/market-data-history
 - [x] GET /api/v5/public/economic-calendar
-- [ ] GET /api/v5/public/premium-history
-- [ ] GET /api/v5/public/event-contract/series
-- [ ] GET /api/v5/public/event-contract/events
-- [ ] GET /api/v5/public/event-contract/markets
-- [ ] GET /api/v5/public/block-trades
-- [ ] GET /api/v5/public/estimated-settlement-info
+- [x] GET /api/v5/public/premium-history
+- [x] GET /api/v5/public/event-contract/series
+- [x] GET /api/v5/public/event-contract/events
+- [x] GET /api/v5/public/event-contract/markets
+- [x] GET /api/v5/public/block-trades
+- [x] GET /api/v5/public/estimated-settlement-info
 - [x] GET /api/v5/public/mm-instrument-types
-- [ ] GET /api/v5/public/settlement-history
+- [x] GET /api/v5/public/settlement-history
 
-<!-- Public Data: 19/28 implemented -->
+<!-- Public Data: 28/28 implemented -->
 
 ## Trading Data
 
