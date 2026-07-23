@@ -322,4 +322,104 @@ impl<'a, T: Transport> PublicData<'a, T> {
     ) -> Result<Vec<EconomicCalendar>, Error> {
         self.client.get(ECONOMIC_CALENDAR, request, true).await
     }
+
+    /// Retrieve swap premium history from the past six months.
+    ///
+    /// `GET /api/v5/public/premium-history`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_premium_history(
+        &self,
+        request: &PremiumHistoryRequest<'_>,
+    ) -> Result<Vec<PremiumHistory>, Error> {
+        self.client.get(PREMIUM_HISTORY, request, false).await
+    }
+
+    /// Retrieve prediction-market series metadata.
+    ///
+    /// `GET /api/v5/public/event-contract/series`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_event_contract_series(
+        &self,
+        request: &EventContractSeriesRequest<'_>,
+    ) -> Result<Vec<EventContractSeries>, Error> {
+        self.client.get(EVENT_CONTRACT_SERIES, request, false).await
+    }
+
+    /// Retrieve prediction-market events.
+    ///
+    /// `GET /api/v5/public/event-contract/events`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_event_contract_events(
+        &self,
+        request: &EventContractEventsRequest<'_>,
+    ) -> Result<Vec<EventContractEvent>, Error> {
+        self.client.get(EVENT_CONTRACT_EVENTS, request, false).await
+    }
+
+    /// Retrieve prediction-market instruments.
+    ///
+    /// `GET /api/v5/public/event-contract/markets`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_event_contract_markets(
+        &self,
+        request: &EventContractMarketsRequest<'_>,
+    ) -> Result<Vec<EventContractMarket>, Error> {
+        self.client.get(EVENT_CONTRACT_MARKETS, request, false).await
+    }
+
+    /// Retrieve delayed public single-leg block trades for an instrument.
+    ///
+    /// `GET /api/v5/public/block-trades`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_public_block_trades(
+        &self,
+        request: &InstIdRequest<'_>,
+    ) -> Result<Vec<PublicBlockTrade>, Error> {
+        self.client.get(BLOCK_TRADES, request, false).await
+    }
+
+    /// Retrieve the estimated futures settlement price.
+    ///
+    /// `GET /api/v5/public/estimated-settlement-info`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_estimated_settlement_info(
+        &self,
+        request: &InstIdRequest<'_>,
+    ) -> Result<Vec<EstimatedSettlementInfo>, Error> {
+        self.client
+            .get(ESTIMATED_SETTLEMENT_INFO, request, false)
+            .await
+    }
+
+    /// Retrieve futures settlement history from the past three months.
+    ///
+    /// `GET /api/v5/public/settlement-history`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_system_time`](Self::get_system_time).
+    pub async fn get_settlement_history(
+        &self,
+        request: &SettlementHistoryRequest<'_>,
+    ) -> Result<Vec<SettlementHistory>, Error> {
+        self.client.get(SETTLEMENT_HISTORY, request, false).await
+    }
 }
