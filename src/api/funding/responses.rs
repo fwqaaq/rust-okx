@@ -244,6 +244,9 @@ pub struct FundingBill {
     /// Currency code.
     #[serde(default)]
     pub ccy: String,
+    /// Client-supplied transfer or withdrawal ID.
+    #[serde(default, rename = "clientId")]
+    pub client_id: String,
     /// Balance change.
     #[serde(default)]
     pub bal_chg: NumberString,
@@ -253,9 +256,51 @@ pub struct FundingBill {
     /// Bill type.
     #[serde(default, rename = "type")]
     pub bill_type: String,
+    /// Notes associated with the bill.
+    #[serde(default)]
+    pub notes: String,
     /// Timestamp.
     #[serde(default)]
     pub ts: NumberString,
+}
+
+/// Exchange recognized by OKX's public exchange list.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct Exchange {
+    /// Exchange name.
+    #[serde(default, rename = "exchName")]
+    pub exchange_name: String,
+    /// Exchange decentralized identifier.
+    #[serde(default, rename = "exchId")]
+    pub exchange_id: String,
+}
+
+/// Result of applying for a monthly statement.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct MonthlyStatementApplication {
+    /// Download-link generation time as a Unix-millisecond string.
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// State of a requested monthly statement.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct MonthlyStatement {
+    /// Download file link.
+    #[serde(default, rename = "fileHref")]
+    pub file_href: String,
+    /// Download-link generation time as a Unix-millisecond integer.
+    #[serde(default)]
+    pub ts: i64,
+    /// Download-link status (`finished` or `ongoing`).
+    #[serde(default)]
+    pub state: String,
 }
 
 /// Lightning deposit invoice.
