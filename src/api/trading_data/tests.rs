@@ -35,7 +35,8 @@ async fn instrument_history_endpoints_match_official_array_responses() {
         .begin("1701417000000")
         .limit(100);
 
-    let body = r#"{"code":"0","msg":"","data":[["1701417600000","731377.57500501","111","8888888"]]}"#;
+    let body =
+        r#"{"code":"0","msg":"","data":[["1701417600000","731377.57500501","111","8888888"]]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
     let rows = client
@@ -53,9 +54,7 @@ async fn instrument_history_endpoints_match_official_array_responses() {
     );
     assert_eq!(
         mock.captured().query(),
-        Some(
-            "instId=BTC-USDT-SWAP&period=5m&end=1701417700000&begin=1701417000000&limit=100"
-        )
+        Some("instId=BTC-USDT-SWAP&period=5m&end=1701417700000&begin=1701417000000&limit=100")
     );
 
     let ratio_body = r#"{"code":"0","msg":"","data":[["1701417600000","1.1739"]]}"#;
@@ -97,8 +96,7 @@ async fn instrument_history_endpoints_match_official_array_responses() {
 
 #[tokio::test]
 async fn taker_volume_endpoints_match_official_responses() {
-    let body =
-        r#"{"code":"0","data":[["1630425600000","7596.2651","7149.4855"]],"msg":""}"#;
+    let body = r#"{"code":"0","data":[["1630425600000","7596.2651","7149.4855"]],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
     let request = TakerVolumeRequest::new("BTC", TakerVolumeInstrumentType::Spot)
@@ -192,8 +190,7 @@ async fn currency_history_endpoints_match_official_responses() {
 #[tokio::test]
 async fn option_endpoints_match_official_responses() {
     let request = OptionHistoryRequest::new("BTC").period("1D");
-    let volume_body =
-        r#"{"code":"0","data":[["1630368000000","3458.1000","78.8000"]],"msg":""}"#;
+    let volume_body = r#"{"code":"0","data":[["1630368000000","3458.1000","78.8000"]],"msg":""}"#;
     let mock = MockTransport::new(volume_body);
     let client = OkxClient::with_transport(mock.clone()).build();
     let rows = client
@@ -204,8 +201,7 @@ async fn option_endpoints_match_official_responses() {
     assert_eq!(rows[0].oi.as_str(), "3458.1000");
     assert_eq!(mock.captured().query(), Some("ccy=BTC&period=1D"));
 
-    let ratio_body =
-        r#"{"code":"0","data":[["1630512000000","2.7261","2.3447"]],"msg":""}"#;
+    let ratio_body = r#"{"code":"0","data":[["1630512000000","2.7261","2.3447"]],"msg":""}"#;
     let mock = MockTransport::new(ratio_body);
     let client = OkxClient::with_transport(mock).build();
     let rows = client
@@ -244,8 +240,7 @@ async fn option_endpoints_match_official_responses() {
         Some("ccy=BTC&expTime=20210901&period=1D")
     );
 
-    let flow_body =
-        r#"{"code":"0","data":["1630512000000","8.55","67.3","16.05","16.3","126.4","40.7"],"msg":""}"#;
+    let flow_body = r#"{"code":"0","data":["1630512000000","8.55","67.3","16.05","16.3","126.4","40.7"],"msg":""}"#;
     let mock = MockTransport::new(flow_body);
     let client = OkxClient::with_transport(mock.clone()).build();
     let flow = client
