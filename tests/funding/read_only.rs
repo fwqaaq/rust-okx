@@ -1,7 +1,8 @@
 use crate::common::{env_non_empty, live_client_or_skip};
 use rust_okx::api::funding::{
     CurrencyRequest, DepositAddressRequest, DepositHistoryRequest, DepositWithdrawStatusRequest,
-    FundingBillsHistoryRequest, FundingBillsRequest, TransferStateRequest, WithdrawalHistoryRequest,
+    FundingBillsHistoryRequest, FundingBillsRequest, TransferStateRequest,
+    WithdrawalHistoryRequest,
 };
 
 #[tokio::test]
