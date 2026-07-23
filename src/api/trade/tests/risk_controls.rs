@@ -42,9 +42,7 @@ async fn cancel_all_after_posts_documented_body() {
     assert_eq!(result[0].ts.as_str(), "1587971400");
 
     let captured = mock.captured();
-    assert!(captured
-        .uri
-        .ends_with("/api/v5/trade/cancel-all-after"));
+    assert!(captured.uri.ends_with("/api/v5/trade/cancel-all-after"));
     assert!(captured.is_signed());
     let sent: serde_json::Value = serde_json::from_str(captured.body_str()).unwrap();
     assert_eq!(sent["timeOut"], "60");
@@ -69,9 +67,7 @@ async fn get_account_rate_limit_sends_signed_empty_query() {
 
     let captured = mock.captured();
     assert_eq!(captured.method, http::Method::GET);
-    assert!(captured
-        .uri
-        .ends_with("/api/v5/trade/account-rate-limit"));
+    assert!(captured.uri.ends_with("/api/v5/trade/account-rate-limit"));
     assert_eq!(captured.query(), None);
     assert!(captured.is_signed());
 }
@@ -125,10 +121,7 @@ async fn order_precheck_posts_only_documented_fields_and_decodes_response() {
         result[0].liq_px_diff.as_str(),
         "-57693.044376796888536773622035980224609375"
     );
-    assert_eq!(
-        result[0].liq_px_diff_ratio.as_str(),
-        "-0.8950500152315991"
-    );
+    assert_eq!(result[0].liq_px_diff_ratio.as_str(), "-0.8950500152315991");
     assert_eq!(result[0].mgn_ratio.as_str(), "0");
     assert_eq!(result[0].mgn_ratio_chg.as_str(), "0");
     assert_eq!(result[0].mmr.as_str(), "0");
