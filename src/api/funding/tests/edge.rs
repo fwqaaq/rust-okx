@@ -1,7 +1,7 @@
 use http::Method;
 
-use crate::test_util::MockTransport;
 use crate::OkxClient;
+use crate::test_util::MockTransport;
 
 use super::super::{
     ApplyMonthlyStatementRequest, FundingBillsHistoryRequest, MonthlyStatementRequest,
@@ -24,11 +24,7 @@ async fn bills_history_matches_official_response_example() {
         .limit(100)
         .paging_type("1");
 
-    let rows = client
-        .funding()
-        .get_bills_history(&request)
-        .await
-        .unwrap();
+    let rows = client.funding().get_bills_history(&request).await.unwrap();
 
     assert_eq!(rows[0].bill_id, "12344");
     assert_eq!(rows[0].bal_chg.as_str(), "2");
