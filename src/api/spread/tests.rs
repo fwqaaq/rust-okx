@@ -1,8 +1,8 @@
 use http::Method;
 
 use super::{
-    SpreadBooksRequest, SpreadCancelAllAfterRequest, SpreadOrderRequest,
-    SpreadPublicTradesRequest, SpreadTradesRequest, SpreadsRequest,
+    SpreadBooksRequest, SpreadCancelAllAfterRequest, SpreadOrderRequest, SpreadPublicTradesRequest,
+    SpreadTradesRequest, SpreadsRequest,
 };
 use crate::test_util::MockTransport;
 use crate::{Credentials, OkxClient};
@@ -65,9 +65,8 @@ async fn place_order_matches_official_example() {
     let body = r#"{"code":"0","msg":"","data":[{"clOrdId":"b15","ordId":"312269865356374016","tag":"","sCode":"0","sMsg":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
-    let request =
-        SpreadOrderRequest::new("BTC-USDT_BTC-USDT-SWAP", "buy", "limit", "2", "2.15")
-            .client_order_id("b15");
+    let request = SpreadOrderRequest::new("BTC-USDT_BTC-USDT-SWAP", "buy", "limit", "2", "2.15")
+        .client_order_id("b15");
 
     let rows = client.spread().place_order(&request).await.unwrap();
 
@@ -99,8 +98,7 @@ async fn private_trades_match_official_example() {
 
 #[tokio::test]
 async fn cancel_all_after_matches_official_shape() {
-    let body =
-        r#"{"code":"0","msg":"","data":[{"triggerTime":"1587971460","ts":"1587971400"}]}"#;
+    let body = r#"{"code":"0","msg":"","data":[{"triggerTime":"1587971460","ts":"1587971400"}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
 
