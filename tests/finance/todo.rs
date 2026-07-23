@@ -63,3 +63,13 @@ fn stable_rewards_endpoints_todo() {
     // STATUS: TODO — read-only implementation is covered offline; live data requires eligible accounts.
     todo!("add an enrolled USDG fixture without restoring decommissioned trade endpoints");
 }
+
+#[test]
+#[ignore = "subscribes or redeems real USDT and OKUSD"]
+fn okusd_endpoints_todo() {
+    // API: GET /api/v5/finance/okusd/limits
+    // API: POST /api/v5/finance/okusd/subscribe
+    // API: POST /api/v5/finance/okusd/redeem
+    // STATUS: TODO — requires an eligible isolated account and strict amount caps.
+    todo!("exercise subscription and both redemption modes with funded fixtures");
+}
