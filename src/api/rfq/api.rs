@@ -105,10 +105,7 @@ impl<'a, T: Transport> Rfq<'a, T> {
     /// # Errors
     ///
     /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
-    pub async fn create_quote(
-        &self,
-        request: &CreateQuoteRequest,
-    ) -> Result<Vec<RfqQuote>, Error> {
+    pub async fn create_quote(&self, request: &CreateQuoteRequest) -> Result<Vec<RfqQuote>, Error> {
         self.client.post(CREATE_QUOTE, request, true).await
     }
 
@@ -239,9 +236,7 @@ impl<'a, T: Transport> Rfq<'a, T> {
     ///
     /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
     pub async fn get_mmp_config(&self) -> Result<Vec<RfqMmpConfig>, Error> {
-        self.client
-            .get(MMP_CONFIG, &EmptyRequest {}, true)
-            .await
+        self.client.get(MMP_CONFIG, &EmptyRequest {}, true).await
     }
 
     /// Configure block-trading maker protection.
