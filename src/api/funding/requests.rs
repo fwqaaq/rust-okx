@@ -464,6 +464,145 @@ impl<'a> FundingBillsRequest<'a> {
     }
 }
 
+/// Query parameters for [`Funding::get_bills_history`](crate::api::funding::Funding::get_bills_history).
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FundingBillsHistoryRequest<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    ccy: Option<Cow<'a, str>>,
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    bill_type: Option<Cow<'a, str>>,
+    #[serde(rename = "thirdPartyType", skip_serializing_if = "Option::is_none")]
+    third_party_type: Option<Cow<'a, str>>,
+    #[serde(rename = "clientId", skip_serializing_if = "Option::is_none")]
+    client_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    after: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    before: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<u32>,
+    #[serde(rename = "pagingType", skip_serializing_if = "Option::is_none")]
+    paging_type: Option<Cow<'a, str>>,
+}
+
+impl<'a> FundingBillsHistoryRequest<'a> {
+    /// Create an unfiltered asset-bills history query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Filter by currency.
+    pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
+        self.ccy = Some(ccy.into());
+        self
+    }
+
+    /// Filter by documented bill type.
+    pub fn bill_type(mut self, bill_type: impl Into<Cow<'a, str>>) -> Self {
+        self.bill_type = Some(bill_type.into());
+        self
+    }
+
+    /// Filter custody bills by documented third-party custody type.
+    pub fn third_party_type(mut self, third_party_type: impl Into<Cow<'a, str>>) -> Self {
+        self.third_party_type = Some(third_party_type.into());
+        self
+    }
+
+    /// Filter by a client-supplied transfer or withdrawal ID.
+    pub fn client_id(mut self, client_id: impl Into<Cow<'a, str>>) -> Self {
+        self.client_id = Some(client_id.into());
+        self
+    }
+
+    /// Return records earlier than the requested timestamp or bill ID.
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
+        self.after = Some(after.into());
+        self
+    }
+
+    /// Return records newer than the requested timestamp.
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
+        self.before = Some(before.into());
+        self
+    }
+
+    /// Set the result limit, up to 100.
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+
+    /// Set paging mode (`1` timestamp, `2` bill ID).
+    pub fn paging_type(mut self, paging_type: impl Into<Cow<'a, str>>) -> Self {
+        self.paging_type = Some(paging_type.into());
+        self
+    }
+}
+
+/// Month accepted by the monthly-statement endpoints.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+pub enum StatementMonth {
+    #[serde(rename = "Jan")]
+    January,
+    #[serde(rename = "Feb")]
+    February,
+    #[serde(rename = "Mar")]
+    March,
+    #[serde(rename = "Apr")]
+    April,
+    #[serde(rename = "May")]
+    May,
+    #[serde(rename = "Jun")]
+    June,
+    #[serde(rename = "Jul")]
+    July,
+    #[serde(rename = "Aug")]
+    August,
+    #[serde(rename = "Sep")]
+    September,
+    #[serde(rename = "Oct")]
+    October,
+    #[serde(rename = "Nov")]
+    November,
+    #[serde(rename = "Dec")]
+    December,
+}
+
+/// Request body for applying for a statement generated in the past year.
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ApplyMonthlyStatementRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    month: Option<StatementMonth>,
+}
+
+impl ApplyMonthlyStatementRequest {
+    /// Apply for the previous month's statement.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Select a month from the past year.
+    pub fn month(mut self, month: StatementMonth) -> Self {
+        self.month = Some(month);
+        self
+    }
+}
+
+/// Query for retrieving a generated statement from the past year.
+#[derive(Debug, Clone, Serialize)]
+pub struct MonthlyStatementRequest {
+    month: StatementMonth,
+}
+
+impl MonthlyStatementRequest {
+    /// Select the statement month.
+    pub fn new(month: StatementMonth) -> Self {
+        Self { month }
+    }
+}
+
 /// Query parameters for [`Funding::get_deposit_lightning`](crate::api::funding::Funding::get_deposit_lightning).
 #[derive(Debug, Clone, Serialize)]
 pub struct DepositLightningRequest<'a> {
