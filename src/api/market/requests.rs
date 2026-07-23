@@ -4,8 +4,11 @@ use serde::Serialize;
 
 use crate::model::InstType;
 
-/// Request for [`get_ticker`](crate::api::market::Market::get_ticker) and
-/// [`get_block_ticker`](crate::api::market::Market::get_block_ticker).
+/// Request for market endpoints that require one instrument ID.
+///
+/// Used by [`get_ticker`](crate::api::market::Market::get_ticker),
+/// [`get_block_ticker`](crate::api::market::Market::get_block_ticker), and
+/// [`get_call_auction_details`](crate::api::market::Market::get_call_auction_details).
 #[derive(Debug, Clone, Serialize)]
 pub struct InstIdRequest<'a> {
     #[serde(rename = "instId")]
@@ -97,6 +100,53 @@ impl<'a> OrderBookRequest<'a> {
     pub fn size(mut self, sz: u32) -> Self {
         self.sz = Some(sz);
         self
+    }
+}
+
+/// Request for [`get_full_orderbook`](crate::api::market::Market::get_full_orderbook).
+#[derive(Debug, Clone, Serialize)]
+pub struct FullOrderBookRequest<'a> {
+    #[serde(rename = "instId")]
+    inst_id: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    sz: Option<u32>,
+}
+
+impl<'a> FullOrderBookRequest<'a> {
+    /// Create a full order-book query for an instrument.
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_id: inst_id.into(),
+            sz: None,
+        }
+    }
+
+    /// Set the depth per side (OKX maximum: 5,000).
+    pub fn size(mut self, sz: u32) -> Self {
+        self.sz = Some(sz);
+        self
+    }
+}
+
+/// Request for [`get_sbe_orderbook`](crate::api::market::Market::get_sbe_orderbook).
+#[derive(Debug, Clone, Serialize)]
+pub struct SbeOrderBookRequest {
+    #[serde(rename = "instIdCode")]
+    inst_id_code: i64,
+    source: u8,
+}
+
+impl SbeOrderBookRequest {
+    /// Create an SBE order-book query for an instrument ID code.
+    ///
+    /// The official API currently supports only source `0` (the normal order
+    /// book), so it is fixed by this constructor rather than exposed as an
+    /// unrestricted value.
+    pub fn new(inst_id_code: i64) -> Self {
+        Self {
+            inst_id_code,
+            source: 0,
+        }
     }
 }
 
@@ -224,6 +274,74 @@ impl<'a> CandlesticksRequest<'a> {
     }
 
     /// Return records before this pagination cursor.
+    pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
+        self.before = Some(before.into());
+        self
+    }
+
+    /// Set the bar size, e.g. `1m`, `1H`, or `1D`.
+    pub fn bar(mut self, bar: impl Into<Cow<'a, str>>) -> Self {
+        self.bar = Some(bar.into());
+        self
+    }
+
+    /// Set the maximum number of rows to return.
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+}
+
+/// Request for [`get_spread_ticker`](crate::api::market::Market::get_spread_ticker).
+#[derive(Debug, Clone, Serialize)]
+pub struct SpreadIdRequest<'a> {
+    #[serde(rename = "sprdId")]
+    spread_id: Cow<'a, str>,
+}
+
+impl<'a> SpreadIdRequest<'a> {
+    /// Create a query for one spread ID.
+    pub fn new(spread_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            spread_id: spread_id.into(),
+        }
+    }
+}
+
+/// Query parameters for spread candlestick endpoints.
+#[derive(Debug, Clone, Serialize)]
+pub struct SpreadCandlesticksRequest<'a> {
+    #[serde(rename = "sprdId")]
+    spread_id: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    after: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    before: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    bar: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<u32>,
+}
+
+impl<'a> SpreadCandlesticksRequest<'a> {
+    /// Create a candlestick query for a spread.
+    pub fn new(spread_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            spread_id: spread_id.into(),
+            after: None,
+            before: None,
+            bar: None,
+            limit: None,
+        }
+    }
+
+    /// Return records earlier than this timestamp cursor.
+    pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
+        self.after = Some(after.into());
+        self
+    }
+
+    /// Return records newer than this timestamp cursor.
     pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self

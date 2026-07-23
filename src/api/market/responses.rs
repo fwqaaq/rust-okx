@@ -130,6 +130,56 @@ impl From<BookLevelRaw> for OrderBookLevel {
     }
 }
 
+/// A full order book snapshot.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct FullOrderBook {
+    /// Ask levels, sorted from best (lowest) price.
+    #[serde(default)]
+    pub asks: Vec<FullOrderBookLevel>,
+    /// Bid levels, sorted from best (highest) price.
+    #[serde(default)]
+    pub bids: Vec<FullOrderBookLevel>,
+    /// Snapshot timestamp (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// A single price level in a [`FullOrderBook`].
+///
+/// On the wire OKX encodes a full-book level as
+/// `[price, size, order_count]`.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(from = "FullBookLevelRaw")]
+#[non_exhaustive]
+pub struct FullOrderBookLevel {
+    /// Price at this level.
+    pub price: NumberString,
+    /// Aggregated size available at this level.
+    pub size: NumberString,
+    /// Number of orders aggregated at this level.
+    pub order_count: NumberString,
+}
+
+type FullBookLevelRaw = (NumberString, NumberString, NumberString);
+
+impl From<FullBookLevelRaw> for FullOrderBookLevel {
+    fn from(raw: FullBookLevelRaw) -> Self {
+        Self {
+            price: raw.0,
+            size: raw.1,
+            order_count: raw.2,
+        }
+    }
+}
+
+/// Raw SBE binary data returned by the SBE order-book endpoint.
+///
+/// Decode these bytes with OKX's `SnapshotDepthResponseEvent` (template ID
+/// `1006`) from the official SBE XML schema.
+pub type SbeOrderBook = bytes::Bytes;
+
 /// A single candlestick (OHLCV) bar.
 ///
 /// On the wire OKX encodes a bar as a 9-element string array.
@@ -405,6 +455,125 @@ impl From<IndexCandleRaw> for IndexCandle {
             low: raw.3,
             close: raw.4,
             confirm: raw.5,
+        }
+    }
+}
+
+/// Call auction details for an instrument.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct CallAuctionDetails {
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Equilibrium price.
+    #[serde(default)]
+    pub eq_px: NumberString,
+    /// Matched size on both the buy and sell sides, in base currency.
+    #[serde(default)]
+    pub matched_sz: NumberString,
+    /// Unmatched size.
+    #[serde(default)]
+    pub unmatched_sz: NumberString,
+    /// Call auction end time (Unix milliseconds).
+    #[serde(default)]
+    pub auction_end_time: NumberString,
+    /// Trading state (`call_auction` or `continuous_trading`).
+    #[serde(default)]
+    pub state: String,
+    /// Data generation time (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// The latest ticker snapshot for a spread.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SpreadTicker {
+    /// Spread ID.
+    #[serde(default)]
+    pub sprd_id: String,
+    /// Last traded price.
+    #[serde(default)]
+    pub last: NumberString,
+    /// Last traded size.
+    #[serde(default)]
+    pub last_sz: NumberString,
+    /// Best ask price.
+    #[serde(default)]
+    pub ask_px: NumberString,
+    /// Best ask size.
+    #[serde(default)]
+    pub ask_sz: NumberString,
+    /// Best bid price.
+    #[serde(default)]
+    pub bid_px: NumberString,
+    /// Best bid size.
+    #[serde(default)]
+    pub bid_sz: NumberString,
+    /// Open price over the last 24 hours.
+    #[serde(default)]
+    pub open24h: NumberString,
+    /// Highest price over the last 24 hours.
+    #[serde(default)]
+    pub high24h: NumberString,
+    /// Lowest price over the last 24 hours.
+    #[serde(default)]
+    pub low24h: NumberString,
+    /// Trading volume over the last 24 hours.
+    #[serde(default)]
+    pub vol24h: NumberString,
+    /// Ticker data generation time (Unix milliseconds).
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// A spread candlestick bar.
+///
+/// On the wire OKX encodes a spread bar as the 7-element array
+/// `[ts, open, high, low, close, volume, confirm]`.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(from = "SpreadCandleRaw")]
+#[non_exhaustive]
+pub struct SpreadCandle {
+    /// Opening timestamp (Unix milliseconds).
+    pub ts: NumberString,
+    /// Open price.
+    pub open: NumberString,
+    /// Highest price.
+    pub high: NumberString,
+    /// Lowest price.
+    pub low: NumberString,
+    /// Close price.
+    pub close: NumberString,
+    /// Trading volume.
+    pub vol: NumberString,
+    /// `1` if the bar is closed/confirmed, `0` otherwise.
+    pub confirm: NumberString,
+}
+
+type SpreadCandleRaw = (
+    NumberString,
+    NumberString,
+    NumberString,
+    NumberString,
+    NumberString,
+    NumberString,
+    NumberString,
+);
+
+impl From<SpreadCandleRaw> for SpreadCandle {
+    fn from(raw: SpreadCandleRaw) -> Self {
+        Self {
+            ts: raw.0,
+            open: raw.1,
+            high: raw.2,
+            low: raw.3,
+            close: raw.4,
+            vol: raw.5,
+            confirm: raw.6,
         }
     }
 }

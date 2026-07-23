@@ -73,6 +73,15 @@ pub enum RestError {
         source: serde_json::Error,
     },
 
+    /// The response content type did not match the endpoint contract.
+    #[error("unexpected content type {content_type:?} from {endpoint}")]
+    UnexpectedContentType {
+        /// The endpoint path.
+        endpoint: &'static str,
+        /// The response `Content-Type` header, or `None` when it was absent.
+        content_type: Option<String>,
+    },
+
     /// The request could not be encoded (query string, JSON body, or headers).
     #[error("failed to encode request")]
     Encode {

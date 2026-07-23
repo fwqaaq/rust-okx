@@ -3,8 +3,9 @@ use crate::model::InstType;
 use crate::test_util::MockTransport;
 
 use super::{
-    CandlesRequest, IndexRequest, IndexTickersRequest, InstFamilyRequest, InstIdRequest,
-    OrderBookRequest, TickersRequest, TradesRequest,
+    CandlesRequest, CandlesticksRequest, FullOrderBookRequest, IndexRequest, IndexTickersRequest,
+    InstFamilyRequest, InstIdRequest, OrderBookRequest, SbeOrderBookRequest,
+    SpreadCandlesticksRequest, SpreadIdRequest, TickersRequest, TradesRequest,
 };
 
 #[tokio::test]
@@ -94,6 +95,46 @@ async fn get_orderbook_parses_levels_and_passes_depth() {
 }
 
 #[tokio::test]
+async fn get_full_orderbook_parses_three_field_levels() {
+    let body = r#"{"code":"0","msg":"","data":[
+            {"asks":[["41006.8","0.60038921","1"]],"bids":[["41006.3","0.30178218","2"]],
+             "ts":"1629966436396"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+
+    let request = FullOrderBookRequest::new("BTC-USDT").size(1);
+    let books = client.market().get_full_orderbook(&request).await.unwrap();
+    assert_eq!(books[0].asks[0].price.as_str(), "41006.8");
+    assert_eq!(books[0].asks[0].order_count.as_str(), "1");
+    assert_eq!(books[0].bids[0].size.as_str(), "0.30178218");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instId=BTC-USDT&sz=1"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_sbe_orderbook_parses_documented_json_error() {
+    let body = r#"{"code":"51000","msg":"Parameter instIdCode error","data":[]}"#;
+    let mock = MockTransport::new(body).with_content_type("application/json");
+    let client = OkxClient::with_transport(mock.clone()).build();
+
+    let error = client
+        .market()
+        .get_sbe_orderbook(&SbeOrderBookRequest::new(12345))
+        .await
+        .unwrap_err();
+    assert!(matches!(
+        error,
+        crate::Error::Rest(crate::RestError::Okx { code, .. }) if code == "51000"
+    ));
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instIdCode=12345&source=0"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
 async fn get_candlesticks_parses_array_rows() {
     let body = r#"{"code":"0","msg":"","data":[
             ["1597026383085","3.721","3.743","3.677","3.708","8422410","22698348.04828491","12698348.04828491","0"],
@@ -158,6 +199,27 @@ async fn get_index_candlesticks_uses_builder_query() {
 }
 
 #[tokio::test]
+async fn get_history_index_candlesticks_uses_builder_query() {
+    let body = r#"{"code":"0","msg":"","data":[
+            ["1597026383085","3.721","3.743","3.677","3.708","1"],
+            ["1597026383085","3.731","3.799","3.494","3.72","1"]]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = CandlesticksRequest::new("BTC-USD").after("10");
+
+    let candles = client
+        .market()
+        .get_history_index_candlesticks(&request)
+        .await
+        .unwrap();
+    assert_eq!(candles[0].low.as_str(), "3.677");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instId=BTC-USD&after=10"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
 async fn get_mark_price_candlesticks_uses_builder_query() {
     let body = r#"{"code":"0","msg":"","data":[
             ["1597026383085","3.721","3.743","3.677","3.708","0"],
@@ -175,6 +237,27 @@ async fn get_mark_price_candlesticks_uses_builder_query() {
 
     let req = mock.captured();
     assert_eq!(req.query(), Some("instId=BTC-USDT-SWAP&before=20"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_history_mark_price_candlesticks_uses_builder_query() {
+    let body = r#"{"code":"0","msg":"","data":[
+            ["1597026383085","3.721","3.743","3.677","3.708","1"],
+            ["1597026383085","3.731","3.799","3.494","3.72","1"]]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = CandlesticksRequest::new("BTC-USD-SWAP").before("20");
+
+    let candles = client
+        .market()
+        .get_history_mark_price_candlesticks(&request)
+        .await
+        .unwrap();
+    assert_eq!(candles[0].close.as_str(), "3.708");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instId=BTC-USD-SWAP&before=20"));
     assert!(!req.is_signed());
 }
 
@@ -232,6 +315,104 @@ async fn get_platform_24_volume_parses_volume() {
     let req = mock.captured();
     assert!(req.uri.ends_with("/api/v5/market/platform-24-volume"));
     assert_eq!(req.query(), None);
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_call_auction_details_builds_request_and_parses() {
+    let body = r#"{"code":"0","msg":"","data":[{
+        "instId":"ONDO-USDC","unmatchedSz":"9988764","eqPx":"0.6",
+        "matchedSz":"44978","state":"continuous_trading",
+        "auctionEndTime":"1726542000000","ts":"1726542000007"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+
+    let details = client
+        .market()
+        .get_call_auction_details(&InstIdRequest::new("ONDO-USDC"))
+        .await
+        .unwrap();
+    assert_eq!(details[0].inst_id, "ONDO-USDC");
+    assert_eq!(details[0].eq_px.as_str(), "0.6");
+    assert_eq!(details[0].state, "continuous_trading");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instId=ONDO-USDC"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_spread_ticker_builds_request_and_parses() {
+    let body = r#"{"code":"0","msg":"","data":[{
+        "sprdId":"BTC-USDT_BTC-USDT-SWAP","last":"14.5","lastSz":"0.5",
+        "askPx":"8.5","askSz":"12.0","bidPx":"0.5","bidSz":"12.0",
+        "open24h":"4","high24h":"14.5","low24h":"-2.2","vol24h":"6.67",
+        "ts":"1715331406485"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+
+    let ticker = client
+        .market()
+        .get_spread_ticker(&SpreadIdRequest::new("BTC-USDT_BTC-USDT-SWAP"))
+        .await
+        .unwrap();
+    assert_eq!(ticker[0].sprd_id, "BTC-USDT_BTC-USDT-SWAP");
+    assert_eq!(ticker[0].low24h.as_str(), "-2.2");
+
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("sprdId=BTC-USDT_BTC-USDT-SWAP"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_spread_candlesticks_uses_builder_query() {
+    let body = r#"{"code":"0","msg":"","data":[
+        ["1597026383085","3.721","3.743","3.677","3.708","8422410","0"],
+        ["1597026383085","3.731","3.799","3.494","3.72","24912403","1"]]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = SpreadCandlesticksRequest::new("BTC-USDT_BTC-USDT-SWAP")
+        .bar("1H")
+        .limit(2);
+
+    let candles = client
+        .market()
+        .get_spread_candlesticks(&request)
+        .await
+        .unwrap();
+    assert_eq!(candles[0].vol.as_str(), "8422410");
+    assert_eq!(candles[0].confirm.as_str(), "0");
+
+    let req = mock.captured();
+    assert_eq!(
+        req.query(),
+        Some("sprdId=BTC-USDT_BTC-USDT-SWAP&bar=1H&limit=2")
+    );
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_spread_history_candlesticks_uses_builder_query() {
+    let body = r#"{"code":"0","msg":"","data":[
+        ["1597026383085","3.721","3.743","3.677","3.708","8422410","1"],
+        ["1597026383085","3.731","3.799","3.494","3.72","24912403","1"]]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = SpreadCandlesticksRequest::new("BTC-USDT_BTC-USDT-SWAP").after("1597026383085");
+
+    let candles = client
+        .market()
+        .get_spread_history_candlesticks(&request)
+        .await
+        .unwrap();
+    assert_eq!(candles[0].open.as_str(), "3.721");
+    assert_eq!(candles[0].confirm.as_str(), "1");
+
+    let req = mock.captured();
+    assert_eq!(
+        req.query(),
+        Some("sprdId=BTC-USDT_BTC-USDT-SWAP&after=1597026383085")
+    );
     assert!(!req.is_signed());
 }
 

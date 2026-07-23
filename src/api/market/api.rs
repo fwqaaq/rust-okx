@@ -74,6 +74,43 @@ impl<'a, T: Transport> Market<'a, T> {
         self.client.get(BOOKS, request, false).await
     }
 
+    /// Retrieve the full order book for an instrument.
+    ///
+    /// `GET /api/v5/market/books-full`. Public. The endpoint returns up to
+    /// 5,000 levels per side and refreshes its server-side snapshot about once
+    /// per second.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_ticker`](Self::get_ticker).
+    pub async fn get_full_orderbook(
+        &self,
+        request: &FullOrderBookRequest<'_>,
+    ) -> Result<Vec<FullOrderBook>, Error> {
+        self.client.get(BOOKS_FULL, request, false).await
+    }
+
+    /// Retrieve the initial 400-level SBE order-book snapshot.
+    ///
+    /// `GET /api/v5/market/books-sbe`. Public. Successful responses are
+    /// returned as raw `application/sbe` bytes encoded as OKX
+    /// `SnapshotDepthResponseEvent` template ID `1006`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RestError::Okx`](crate::RestError::Okx) when OKX returns its
+    /// documented JSON error envelope, or
+    /// [`RestError::UnexpectedContentType`](crate::RestError::UnexpectedContentType)
+    /// when the response is neither SBE nor a documented JSON error.
+    pub async fn get_sbe_orderbook(
+        &self,
+        request: &SbeOrderBookRequest,
+    ) -> Result<SbeOrderBook, Error> {
+        self.client
+            .get_binary(BOOKS_SBE, request, "application/sbe")
+            .await
+    }
+
     /// Retrieve candlestick (OHLCV) data.
     ///
     /// `GET /api/v5/market/candles`. `bar` is the bar size, e.g. `1m`, `1H`,
@@ -118,6 +155,20 @@ impl<'a, T: Transport> Market<'a, T> {
         self.client.get(INDEX_CANDLES, request, false).await
     }
 
+    /// Retrieve historical index candlestick data.
+    ///
+    /// `GET /api/v5/market/history-index-candles`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_ticker`](Self::get_ticker).
+    pub async fn get_history_index_candlesticks(
+        &self,
+        request: &CandlesticksRequest<'_>,
+    ) -> Result<Vec<IndexCandle>, Error> {
+        self.client.get(HISTORY_INDEX_CANDLES, request, false).await
+    }
+
     /// Retrieve mark-price candlestick data.
     ///
     /// `GET /api/v5/market/mark-price-candles`. Public.
@@ -130,6 +181,22 @@ impl<'a, T: Transport> Market<'a, T> {
         request: &CandlesticksRequest<'_>,
     ) -> Result<Vec<IndexCandle>, Error> {
         self.client.get(MARK_PRICE_CANDLES, request, false).await
+    }
+
+    /// Retrieve historical mark-price candlestick data.
+    ///
+    /// `GET /api/v5/market/history-mark-price-candles`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_ticker`](Self::get_ticker).
+    pub async fn get_history_mark_price_candlesticks(
+        &self,
+        request: &CandlesticksRequest<'_>,
+    ) -> Result<Vec<IndexCandle>, Error> {
+        self.client
+            .get(HISTORY_MARK_PRICE_CANDLES, request, false)
+            .await
     }
 
     /// Retrieve recent trades for an instrument.
@@ -167,6 +234,64 @@ impl<'a, T: Transport> Market<'a, T> {
     pub async fn get_platform_24_volume(&self) -> Result<Vec<PlatformVolume>, Error> {
         self.client
             .get(PLATFORM_24_VOLUME, &EmptyRequest {}, false)
+            .await
+    }
+
+    /// Retrieve call auction details for an instrument.
+    ///
+    /// `GET /api/v5/market/call-auction-details`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_ticker`](Self::get_ticker).
+    pub async fn get_call_auction_details(
+        &self,
+        request: &InstIdRequest<'_>,
+    ) -> Result<Vec<CallAuctionDetails>, Error> {
+        self.client.get(CALL_AUCTION_DETAILS, request, false).await
+    }
+
+    /// Retrieve the latest ticker snapshot for a spread.
+    ///
+    /// `GET /api/v5/market/sprd-ticker`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_ticker`](Self::get_ticker).
+    pub async fn get_spread_ticker(
+        &self,
+        request: &SpreadIdRequest<'_>,
+    ) -> Result<Vec<SpreadTicker>, Error> {
+        self.client.get(SPREAD_TICKER, request, false).await
+    }
+
+    /// Retrieve recent candlestick data for a spread.
+    ///
+    /// `GET /api/v5/market/sprd-candles`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_ticker`](Self::get_ticker).
+    pub async fn get_spread_candlesticks(
+        &self,
+        request: &SpreadCandlesticksRequest<'_>,
+    ) -> Result<Vec<SpreadCandle>, Error> {
+        self.client.get(SPREAD_CANDLES, request, false).await
+    }
+
+    /// Retrieve historical candlestick data for a spread.
+    ///
+    /// `GET /api/v5/market/sprd-history-candles`. Public.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_ticker`](Self::get_ticker).
+    pub async fn get_spread_history_candlesticks(
+        &self,
+        request: &SpreadCandlesticksRequest<'_>,
+    ) -> Result<Vec<SpreadCandle>, Error> {
+        self.client
+            .get(SPREAD_HISTORY_CANDLES, request, false)
             .await
     }
 
