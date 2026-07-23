@@ -138,6 +138,93 @@ impl<T: Transport> OkxClient<T> {
         .await
     }
 
+    /// Send a public `GET` request that is expected to return a binary body.
+    pub(crate) async fn get_binary<Q>(
+        &self,
+        endpoint: &'static str,
+        query: &Q,
+        expected_content_type: &'static str,
+    ) -> Result<Bytes, Error>
+    where
+        Q: Serialize,
+    {
+        let qs = serde_urlencoded::to_string(query)
+            .map_err(|e| RestError::Encode { source: e.into() })?;
+        let request_path = if qs.is_empty() {
+            endpoint.to_owned()
+        } else {
+            format!("{endpoint}?{qs}")
+        };
+        let url = format!("{}{}", self.base_url, request_path);
+        let mut builder = http::Request::builder().method(Method::GET).uri(url);
+
+        let headers = builder
+            .headers_mut()
+            .expect("a freshly constructed request builder has no error");
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        if self.demo {
+            headers.insert(
+                HeaderName::from_static("x-simulated-trading"),
+                HeaderValue::from_static("1"),
+            );
+        }
+
+        let request = builder
+            .body(Bytes::new())
+            .map_err(|e| RestError::Encode { source: e.into() })?;
+        let response = self
+            .transport
+            .send(request)
+            .await
+            .map_err(RestError::from)?;
+        let status = response.status();
+        let content_type = response
+            .headers()
+            .get(CONTENT_TYPE)
+            .and_then(|value| value.to_str().ok())
+            .map(str::to_owned);
+        let bytes = response.into_body();
+
+        if !status.is_success() {
+            return Err(RestError::HttpStatus {
+                endpoint,
+                status,
+                body: String::from_utf8_lossy(&bytes).into_owned(),
+            }
+            .into());
+        }
+
+        let media_type = content_type
+            .as_deref()
+            .and_then(|value| value.split(';').next())
+            .map(str::trim);
+        if media_type == Some(expected_content_type) {
+            return Ok(bytes);
+        }
+
+        if media_type == Some("application/json") {
+            let envelope: OkxResponse<serde_json::Value> =
+                serde_json::from_slice(&bytes).map_err(|source| RestError::Decode {
+                    endpoint,
+                    source,
+                })?;
+            if envelope.code != "0" {
+                return Err(RestError::Okx {
+                    endpoint,
+                    code: envelope.code,
+                    message: envelope.msg,
+                }
+                .into());
+            }
+        }
+
+        Err(RestError::UnexpectedContentType {
+            endpoint,
+            content_type,
+        }
+        .into())
+    }
+
     /// Send a `POST` request with `body` serialized as JSON and return the
     /// deserialized `data` array.
     pub(crate) async fn post<B, D>(
