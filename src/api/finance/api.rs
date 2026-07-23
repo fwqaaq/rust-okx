@@ -66,6 +66,59 @@ impl<'a, T: Transport> Finance<'a, T> {
             client: self.client,
         }
     }
+
+    /// Access OKUSD endpoints.
+    pub fn okusd(&self) -> Okusd<'_, T> {
+        Okusd {
+            client: self.client,
+        }
+    }
+}
+
+/// Accessor for OKUSD endpoints.
+pub struct Okusd<'a, T> {
+    client: &'a OkxClient<T>,
+}
+
+impl<T: Transport> Okusd<'_, T> {
+    /// Retrieve the remaining OKUSD subscription and redemption quotas.
+    ///
+    /// `GET /api/v5/finance/okusd/limits`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_limits(&self) -> Result<Vec<OkusdLimits>, Error> {
+        self.client.get(OKUSD_LIMITS, &EmptyRequest {}, true).await
+    }
+
+    /// Subscribe USDT for OKUSD.
+    ///
+    /// `POST /api/v5/finance/okusd/subscribe`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn subscribe(
+        &self,
+        request: &OkusdSubscribeRequest<'_>,
+    ) -> Result<Vec<OkusdSubscription>, Error> {
+        self.client.post(OKUSD_SUBSCRIBE, request, true).await
+    }
+
+    /// Redeem OKUSD for USDT.
+    ///
+    /// `POST /api/v5/finance/okusd/redeem`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn redeem(
+        &self,
+        request: &OkusdRedeemRequest<'_>,
+    ) -> Result<Vec<OkusdRedemption>, Error> {
+        self.client.post(OKUSD_REDEEM, request, true).await
+    }
 }
 
 /// Accessor for active Stable Rewards endpoints.
