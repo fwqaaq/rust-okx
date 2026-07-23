@@ -53,3 +53,13 @@ fn dual_investment_endpoints_todo() {
     // STATUS: TODO — requires a live product, short-lived quotes, and an isolated funded account.
     todo!("exercise the two-step trade and redeem flows with strict investment caps");
 }
+
+#[test]
+#[ignore = "requires Stable Rewards enrollment and balance history"]
+fn stable_rewards_endpoints_todo() {
+    // API: GET /api/v5/finance/stable-rewards/product-info
+    // API: GET /api/v5/finance/stable-rewards/balance
+    // API: GET /api/v5/finance/stable-rewards/apy-history
+    // STATUS: TODO — read-only implementation is covered offline; live data requires eligible accounts.
+    todo!("add an enrolled USDG fixture without restoring decommissioned trade endpoints");
+}
