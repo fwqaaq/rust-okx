@@ -486,3 +486,213 @@ fn array_or_empty_string_rejects_non_empty_strings() {
             .contains("expected an array or empty string")
     );
 }
+
+#[tokio::test]
+async fn get_premium_history_uses_documented_query_and_response() {
+    let body = r#"{"code":"0","data":[{
+        "instId":"BTC-USDT-SWAP",
+        "premium":"0.0000578896878167",
+        "ts":"1713925924000"
+    }],"msg":""}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = super::PremiumHistoryRequest::new("BTC-USDT-SWAP")
+        .after("1713925924000")
+        .limit("100");
+
+    let rows = client
+        .public_data()
+        .get_premium_history(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].premium.as_str(), "0.0000578896878167");
+    let req = mock.captured();
+    assert_eq!(
+        req.query(),
+        Some("instId=BTC-USDT-SWAP&after=1713925924000&limit=100")
+    );
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_event_contract_series_parses_nested_settlement() {
+    let body = r#"{"code":"0","data":[{
+        "seriesId":"BTC-ABOVE-DAILY",
+        "freq":"daily",
+        "title":"BTC price above 15k",
+        "category":"Crypto",
+        "settlement":{
+            "method":"price_above",
+            "closeEarly":false,
+            "srcName":"okx_index",
+            "underlying":"BTC-USDT"
+        }
+    }],"msg":""}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request =
+        super::EventContractSeriesRequest::new().series_id("BTC-ABOVE-DAILY");
+
+    let rows = client
+        .public_data()
+        .get_event_contract_series(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].settlement.method, "price_above");
+    assert!(!rows[0].settlement.close_early);
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("seriesId=BTC-ABOVE-DAILY"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_event_contract_events_accepts_documented_example() {
+    let body = r#"{"code":"0","data":[{
+        "seriesId":"BTC-ABOVE-DAILY",
+        "eventId":"BTC-ABOVE-DAILY-260224-1600",
+        "expTime":"1769697132335",
+        "state":"live"
+    }],"msg":""}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = super::EventContractEventsRequest::new("BTC-ABOVE-DAILY")
+        .state("live")
+        .limit("100");
+
+    let rows = client
+        .public_data()
+        .get_event_contract_events(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].event_id, "BTC-ABOVE-DAILY-260224-1600");
+    assert!(rows[0].fix_time.is_empty());
+    let req = mock.captured();
+    assert_eq!(
+        req.query(),
+        Some("seriesId=BTC-ABOVE-DAILY&state=live&limit=100")
+    );
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_event_contract_markets_parses_all_documented_fields() {
+    let body = r#"{"code":"0","data":[{
+        "seriesId":"BTC-ABOVE-DAILY",
+        "eventId":"BTC-ABOVE-DAILY-260224-1600",
+        "instId":"BTC-ABOVE-DAILY-260224-1600-65000",
+        "listTime":"1769697132335",
+        "expTime":"1769697132335",
+        "state":"live",
+        "fixTime":"",
+        "outcome":"0",
+        "floorStrike":"120000",
+        "capStrike":"",
+        "settleValue":"",
+        "disputed":false,
+        "hitDir":""
+    }],"msg":""}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request = super::EventContractMarketsRequest::new("BTC-ABOVE-DAILY")
+        .event_id("BTC-ABOVE-DAILY-260224-1600");
+
+    let rows = client
+        .public_data()
+        .get_event_contract_markets(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].floor_strike.as_str(), "120000");
+    assert!(!rows[0].disputed);
+    let req = mock.captured();
+    assert_eq!(
+        req.query(),
+        Some(
+            "seriesId=BTC-ABOVE-DAILY&eventId=BTC-ABOVE-DAILY-260224-1600"
+        )
+    );
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_public_block_trades_parses_documented_fields() {
+    let body = r#"{"code":"0","msg":"","data":[{
+        "fillVol":"5",
+        "fwdPx":"26857.86591585",
+        "groupId":"",
+        "idxPx":"26889.7",
+        "instId":"BTC-USD-231013-22000-P",
+        "markPx":"0.0000000000000001",
+        "px":"0.0026",
+        "side":"buy",
+        "sz":"1",
+        "tradeId":"632960608383700997",
+        "ts":"1697181568974"
+    }]}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+
+    let rows = client
+        .public_data()
+        .get_public_block_trades(&InstIdRequest::new("BTC-USDT"))
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].trade_id, "632960608383700997");
+    assert_eq!(rows[0].fill_vol.as_str(), "5");
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instId=BTC-USDT"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_estimated_settlement_info_parses_documented_fields() {
+    let body = r#"{"code":"0","data":[{
+        "estSettlePx":"2.5666068562369959",
+        "instId":"XRP-USDT-250307",
+        "nextSettleTime":"1741248000000",
+        "ts":"1741246429748"
+    }],"msg":""}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+
+    let rows = client
+        .public_data()
+        .get_estimated_settlement_info(&InstIdRequest::new("XRP-USDT-250307"))
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].est_settle_px.as_str(), "2.5666068562369959");
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instId=XRP-USDT-250307"));
+    assert!(!req.is_signed());
+}
+
+#[tokio::test]
+async fn get_settlement_history_parses_nested_details() {
+    let body = r#"{"code":"0","data":[{
+        "details":[{
+            "instId":"XRP-USDT-250307",
+            "settlePx":"2.5192078615298715"
+        }],
+        "ts":"1741161600000"
+    }],"msg":""}"#;
+    let mock = MockTransport::new(body);
+    let client = OkxClient::with_transport(mock.clone()).build();
+    let request =
+        super::SettlementHistoryRequest::new("XRP-USD").limit("100");
+
+    let rows = client
+        .public_data()
+        .get_settlement_history(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].details[0].inst_id, "XRP-USDT-250307");
+    let req = mock.captured();
+    assert_eq!(req.query(), Some("instFamily=XRP-USD&limit=100"));
+    assert!(!req.is_signed());
+}
