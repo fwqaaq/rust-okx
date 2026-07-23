@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **220/395 (55.7%)**
+> Progress: **224/395 (56.7%)**
 
 ## Account
 
@@ -203,20 +203,20 @@
 - [x] POST /api/v5/asset/transfer
 - [x] GET /api/v5/asset/transfer-state
 - [x] GET /api/v5/asset/bills
-- [ ] GET /api/v5/asset/bills-history
+- [x] GET /api/v5/asset/bills-history
 - [x] GET /api/v5/asset/deposit-address
 - [x] GET /api/v5/asset/deposit-history
 - [x] POST /api/v5/asset/withdrawal
 - [x] POST /api/v5/asset/cancel-withdrawal
 - [x] GET /api/v5/asset/withdrawal-history
 - [x] GET /api/v5/asset/deposit-withdraw-status
-- [ ] GET /api/v5/asset/exchange-list
-- [ ] POST /api/v5/asset/monthly-statement
-- [ ] GET /api/v5/asset/monthly-statement
+- [x] GET /api/v5/asset/exchange-list
+- [x] POST /api/v5/asset/monthly-statement
+- [x] GET /api/v5/asset/monthly-statement
 - [x] GET /api/v5/asset/deposit-lightning
 - [x] POST /api/v5/asset/withdrawal-lightning
 
-<!-- Funding Account: 15/19 implemented -->
+<!-- Funding Account: 19/19 implemented -->
 
 ## Convert
 
