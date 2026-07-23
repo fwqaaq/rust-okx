@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **237/395 (60.0%)**
+> Progress: **245/395 (62.0%)**
 
 ## Account
 
@@ -312,16 +312,16 @@
 
 ## Financial Product — Dual Investment
 
-- [ ] GET /api/v5/finance/sfp/dcd/currency-pair
-- [ ] GET /api/v5/finance/sfp/dcd/products
-- [ ] POST /api/v5/finance/sfp/dcd/quote
-- [ ] POST /api/v5/finance/sfp/dcd/trade
-- [ ] POST /api/v5/finance/sfp/dcd/redeem-quote
-- [ ] POST /api/v5/finance/sfp/dcd/redeem
-- [ ] GET /api/v5/finance/sfp/dcd/order-status
-- [ ] GET /api/v5/finance/sfp/dcd/order-history
+- [x] GET /api/v5/finance/sfp/dcd/currency-pair
+- [x] GET /api/v5/finance/sfp/dcd/products
+- [x] POST /api/v5/finance/sfp/dcd/quote
+- [x] POST /api/v5/finance/sfp/dcd/trade
+- [x] POST /api/v5/finance/sfp/dcd/redeem-quote
+- [x] POST /api/v5/finance/sfp/dcd/redeem
+- [x] GET /api/v5/finance/sfp/dcd/order-status
+- [x] GET /api/v5/finance/sfp/dcd/order-history
 
-<!-- Financial Product — Dual Investment: 0/8 implemented -->
+<!-- Financial Product — Dual Investment: 8/8 implemented -->
 
 ## Financial Product — Stable Rewards
 
