@@ -46,3 +46,6 @@ pub(super) const STABLE_REWARDS_PRODUCT_INFO: &str =
 pub(super) const STABLE_REWARDS_BALANCE: &str = "/api/v5/finance/stable-rewards/balance";
 pub(super) const STABLE_REWARDS_APY_HISTORY: &str =
     "/api/v5/finance/stable-rewards/apy-history";
+pub(super) const OKUSD_LIMITS: &str = "/api/v5/finance/okusd/limits";
+pub(super) const OKUSD_SUBSCRIBE: &str = "/api/v5/finance/okusd/subscribe";
+pub(super) const OKUSD_REDEEM: &str = "/api/v5/finance/okusd/redeem";
