@@ -227,6 +227,8 @@ string_enum! {
         Ioc = "ioc",
         /// Market order with immediate-or-cancel (futures/swap).
         OptimalLimitIoc = "optimal_limit_ioc",
+        /// Exclusive liquidity provider order.
+        Elp = "elp",
     }
 }
 

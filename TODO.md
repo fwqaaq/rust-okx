@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **184/396 (46.5%)**
+> Progress: **190/396 (48.0%)**
 
 ## Account
 
@@ -84,10 +84,10 @@
 - [x] GET /api/v5/trade/orders-history-archive
 - [x] GET /api/v5/trade/fills
 - [x] GET /api/v5/trade/fills-history
-- [ ] POST /api/v5/trade/cancel-all-after
-- [ ] GET /api/v5/trade/account-rate-limit
-- [ ] POST /api/v5/trade/order-precheck
-- [ ] POST /api/v5/trade/mass-cancel
+- [x] POST /api/v5/trade/cancel-all-after
+- [x] GET /api/v5/trade/account-rate-limit
+- [x] POST /api/v5/trade/order-precheck
+- [x] POST /api/v5/trade/mass-cancel
 - [x] GET /api/v5/trade/easy-convert-currency-list
 - [x] POST /api/v5/trade/easy-convert
 - [x] GET /api/v5/trade/easy-convert-history
@@ -98,7 +98,7 @@
 - [x] POST /api/v5/trade/one-click-repay-v2
 - [x] GET /api/v5/trade/one-click-repay-history-v2
 
-<!-- Trade: 22/26 implemented -->
+<!-- Trade: 26/26 implemented -->
 
 ## Algo Trading
 

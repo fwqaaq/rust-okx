@@ -2,9 +2,9 @@ use crate::common::{expect_ok_or_api_unavailable, live_client_or_skip};
 use rust_okx::api::trade::{
     AlgoOrderListRequest, EasyConvertHistoryRequest, FillHistoryRequest, FillsRequest,
     OneClickRepayCurrencyListRequest, OneClickRepayHistoryRequest, OrderHistoryRequest,
-    OrderListRequest,
+    OrderListRequest, OrderPrecheckRequest,
 };
-use rust_okx::model::InstType;
+use rust_okx::model::{InstType, OrderSide, OrderType, TradeMode};
 
 #[tokio::test]
 async fn standard_trade_read_only_endpoints_parse() {
@@ -98,5 +98,31 @@ async fn advanced_trade_read_only_endpoints_parse_when_supported() {
             .get_one_click_repay_history(&OneClickRepayHistoryRequest::new().limit(10))
             .await,
         "trade/one-click-repay-history",
+    );
+
+    // API: GET /api/v5/trade/account-rate-limit
+    // STATUS: LIVE/ELIGIBILITY-TODO — decode errors fail; mode rejection skips.
+    expect_ok_or_api_unavailable(
+        client.trade().get_account_rate_limit().await,
+        "trade/account-rate-limit",
+    );
+
+    // API: POST /api/v5/trade/order-precheck
+    // STATUS: LIVE/ELIGIBILITY-TODO — precheck does not place an order.
+    expect_ok_or_api_unavailable(
+        client
+            .trade()
+            .precheck_order(
+                &OrderPrecheckRequest::new(
+                    "BTC-USDT",
+                    TradeMode::Cash,
+                    OrderSide::Buy,
+                    OrderType::Limit,
+                    "0.001",
+                )
+                .price("1"),
+            )
+            .await,
+        "trade/order-precheck",
     );
 }

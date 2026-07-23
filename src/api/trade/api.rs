@@ -200,6 +200,61 @@ impl<'a, T: Transport> Trade<'a, T> {
         self.client.get(FILLS_HISTORY, request, true).await
     }
 
+    /// Cancel all pending orders after the configured timeout.
+    ///
+    /// `POST /api/v5/trade/cancel-all-after`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`place_order`](Self::place_order).
+    pub async fn cancel_all_after(
+        &self,
+        request: &CancelAllAfterRequest<'_>,
+    ) -> Result<Vec<CancelAllAfterResult>, Error> {
+        self.client.post(CANCEL_ALL_AFTER, request, true).await
+    }
+
+    /// Retrieve the account-level sub-account rate limit.
+    ///
+    /// `GET /api/v5/trade/account-rate-limit`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`place_order`](Self::place_order).
+    pub async fn get_account_rate_limit(&self) -> Result<Vec<AccountRateLimit>, Error> {
+        self.client
+            .get(ACCOUNT_RATE_LIMIT, &EmptyRequest {}, true)
+            .await
+    }
+
+    /// Precheck the margin impact of an order without placing it.
+    ///
+    /// `POST /api/v5/trade/order-precheck`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`place_order`](Self::place_order).
+    pub async fn precheck_order(
+        &self,
+        request: &OrderPrecheckRequest<'_>,
+    ) -> Result<Vec<OrderPrecheckResult>, Error> {
+        self.client.post(ORDER_PRECHECK, request, true).await
+    }
+
+    /// Mass-cancel option orders for an instrument family.
+    ///
+    /// `POST /api/v5/trade/mass-cancel`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`place_order`](Self::place_order).
+    pub async fn mass_cancel(
+        &self,
+        request: &MassCancelRequest<'_>,
+    ) -> Result<Vec<MassCancelResult>, Error> {
+        self.client.post(MASS_CANCEL, request, true).await
+    }
+
     /// Place an algo order.
     ///
     /// `POST /api/v5/trade/order-algo`. Authenticated.

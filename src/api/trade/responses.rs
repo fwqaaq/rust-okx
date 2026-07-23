@@ -7,9 +7,11 @@ use crate::{
 
 mod advanced;
 mod algo;
+mod risk_controls;
 
 pub use advanced::*;
 pub use algo::*;
+pub use risk_controls::*;
 
 /// The result of placing an order.
 #[derive(Debug, Clone, Deserialize)]
