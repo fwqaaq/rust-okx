@@ -1,9 +1,8 @@
 use http::Method;
 
 use super::{
-    CreateQuoteRequest, CreateRfqRequest, MakerInstrumentRequest,
-    MakerInstrumentSettingsRequest, PublicRfqTradesRequest, QuoteLegRequest, RfqLegRequest,
-    RfqMmpConfigRequest, RfqsRequest,
+    CreateQuoteRequest, CreateRfqRequest, MakerInstrumentRequest, MakerInstrumentSettingsRequest,
+    PublicRfqTradesRequest, QuoteLegRequest, RfqLegRequest, RfqMmpConfigRequest, RfqsRequest,
 };
 use crate::test_util::MockTransport;
 use crate::{Credentials, OkxClient};
