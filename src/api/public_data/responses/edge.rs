@@ -423,6 +423,216 @@ pub struct EconomicCalendar {
     pub unit: String,
 }
 
+/// Historical swap-premium row.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct PremiumHistory {
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Premium index.
+    #[serde(default)]
+    pub premium: NumberString,
+    /// Data generation time in Unix milliseconds.
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// Settlement metadata for an event-contract series.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct EventContractSettlement {
+    /// Settlement method.
+    #[serde(default)]
+    pub method: String,
+    /// Whether the market may settle before its expiration time.
+    #[serde(default)]
+    pub close_early: bool,
+    /// Settlement source name.
+    #[serde(default)]
+    pub src_name: String,
+    /// Price underlying in OKX instrument format.
+    #[serde(default)]
+    pub underlying: String,
+}
+
+/// Event-contract series metadata.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct EventContractSeries {
+    /// Series ID.
+    #[serde(default)]
+    pub series_id: String,
+    /// Series frequency.
+    #[serde(default)]
+    pub freq: String,
+    /// Series title.
+    #[serde(default)]
+    pub title: String,
+    /// Series category.
+    #[serde(default)]
+    pub category: String,
+    /// Settlement metadata.
+    #[serde(default)]
+    pub settlement: EventContractSettlement,
+}
+
+/// Prediction-market event metadata.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct EventContractEvent {
+    /// Series ID.
+    #[serde(default)]
+    pub series_id: String,
+    /// Event ID.
+    #[serde(default)]
+    pub event_id: String,
+    /// Strike-price fixing time in Unix milliseconds.
+    #[serde(default)]
+    pub fix_time: NumberString,
+    /// Event strike time in Unix milliseconds.
+    #[serde(default)]
+    pub exp_time: NumberString,
+    /// Event state.
+    #[serde(default)]
+    pub state: String,
+}
+
+/// Prediction-market instrument metadata.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct EventContractMarket {
+    /// Series ID.
+    #[serde(default)]
+    pub series_id: String,
+    /// Event ID.
+    #[serde(default)]
+    pub event_id: String,
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Listing time in Unix milliseconds.
+    #[serde(default)]
+    pub list_time: NumberString,
+    /// Strike-price fixing time in Unix milliseconds.
+    #[serde(default)]
+    pub fix_time: NumberString,
+    /// Strike time in Unix milliseconds.
+    #[serde(default)]
+    pub exp_time: NumberString,
+    /// Market state.
+    #[serde(default)]
+    pub state: String,
+    /// Whether the market has been disputed.
+    #[serde(default)]
+    pub disputed: bool,
+    /// Market outcome.
+    #[serde(default)]
+    pub outcome: String,
+    /// Minimum expiration value that produces a YES outcome.
+    #[serde(default)]
+    pub floor_strike: NumberString,
+    /// Maximum expiration value that produces a YES outcome.
+    #[serde(default)]
+    pub cap_strike: NumberString,
+    /// Final settlement value.
+    #[serde(default)]
+    pub settle_value: NumberString,
+    /// Hit direction for `hit` settlement methods.
+    #[serde(default)]
+    pub hit_dir: String,
+}
+
+/// Public single-leg block-trade row.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct PublicBlockTrade {
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Trade ID.
+    #[serde(default)]
+    pub trade_id: String,
+    /// Trade price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Trade quantity.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Trade side.
+    #[serde(default)]
+    pub side: String,
+    /// Implied volatility for options.
+    #[serde(default)]
+    pub fill_vol: NumberString,
+    /// Forward price for options.
+    #[serde(default)]
+    pub fwd_px: NumberString,
+    /// Index price for derivatives.
+    #[serde(default)]
+    pub idx_px: NumberString,
+    /// Mark price for derivatives.
+    #[serde(default)]
+    pub mark_px: NumberString,
+    /// Group RFQ ID.
+    #[serde(default)]
+    pub group_id: String,
+    /// Trade time in Unix milliseconds.
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// Estimated futures settlement information.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct EstimatedSettlementInfo {
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Next settlement time in Unix milliseconds.
+    #[serde(default)]
+    pub next_settle_time: NumberString,
+    /// Estimated settlement price.
+    #[serde(default)]
+    pub est_settle_px: NumberString,
+    /// Data return time in Unix milliseconds.
+    #[serde(default)]
+    pub ts: NumberString,
+}
+
+/// Per-instrument futures settlement detail.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SettlementHistoryDetail {
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Settlement price.
+    #[serde(default)]
+    pub settle_px: NumberString,
+}
+
+/// Futures settlement-history row.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SettlementHistory {
+    /// Settlement time in Unix milliseconds.
+    #[serde(default)]
+    pub ts: NumberString,
+    /// Instrument settlement details.
+    #[serde(default)]
+    pub details: Vec<SettlementHistoryDetail>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
