@@ -23,9 +23,13 @@ pub struct TradingDataSupportCoins {
 #[serde(from = "ContractOpenInterestHistoryRaw")]
 #[non_exhaustive]
 pub struct ContractOpenInterestHistory {
+    /// Timestamp in Unix milliseconds.
     pub ts: NumberString,
+    /// Open interest in contracts.
     pub oi: NumberString,
+    /// Open interest in cryptocurrency.
     pub oi_ccy: NumberString,
+    /// Open interest in USD.
     pub oi_usd: NumberString,
 }
 
@@ -47,8 +51,11 @@ impl From<ContractOpenInterestHistoryRaw> for ContractOpenInterestHistory {
 #[serde(from = "TakerVolumeRaw")]
 #[non_exhaustive]
 pub struct TakerVolume {
+    /// Timestamp in Unix milliseconds.
     pub ts: NumberString,
+    /// Taker sell volume.
     pub sell_vol: NumberString,
+    /// Taker buy volume.
     pub buy_vol: NumberString,
 }
 
@@ -69,7 +76,9 @@ impl From<TakerVolumeRaw> for TakerVolume {
 #[serde(from = "RatioPointRaw")]
 #[non_exhaustive]
 pub struct RatioPoint {
+    /// Timestamp in Unix milliseconds.
     pub ts: NumberString,
+    /// Documented ratio value.
     pub ratio: NumberString,
 }
 
@@ -89,8 +98,11 @@ impl From<RatioPointRaw> for RatioPoint {
 #[serde(from = "OpenInterestVolumeRaw")]
 #[non_exhaustive]
 pub struct OpenInterestVolume {
+    /// Timestamp in Unix milliseconds.
     pub ts: NumberString,
+    /// Open interest.
     pub oi: NumberString,
+    /// Trading volume.
     pub vol: NumberString,
 }
 
@@ -111,8 +123,11 @@ impl From<OpenInterestVolumeRaw> for OpenInterestVolume {
 #[serde(from = "PutCallRatioRaw")]
 #[non_exhaustive]
 pub struct PutCallRatio {
+    /// Timestamp in Unix milliseconds.
     pub ts: NumberString,
+    /// Put/call open-interest ratio.
     pub oi_ratio: NumberString,
+    /// Put/call trading-volume ratio.
     pub vol_ratio: NumberString,
 }
 
@@ -134,11 +149,17 @@ impl From<PutCallRatioRaw> for PutCallRatio {
 #[serde(from = "OptionExpiryVolumeRaw")]
 #[non_exhaustive]
 pub struct OptionExpiryVolume {
+    /// Timestamp in Unix milliseconds.
     pub ts: NumberString,
+    /// Contract expiry date in `YYYYMMDD` format.
     pub exp_time: String,
+    /// Total call open interest.
     pub call_oi: NumberString,
+    /// Total put open interest.
     pub put_oi: NumberString,
+    /// Total call trading volume.
     pub call_vol: NumberString,
+    /// Total put trading volume.
     pub put_vol: NumberString,
 }
 
@@ -170,11 +191,17 @@ impl From<OptionExpiryVolumeRaw> for OptionExpiryVolume {
 #[serde(from = "OptionStrikeVolumeRaw")]
 #[non_exhaustive]
 pub struct OptionStrikeVolume {
+    /// Timestamp in Unix milliseconds.
     pub ts: NumberString,
+    /// Option strike price.
     pub strike: NumberString,
+    /// Total call open interest.
     pub call_oi: NumberString,
+    /// Total put open interest.
     pub put_oi: NumberString,
+    /// Total call trading volume.
     pub call_vol: NumberString,
+    /// Total put trading volume.
     pub put_vol: NumberString,
 }
 
@@ -206,12 +233,19 @@ impl From<OptionStrikeVolumeRaw> for OptionStrikeVolume {
 #[serde(from = "OptionTakerFlowRaw")]
 #[non_exhaustive]
 pub struct OptionTakerFlow {
+    /// Timestamp in Unix milliseconds.
     pub ts: NumberString,
+    /// Call-option taker buy volume.
     pub call_buy_vol: NumberString,
+    /// Call-option taker sell volume.
     pub call_sell_vol: NumberString,
+    /// Put-option taker buy volume.
     pub put_buy_vol: NumberString,
+    /// Put-option taker sell volume.
     pub put_sell_vol: NumberString,
+    /// Call block volume.
     pub call_block_vol: NumberString,
+    /// Put block volume.
     pub put_block_vol: NumberString,
 }
 
