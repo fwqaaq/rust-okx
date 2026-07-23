@@ -30,5 +30,7 @@ fn funding_monthly_statement_todo() {
     // API: POST /api/v5/asset/monthly-statement
     // API: GET /api/v5/asset/monthly-statement
     // STATUS: TODO — requires a deliberately selected month and asynchronous generation fixture.
-    todo!("apply once for a selected month, then poll the generated statement without exhausting quota");
+    todo!(
+        "apply once for a selected month, then poll the generated statement without exhausting quota"
+    );
 }
