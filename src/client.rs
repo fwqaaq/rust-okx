@@ -203,11 +203,8 @@ impl<T: Transport> OkxClient<T> {
         }
 
         if media_type == Some("application/json") {
-            let envelope: OkxResponse<serde_json::Value> =
-                serde_json::from_slice(&bytes).map_err(|source| RestError::Decode {
-                    endpoint,
-                    source,
-                })?;
+            let envelope: OkxResponse<serde_json::Value> = serde_json::from_slice(&bytes)
+                .map_err(|source| RestError::Decode { endpoint, source })?;
             if envelope.code != "0" {
                 return Err(RestError::Okx {
                     endpoint,
