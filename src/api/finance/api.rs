@@ -136,7 +136,7 @@ impl<T: Transport> DualInvestment<'_, T> {
     /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
     pub async fn get_currency_pairs(&self) -> Result<Vec<DualInvestmentCurrencyPair>, Error> {
         self.client
-            .get(DUAL_CURRENCY_PAIR, &EmptyRequest::default(), true)
+            .get(DUAL_CURRENCY_PAIR, &EmptyRequest {}, true)
             .await
     }
 
