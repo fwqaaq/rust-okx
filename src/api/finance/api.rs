@@ -52,6 +52,131 @@ impl<'a, T: Transport> Finance<'a, T> {
             client: self.client,
         }
     }
+
+    /// Access Dual Investment endpoints.
+    pub fn dual_investment(&self) -> DualInvestment<'_, T> {
+        DualInvestment {
+            client: self.client,
+        }
+    }
+}
+
+/// Accessor for Dual Investment endpoints.
+pub struct DualInvestment<'a, T> {
+    client: &'a OkxClient<T>,
+}
+
+impl<T: Transport> DualInvestment<'_, T> {
+    /// Retrieve available dual-investment currency pairs.
+    ///
+    /// `GET /api/v5/finance/sfp/dcd/currency-pair`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_currency_pairs(&self) -> Result<Vec<DualInvestmentCurrencyPair>, Error> {
+        self.client
+            .get(DUAL_CURRENCY_PAIR, &EmptyRequest {}, true)
+            .await
+    }
+
+    /// Retrieve dual-investment products.
+    ///
+    /// `GET /api/v5/finance/sfp/dcd/products`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_products(
+        &self,
+        request: &DualInvestmentProductsRequest<'_>,
+    ) -> Result<Vec<DualInvestmentProduct>, Error> {
+        self.client.get(DUAL_PRODUCTS, request, true).await
+    }
+
+    /// Request a dual-investment quote.
+    ///
+    /// `POST /api/v5/finance/sfp/dcd/quote`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn request_quote(
+        &self,
+        request: &DualInvestmentQuoteRequest<'_>,
+    ) -> Result<Vec<DualInvestmentQuote>, Error> {
+        self.client.post(DUAL_QUOTE, request, true).await
+    }
+
+    /// Place a dual-investment order using a quote.
+    ///
+    /// `POST /api/v5/finance/sfp/dcd/trade`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn trade(
+        &self,
+        request: &DualInvestmentQuoteIdRequest<'_>,
+    ) -> Result<Vec<DualInvestmentTrade>, Error> {
+        self.client.post(DUAL_TRADE, request, true).await
+    }
+
+    /// Request an early-redemption quote.
+    ///
+    /// `POST /api/v5/finance/sfp/dcd/redeem-quote`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn request_redeem_quote(
+        &self,
+        request: &DualInvestmentOrderIdRequest<'_>,
+    ) -> Result<Vec<DualInvestmentRedeemQuote>, Error> {
+        self.client.post(DUAL_REDEEM_QUOTE, request, true).await
+    }
+
+    /// Confirm a dual-investment early redemption.
+    ///
+    /// `POST /api/v5/finance/sfp/dcd/redeem`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn redeem(
+        &self,
+        request: &DualInvestmentRedeemRequest<'_>,
+    ) -> Result<Vec<DualInvestmentOrderState>, Error> {
+        self.client.post(DUAL_REDEEM, request, true).await
+    }
+
+    /// Retrieve a dual-investment order's current state.
+    ///
+    /// `GET /api/v5/finance/sfp/dcd/order-status`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_order_status(
+        &self,
+        request: &DualInvestmentOrderIdRequest<'_>,
+    ) -> Result<Vec<DualInvestmentOrderState>, Error> {
+        self.client.get(DUAL_ORDER_STATUS, request, true).await
+    }
+
+    /// Retrieve dual-investment order history.
+    ///
+    /// `GET /api/v5/finance/sfp/dcd/order-history`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_order_history(
+        &self,
+        request: &DualInvestmentHistoryRequest<'_>,
+    ) -> Result<Vec<DualInvestmentOrder>, Error> {
+        self.client.get(DUAL_ORDER_HISTORY, request, true).await
+    }
 }
 
 /// Accessor for Savings endpoints.
