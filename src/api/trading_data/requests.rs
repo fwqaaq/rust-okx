@@ -95,10 +95,7 @@ pub struct TakerVolumeRequest<'a> {
 
 impl<'a> TakerVolumeRequest<'a> {
     /// Create a taker-volume query.
-    pub fn new(
-        ccy: impl Into<Cow<'a, str>>,
-        inst_type: TakerVolumeInstrumentType,
-    ) -> Self {
+    pub fn new(ccy: impl Into<Cow<'a, str>>, inst_type: TakerVolumeInstrumentType) -> Self {
         Self {
             ccy: ccy.into(),
             inst_type,
@@ -266,10 +263,7 @@ pub struct OptionStrikeRequest<'a> {
 
 impl<'a> OptionStrikeRequest<'a> {
     /// Create a strike-history query for one expiry date (`YYYYMMDD`).
-    pub fn new(
-        ccy: impl Into<Cow<'a, str>>,
-        exp_time: impl Into<Cow<'a, str>>,
-    ) -> Self {
+    pub fn new(ccy: impl Into<Cow<'a, str>>, exp_time: impl Into<Cow<'a, str>>) -> Self {
         Self {
             ccy: ccy.into(),
             exp_time: exp_time.into(),
