@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **251/392 (64.0%)**
+> Progress: **271/390 (69.5%)**
 
 ## Account
 
@@ -356,30 +356,30 @@
 
 ## Block Trading / RFQ
 
-- [ ] GET /api/v5/rfq/counterparties
-- [ ] POST /api/v5/rfq/create-rfq
-- [ ] POST /api/v5/rfq/cancel-rfq
-- [ ] POST /api/v5/rfq/cancel-batch-rfqs
-- [ ] POST /api/v5/rfq/cancel-all-rfqs
-- [ ] POST /api/v5/rfq/execute-quote
-- [ ] GET /api/v5/rfq/quote-products
-- [ ] POST /api/v5/rfq/set-quote-products
-- [ ] POST /api/v5/rfq/create-quote
-- [ ] POST /api/v5/rfq/cancel-quote
-- [ ] POST /api/v5/rfq/cancel-batch-quotes
-- [ ] POST /api/v5/rfq/cancel-all-quotes
-- [ ] GET /api/v5/rfq/rfqs
-- [ ] GET /api/v5/rfq/quotes
-- [ ] GET /api/v5/rfq/trades
-- [ ] GET /api/v5/rfq/public-trades
-- [ ] GET /api/v5/rfq/maker-instrument-settings
-- [ ] POST /api/v5/rfq/maker-instrument-settings
-- [ ] GET /api/v5/rfq/mmp-config
-- [ ] POST /api/v5/rfq/mmp-config
-- [ ] POST /api/v5/rfq/mmp-reset
-- [ ] POST /api/v5/rfq/cancel-all-after
+<!-- Undocumented legacy aliases excluded: quote-products, set-quote-products -->
 
-<!-- Block Trading / RFQ: 0/22 implemented -->
+- [x] GET /api/v5/rfq/counterparties
+- [x] POST /api/v5/rfq/create-rfq
+- [x] POST /api/v5/rfq/cancel-rfq
+- [x] POST /api/v5/rfq/cancel-batch-rfqs
+- [x] POST /api/v5/rfq/cancel-all-rfqs
+- [x] POST /api/v5/rfq/execute-quote
+- [x] POST /api/v5/rfq/create-quote
+- [x] POST /api/v5/rfq/cancel-quote
+- [x] POST /api/v5/rfq/cancel-batch-quotes
+- [x] POST /api/v5/rfq/cancel-all-quotes
+- [x] GET /api/v5/rfq/rfqs
+- [x] GET /api/v5/rfq/quotes
+- [x] GET /api/v5/rfq/trades
+- [x] GET /api/v5/rfq/public-trades
+- [x] GET /api/v5/rfq/maker-instrument-settings
+- [x] POST /api/v5/rfq/maker-instrument-settings
+- [x] GET /api/v5/rfq/mmp-config
+- [x] POST /api/v5/rfq/mmp-config
+- [x] POST /api/v5/rfq/mmp-reset
+- [x] POST /api/v5/rfq/cancel-all-after
+
+<!-- Block Trading / RFQ: 20/20 implemented -->
 
 ## Spread Trading
 
