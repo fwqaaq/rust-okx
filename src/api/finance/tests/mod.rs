@@ -2,6 +2,7 @@ use crate::test_util::MockTransport;
 use crate::{Credentials, OkxClient};
 
 mod eth_staking;
+mod dual_investment;
 mod flexible_loan;
 mod savings;
 mod sol_staking;
