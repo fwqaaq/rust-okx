@@ -166,9 +166,7 @@ impl<'a, T: Transport> SpreadTrading<'a, T> {
         &self,
         request: &SpreadOrdersArchiveRequest,
     ) -> Result<Vec<SpreadOrder>, Error> {
-        self.client
-            .get(ORDERS_HISTORY_ARCHIVE, request, true)
-            .await
+        self.client.get(ORDERS_HISTORY_ARCHIVE, request, true).await
     }
 
     /// Retrieve private spread trades from the last seven days.
