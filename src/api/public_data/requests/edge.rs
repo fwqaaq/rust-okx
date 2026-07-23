@@ -246,6 +246,243 @@ impl<'a> EconomicCalendarRequest<'a> {
     }
 }
 
+/// Query parameters for `GET /api/v5/public/premium-history`.
+#[derive(Debug, Clone, Serialize)]
+pub struct PremiumHistoryRequest<'a> {
+    #[serde(rename = "instId")]
+    inst_id: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    after: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    before: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<Cow<'a, str>>,
+}
+
+impl<'a> PremiumHistoryRequest<'a> {
+    /// Create a premium-history query for a swap instrument.
+    pub fn new(inst_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_id: inst_id.into(),
+            after: None,
+            before: None,
+            limit: None,
+        }
+    }
+
+    /// Return records earlier than this timestamp, exclusive.
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.after = Some(value.into());
+        self
+    }
+
+    /// Return records newer than this timestamp, exclusive.
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.before = Some(value.into());
+        self
+    }
+
+    /// Set the number of results. The documented maximum is 100.
+    pub fn limit(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.limit = Some(value.into());
+        self
+    }
+}
+
+/// Query parameters for `GET /api/v5/public/event-contract/series`.
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct EventContractSeriesRequest<'a> {
+    #[serde(rename = "seriesId", skip_serializing_if = "Option::is_none")]
+    series_id: Option<Cow<'a, str>>,
+}
+
+impl<'a> EventContractSeriesRequest<'a> {
+    /// Create an unfiltered event-contract series query.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Restrict the result to one series ID.
+    pub fn series_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.series_id = Some(value.into());
+        self
+    }
+}
+
+/// Query parameters for `GET /api/v5/public/event-contract/events`.
+#[derive(Debug, Clone, Serialize)]
+pub struct EventContractEventsRequest<'a> {
+    #[serde(rename = "seriesId")]
+    series_id: Cow<'a, str>,
+    #[serde(rename = "eventId", skip_serializing_if = "Option::is_none")]
+    event_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    state: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    before: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    after: Option<Cow<'a, str>>,
+}
+
+impl<'a> EventContractEventsRequest<'a> {
+    /// Create an event query for one series.
+    pub fn new(series_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            series_id: series_id.into(),
+            event_id: None,
+            state: None,
+            limit: None,
+            before: None,
+            after: None,
+        }
+    }
+
+    /// Restrict the result to one event ID.
+    pub fn event_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.event_id = Some(value.into());
+        self
+    }
+
+    /// Restrict the result to one documented event state.
+    pub fn state(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.state = Some(value.into());
+        self
+    }
+
+    /// Set the number of results. The documented maximum is 100.
+    pub fn limit(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.limit = Some(value.into());
+        self
+    }
+
+    /// Return records newer than this expiration timestamp, exclusive.
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.before = Some(value.into());
+        self
+    }
+
+    /// Return records earlier than this expiration timestamp, exclusive.
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.after = Some(value.into());
+        self
+    }
+}
+
+/// Query parameters for `GET /api/v5/public/event-contract/markets`.
+#[derive(Debug, Clone, Serialize)]
+pub struct EventContractMarketsRequest<'a> {
+    #[serde(rename = "seriesId")]
+    series_id: Cow<'a, str>,
+    #[serde(rename = "eventId", skip_serializing_if = "Option::is_none")]
+    event_id: Option<Cow<'a, str>>,
+    #[serde(rename = "instId", skip_serializing_if = "Option::is_none")]
+    inst_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    state: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    before: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    after: Option<Cow<'a, str>>,
+}
+
+impl<'a> EventContractMarketsRequest<'a> {
+    /// Create a market query for one series.
+    pub fn new(series_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            series_id: series_id.into(),
+            event_id: None,
+            inst_id: None,
+            state: None,
+            limit: None,
+            before: None,
+            after: None,
+        }
+    }
+
+    /// Restrict the result to one event ID.
+    pub fn event_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.event_id = Some(value.into());
+        self
+    }
+
+    /// Restrict the result to one instrument ID.
+    pub fn inst_id(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.inst_id = Some(value.into());
+        self
+    }
+
+    /// Restrict the result to one documented market state.
+    pub fn state(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.state = Some(value.into());
+        self
+    }
+
+    /// Set the number of results. The documented maximum is 100.
+    pub fn limit(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.limit = Some(value.into());
+        self
+    }
+
+    /// Return records newer than this expiration timestamp, exclusive.
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.before = Some(value.into());
+        self
+    }
+
+    /// Return records earlier than this expiration timestamp, exclusive.
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.after = Some(value.into());
+        self
+    }
+}
+
+/// Query parameters for `GET /api/v5/public/settlement-history`.
+#[derive(Debug, Clone, Serialize)]
+pub struct SettlementHistoryRequest<'a> {
+    #[serde(rename = "instFamily")]
+    inst_family: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    after: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    before: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<Cow<'a, str>>,
+}
+
+impl<'a> SettlementHistoryRequest<'a> {
+    /// Create a futures settlement-history query.
+    pub fn new(inst_family: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            inst_family: inst_family.into(),
+            after: None,
+            before: None,
+            limit: None,
+        }
+    }
+
+    /// Return records earlier than this timestamp, exclusive.
+    pub fn after(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.after = Some(value.into());
+        self
+    }
+
+    /// Return records newer than this timestamp, exclusive.
+    pub fn before(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.before = Some(value.into());
+        self
+    }
+
+    /// Set the number of results. The documented maximum is 100.
+    pub fn limit(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.limit = Some(value.into());
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
