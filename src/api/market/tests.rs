@@ -103,11 +103,7 @@ async fn get_full_orderbook_parses_three_field_levels() {
     let client = OkxClient::with_transport(mock.clone()).build();
 
     let request = FullOrderBookRequest::new("BTC-USDT").size(1);
-    let books = client
-        .market()
-        .get_full_orderbook(&request)
-        .await
-        .unwrap();
+    let books = client.market().get_full_orderbook(&request).await.unwrap();
     assert_eq!(books[0].asks[0].price.as_str(), "41006.8");
     assert_eq!(books[0].asks[0].order_count.as_str(), "1");
     assert_eq!(books[0].bids[0].size.as_str(), "0.30178218");
@@ -364,10 +360,7 @@ async fn get_spread_ticker_builds_request_and_parses() {
     assert_eq!(ticker[0].low24h.as_str(), "-2.2");
 
     let req = mock.captured();
-    assert_eq!(
-        req.query(),
-        Some("sprdId=BTC-USDT_BTC-USDT-SWAP")
-    );
+    assert_eq!(req.query(), Some("sprdId=BTC-USDT_BTC-USDT-SWAP"));
     assert!(!req.is_signed());
 }
 
@@ -405,8 +398,7 @@ async fn get_spread_history_candlesticks_uses_builder_query() {
         ["1597026383085","3.731","3.799","3.494","3.72","24912403","1"]]}"#;
     let mock = MockTransport::new(body);
     let client = OkxClient::with_transport(mock.clone()).build();
-    let request =
-        SpreadCandlesticksRequest::new("BTC-USDT_BTC-USDT-SWAP").after("1597026383085");
+    let request = SpreadCandlesticksRequest::new("BTC-USDT_BTC-USDT-SWAP").after("1597026383085");
 
     let candles = client
         .market()
