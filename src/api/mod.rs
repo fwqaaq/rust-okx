@@ -18,3 +18,4 @@ pub mod sub_account;
 pub mod support;
 pub mod trade;
 pub mod trading_data;
+pub mod trading_bot;
