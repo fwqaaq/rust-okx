@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **248/392 (63.3%)**
+> Progress: **251/392 (64.0%)**
 
 ## Account
 
@@ -335,11 +335,11 @@
 
 ## Financial Product — OKUSD
 
-- [ ] GET /api/v5/finance/okusd/limits
-- [ ] POST /api/v5/finance/okusd/subscribe
-- [ ] POST /api/v5/finance/okusd/redeem
+- [x] GET /api/v5/finance/okusd/limits
+- [x] POST /api/v5/finance/okusd/subscribe
+- [x] POST /api/v5/finance/okusd/redeem
 
-<!-- Financial Product — OKUSD: 0/3 implemented -->
+<!-- Financial Product — OKUSD: 3/3 implemented -->
 
 ## Loan — Flexible Loan
 
