@@ -85,31 +85,37 @@ impl<'a> FiatOrderHistoryRequest<'a> {
         Self::default()
     }
 
+    /// Filter by fiat currency.
     pub fn currency(mut self, ccy: impl Into<Cow<'a, str>>) -> Self {
         self.ccy = Some(ccy.into());
         self
     }
 
+    /// Filter by payment method.
     pub fn payment_method(mut self, payment_method: impl Into<Cow<'a, str>>) -> Self {
         self.payment_method = Some(payment_method.into());
         self
     }
 
+    /// Filter by order state.
     pub fn state(mut self, state: impl Into<Cow<'a, str>>) -> Self {
         self.state = Some(state.into());
         self
     }
 
+    /// Set the inclusive begin timestamp.
     pub fn after(mut self, after: impl Into<Cow<'a, str>>) -> Self {
         self.after = Some(after.into());
         self
     }
 
+    /// Set the inclusive end timestamp.
     pub fn before(mut self, before: impl Into<Cow<'a, str>>) -> Self {
         self.before = Some(before.into());
         self
     }
 
+    /// Set the maximum number of results.
     pub fn limit(mut self, limit: u32) -> Self {
         self.limit = Some(limit);
         self
@@ -125,6 +131,7 @@ pub struct FiatBuySellPairRequest<'a> {
 }
 
 impl<'a> FiatBuySellPairRequest<'a> {
+    /// Select the currency to sell and currency to buy.
     pub fn new(
         from_ccy: impl Into<Cow<'a, str>>,
         to_ccy: impl Into<Cow<'a, str>>,
@@ -140,7 +147,9 @@ impl<'a> FiatBuySellPairRequest<'a> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum FiatBuySellSide {
+    /// Buy crypto or fiat using fiat.
     Buy,
+    /// Sell crypto to crypto or fiat.
     Sell,
 }
 
@@ -156,6 +165,7 @@ pub struct FiatBuySellQuoteRequest<'a> {
 }
 
 impl<'a> FiatBuySellQuoteRequest<'a> {
+    /// Create a quote request.
     pub fn new(
         side: FiatBuySellSide,
         from_ccy: impl Into<Cow<'a, str>>,
@@ -188,6 +198,7 @@ pub struct FiatBuySellTradeRequest<'a> {
 }
 
 impl<'a> FiatBuySellTradeRequest<'a> {
+    /// Create a trade request matching the original quote inputs.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         quote_id: impl Into<Cow<'a, str>>,
@@ -231,35 +242,42 @@ pub struct FiatBuySellHistoryRequest<'a> {
 }
 
 impl<'a> FiatBuySellHistoryRequest<'a> {
+    /// Create an unfiltered trade-history query.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Filter by order ID.
     pub fn order_id(mut self, ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.ord_id = Some(ord_id.into());
         self
     }
 
+    /// Filter by client order ID.
     pub fn client_order_id(mut self, cl_ord_id: impl Into<Cow<'a, str>>) -> Self {
         self.cl_ord_id = Some(cl_ord_id.into());
         self
     }
 
+    /// Filter by trade state.
     pub fn state(mut self, state: impl Into<Cow<'a, str>>) -> Self {
         self.state = Some(state.into());
         self
     }
 
+    /// Set the begin timestamp.
     pub fn begin(mut self, begin: impl Into<Cow<'a, str>>) -> Self {
         self.begin = Some(begin.into());
         self
     }
 
+    /// Set the end timestamp.
     pub fn end(mut self, end: impl Into<Cow<'a, str>>) -> Self {
         self.end = Some(end.into());
         self
     }
 
+    /// Set the maximum number of results.
     pub fn limit(mut self, limit: u32) -> Self {
         self.limit = Some(limit);
         self
