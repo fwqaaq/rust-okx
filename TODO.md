@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **271/390 (69.5%)**
+> Progress: **284/390 (72.8%)**
 
 ## Account
 
@@ -383,21 +383,21 @@
 
 ## Spread Trading
 
-- [ ] GET /api/v5/sprd/spreads
-- [ ] GET /api/v5/sprd/books
-- [ ] GET /api/v5/sprd/public-trades
-- [ ] POST /api/v5/sprd/order
-- [ ] POST /api/v5/sprd/cancel-order
-- [ ] POST /api/v5/sprd/cancel-all-after
-- [ ] POST /api/v5/sprd/mass-cancel
-- [ ] POST /api/v5/sprd/amend-order
-- [ ] GET /api/v5/sprd/order
-- [ ] GET /api/v5/sprd/orders-pending
-- [ ] GET /api/v5/sprd/orders-history
-- [ ] GET /api/v5/sprd/orders-history-archive
-- [ ] GET /api/v5/sprd/trades
+- [x] GET /api/v5/sprd/spreads
+- [x] GET /api/v5/sprd/books
+- [x] GET /api/v5/sprd/public-trades
+- [x] POST /api/v5/sprd/order
+- [x] POST /api/v5/sprd/cancel-order
+- [x] POST /api/v5/sprd/cancel-all-after
+- [x] POST /api/v5/sprd/mass-cancel
+- [x] POST /api/v5/sprd/amend-order
+- [x] GET /api/v5/sprd/order
+- [x] GET /api/v5/sprd/orders-pending
+- [x] GET /api/v5/sprd/orders-history
+- [x] GET /api/v5/sprd/orders-history-archive
+- [x] GET /api/v5/sprd/trades
 
-<!-- Spread Trading: 0/13 implemented -->
+<!-- Spread Trading: 13/13 implemented -->
 <!-- Note: sprd/ticker, sprd/candles, sprd/history-candles were relocated by OKX to market/sprd-ticker, market/sprd-candles, market/sprd-history-candles (see Market Data). -->
 
 ## Trading Bot — Grid
