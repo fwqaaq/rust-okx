@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **335/388 (86.3%)**
+> Progress: **348/388 (89.7%)**
 
 ## Account
 
@@ -470,21 +470,21 @@
 
 ## Trading Bot — DCA
 
-- [ ] POST /api/v5/tradingBot/dca/create
-- [ ] POST /api/v5/tradingBot/dca/amend-order-algo
-- [ ] POST /api/v5/tradingBot/dca/stop
-- [ ] POST /api/v5/tradingBot/dca/margin/add
-- [ ] POST /api/v5/tradingBot/dca/margin/reduce
-- [ ] POST /api/v5/tradingBot/dca/orders/manual-buy
-- [ ] POST /api/v5/tradingBot/dca/settings/reinvestment
-- [ ] POST /api/v5/tradingBot/dca/settings/take-profit
-- [ ] GET /api/v5/tradingBot/dca/orders
-- [ ] GET /api/v5/tradingBot/dca/ongoing-list
-- [ ] GET /api/v5/tradingBot/dca/history-list
-- [ ] GET /api/v5/tradingBot/dca/cycle-list
-- [ ] GET /api/v5/tradingBot/dca/position-details
+- [x] POST /api/v5/tradingBot/dca/create
+- [x] POST /api/v5/tradingBot/dca/amend-order-algo
+- [x] POST /api/v5/tradingBot/dca/stop
+- [x] POST /api/v5/tradingBot/dca/margin/add
+- [x] POST /api/v5/tradingBot/dca/margin/reduce
+- [x] POST /api/v5/tradingBot/dca/orders/manual-buy
+- [x] POST /api/v5/tradingBot/dca/settings/reinvestment
+- [x] POST /api/v5/tradingBot/dca/settings/take-profit
+- [x] GET /api/v5/tradingBot/dca/orders
+- [x] GET /api/v5/tradingBot/dca/ongoing-list
+- [x] GET /api/v5/tradingBot/dca/history-list
+- [x] GET /api/v5/tradingBot/dca/cycle-list
+- [x] GET /api/v5/tradingBot/dca/position-details
 
-<!-- Trading Bot — DCA: 0/13 implemented -->
+<!-- Trading Bot — DCA: 13/13 implemented -->
 
 ## Copy Trading
 
