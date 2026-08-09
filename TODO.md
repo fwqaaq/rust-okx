@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **380/385 (98.7%)**
+> Progress: **380/383 (99.2%)**
 
 ## Account
 
@@ -532,10 +532,8 @@
 
 ## Broker / Partner
 
-- [ ] GET /api/v5/broker/fd/rebate-per-orders
-- [ ] POST /api/v5/broker/fd/rebate-per-orders
-
-<!-- Broker / Partner: 0/2 implemented -->
+<!-- Broker / Partner: 0/0 current documented endpoints -->
+<!-- Excluded: both broker/fd/rebate-per-orders operations are absent from the current OKX V5 Global API guide. -->
 
 ## Status
 
