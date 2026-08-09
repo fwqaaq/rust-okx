@@ -53,3 +53,17 @@ pub(super) const SIGNAL_CLOSE_POSITION: &str = "/api/v5/tradingBot/signal/close-
 pub(super) const SIGNAL_MARGIN_BALANCE: &str = "/api/v5/tradingBot/signal/margin-balance";
 pub(super) const SIGNAL_SET_INSTRUMENTS: &str = "/api/v5/tradingBot/signal/set-instruments";
 pub(super) const SIGNAL_SUB_ORDER: &str = "/api/v5/tradingBot/signal/sub-order";
+
+pub(super) const DCA_CREATE: &str = "/api/v5/tradingBot/dca/create";
+pub(super) const DCA_AMEND: &str = "/api/v5/tradingBot/dca/amend-order-algo";
+pub(super) const DCA_STOP: &str = "/api/v5/tradingBot/dca/stop";
+pub(super) const DCA_MARGIN_ADD: &str = "/api/v5/tradingBot/dca/margin/add";
+pub(super) const DCA_MARGIN_REDUCE: &str = "/api/v5/tradingBot/dca/margin/reduce";
+pub(super) const DCA_MANUAL_BUY: &str = "/api/v5/tradingBot/dca/orders/manual-buy";
+pub(super) const DCA_REINVESTMENT: &str = "/api/v5/tradingBot/dca/settings/reinvestment";
+pub(super) const DCA_TAKE_PROFIT: &str = "/api/v5/tradingBot/dca/settings/take-profit";
+pub(super) const DCA_ORDERS: &str = "/api/v5/tradingBot/dca/orders";
+pub(super) const DCA_ONGOING: &str = "/api/v5/tradingBot/dca/ongoing-list";
+pub(super) const DCA_HISTORY: &str = "/api/v5/tradingBot/dca/history-list";
+pub(super) const DCA_CYCLES: &str = "/api/v5/tradingBot/dca/cycle-list";
+pub(super) const DCA_POSITION: &str = "/api/v5/tradingBot/dca/position-details";

@@ -38,6 +38,13 @@ impl<'a, T: Transport> TradingBot<'a, T> {
             client: self.client,
         }
     }
+
+    /// Access DCA Bot endpoints.
+    pub fn dca(&self) -> DcaBot<'_, T> {
+        DcaBot {
+            client: self.client,
+        }
+    }
 }
 
 /// Accessor for Grid Bot endpoints.
@@ -783,5 +790,185 @@ impl<T: Transport> SignalBot<'_, T> {
         request: &SignalSubOrderRequest,
     ) -> Result<Vec<SignalSubOrderPlacement>, Error> {
         self.client.post(SIGNAL_SUB_ORDER, request, true).await
+    }
+}
+
+/// Accessor for DCA Bot endpoints.
+pub struct DcaBot<'a, T> {
+    client: &'a OkxClient<T>,
+}
+
+impl<T: Transport> DcaBot<'_, T> {
+    /// Create a DCA algo order.
+    ///
+    /// `POST /api/v5/tradingBot/dca/create`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn create(&self, request: &DcaCreateRequest) -> Result<Vec<DcaActionResult>, Error> {
+        self.client.post(DCA_CREATE, request, true).await
+    }
+
+    /// Amend Spot DCA core parameters.
+    ///
+    /// `POST /api/v5/tradingBot/dca/amend-order-algo`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn amend_order(
+        &self,
+        request: &DcaAmendRequest,
+    ) -> Result<Vec<DcaActionResult>, Error> {
+        self.client.post(DCA_AMEND, request, true).await
+    }
+
+    /// Stop a DCA algo order.
+    ///
+    /// `POST /api/v5/tradingBot/dca/stop`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn stop(&self, request: &DcaStopRequest) -> Result<Vec<DcaActionResult>, Error> {
+        self.client.post(DCA_STOP, request, true).await
+    }
+
+    /// Add Contract DCA margin.
+    ///
+    /// `POST /api/v5/tradingBot/dca/margin/add`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn add_margin(
+        &self,
+        request: &DcaMarginRequest,
+    ) -> Result<Vec<DcaActionResult>, Error> {
+        self.client.post(DCA_MARGIN_ADD, request, true).await
+    }
+
+    /// Reduce Contract DCA margin.
+    ///
+    /// `POST /api/v5/tradingBot/dca/margin/reduce`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn reduce_margin(
+        &self,
+        request: &DcaMarginRequest,
+    ) -> Result<Vec<DcaActionResult>, Error> {
+        self.client.post(DCA_MARGIN_REDUCE, request, true).await
+    }
+
+    /// Add investment through a manual DCA sub-order.
+    ///
+    /// `POST /api/v5/tradingBot/dca/orders/manual-buy`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn manual_buy(
+        &self,
+        request: &DcaManualBuyRequest,
+    ) -> Result<Vec<DcaActionResult>, Error> {
+        self.client.post(DCA_MANUAL_BUY, request, true).await
+    }
+
+    /// Change Contract DCA profit reinvestment.
+    ///
+    /// `POST /api/v5/tradingBot/dca/settings/reinvestment`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn set_reinvestment(
+        &self,
+        request: &DcaReinvestmentRequest,
+    ) -> Result<Vec<DcaActionResult>, Error> {
+        self.client.post(DCA_REINVESTMENT, request, true).await
+    }
+
+    /// Change Contract DCA take-profit price.
+    ///
+    /// `POST /api/v5/tradingBot/dca/settings/take-profit`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn set_take_profit(
+        &self,
+        request: &DcaTakeProfitRequest,
+    ) -> Result<Vec<DcaActionResult>, Error> {
+        self.client.post(DCA_TAKE_PROFIT, request, true).await
+    }
+
+    /// Retrieve DCA sub-orders.
+    ///
+    /// `GET /api/v5/tradingBot/dca/orders`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_sub_orders(
+        &self,
+        request: &DcaSubOrdersRequest,
+    ) -> Result<Vec<DcaSubOrder>, Error> {
+        self.client.get(DCA_ORDERS, request, true).await
+    }
+
+    /// Retrieve ongoing DCA algo orders.
+    ///
+    /// `GET /api/v5/tradingBot/dca/ongoing-list`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_ongoing_orders(
+        &self,
+        request: &DcaOrdersRequest,
+    ) -> Result<Vec<DcaAlgoOrder>, Error> {
+        self.client.get(DCA_ONGOING, request, true).await
+    }
+
+    /// Retrieve DCA algo order history.
+    ///
+    /// `GET /api/v5/tradingBot/dca/history-list`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_history(
+        &self,
+        request: &DcaOrdersRequest,
+    ) -> Result<Vec<DcaAlgoOrder>, Error> {
+        self.client.get(DCA_HISTORY, request, true).await
+    }
+
+    /// Retrieve DCA cycles.
+    ///
+    /// `GET /api/v5/tradingBot/dca/cycle-list`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_cycles(&self, request: &DcaCyclesRequest) -> Result<Vec<DcaCycle>, Error> {
+        self.client.get(DCA_CYCLES, request, true).await
+    }
+
+    /// Retrieve current DCA position details.
+    ///
+    /// `GET /api/v5/tradingBot/dca/position-details`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_position_details(
+        &self,
+        request: &DcaAlgoRequest,
+    ) -> Result<Vec<DcaPosition>, Error> {
+        self.client.get(DCA_POSITION, request, true).await
     }
 }

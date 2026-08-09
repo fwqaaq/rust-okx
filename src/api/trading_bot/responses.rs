@@ -1294,3 +1294,339 @@ pub struct SignalEvent {
     #[serde(default)]
     pub triggered_ord_data: Vec<SignalTriggeredOrder>,
 }
+
+/// Result of creating, amending, stopping, or configuring a DCA bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DcaActionResult {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// DCA algo order type.
+    #[serde(default)]
+    pub algo_ord_type: String,
+    /// Order tag.
+    #[serde(default)]
+    pub tag: String,
+    /// Extra amount transferred from the trading account.
+    #[serde(default)]
+    pub diff_amount: NumberString,
+    /// Per-order result code.
+    #[serde(default)]
+    pub s_code: String,
+    /// Per-order result message.
+    #[serde(default)]
+    pub s_msg: String,
+}
+
+/// Trigger configuration returned for a DCA bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DcaTrigger {
+    /// Trigger action.
+    #[serde(default)]
+    pub trigger_action: String,
+    /// Trigger strategy.
+    #[serde(default)]
+    pub trigger_strategy: String,
+    /// Trigger price.
+    #[serde(default)]
+    pub trigger_px: NumberString,
+    /// RSI trigger condition.
+    #[serde(default)]
+    pub trigger_cond: String,
+    /// RSI time period.
+    #[serde(default)]
+    pub time_period: NumberString,
+    /// RSI threshold.
+    #[serde(default)]
+    pub thold: NumberString,
+    /// Candlestick timeframe.
+    #[serde(default)]
+    pub timeframe: String,
+}
+
+/// Ongoing or historical DCA algo order.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DcaAlgoOrder {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// DCA algo order type.
+    #[serde(default)]
+    pub algo_ord_type: String,
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Profit-sharing order type.
+    #[serde(default)]
+    pub copy_type: String,
+    /// Algo order state.
+    #[serde(default)]
+    pub state: String,
+    /// Stop reason for a historical order.
+    #[serde(default)]
+    pub cancel_type: String,
+    /// Position direction.
+    #[serde(default)]
+    pub direction: String,
+    /// Leverage.
+    #[serde(default)]
+    pub lever: NumberString,
+    /// Initial order amount.
+    #[serde(default)]
+    pub init_ord_amt: NumberString,
+    /// Safety order amount.
+    #[serde(default)]
+    pub safety_ord_amt: NumberString,
+    /// Maximum number of safety orders.
+    #[serde(default)]
+    pub max_safety_ords: NumberString,
+    /// Safety-order price step.
+    #[serde(default)]
+    pub px_steps: NumberString,
+    /// Price-step multiplier.
+    #[serde(default)]
+    pub px_steps_mult: NumberString,
+    /// Safety-order amount multiplier.
+    #[serde(default)]
+    pub vol_mult: NumberString,
+    /// Contract-DCA take-profit price limit.
+    #[serde(default)]
+    pub tp_px_range: NumberString,
+    /// Stop-loss target.
+    #[serde(default)]
+    pub sl_pct: NumberString,
+    /// Stop-loss order mode.
+    #[serde(default)]
+    pub sl_mode: String,
+    /// Whether profit is reinvested.
+    #[serde(default)]
+    pub allow_reinvest: bool,
+    /// Total profit and loss.
+    #[serde(default)]
+    pub total_pnl: NumberString,
+    /// Profit-and-loss ratio.
+    #[serde(default)]
+    pub pnl_ratio: NumberString,
+    /// Total funding fee for an ongoing order.
+    #[serde(default)]
+    pub total_funding_fee: NumberString,
+    /// Total funding fee for a historical order.
+    #[serde(default)]
+    pub funding_fee: NumberString,
+    /// Total investment amount.
+    #[serde(default)]
+    pub investment_amt: NumberString,
+    /// Investment currency.
+    #[serde(default)]
+    pub investment_ccy: String,
+    /// Arbitrage profit and loss.
+    #[serde(default)]
+    pub arbitrage_pn_l: NumberString,
+    /// Net margin transferred in.
+    #[serde(default)]
+    pub transfer_in_margin: NumberString,
+    /// Profit-sharing ratio.
+    #[serde(default)]
+    pub profit_sharing_ratio: NumberString,
+    /// Tracking mode.
+    #[serde(default)]
+    pub tracking_mode: String,
+    /// Trigger settings.
+    #[serde(default)]
+    pub trigger_params: Vec<DcaTrigger>,
+    /// Contract value.
+    #[serde(default)]
+    pub ct_val: NumberString,
+    /// Creation timestamp.
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Last update timestamp.
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Spot-DCA quote currency.
+    #[serde(default)]
+    pub trade_quote_ccy: String,
+}
+
+/// Sub-order created by a DCA bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DcaSubOrder {
+    /// Cycle ID.
+    #[serde(default)]
+    pub cycle_id: String,
+    /// Sub-order ID.
+    #[serde(default)]
+    pub ord_id: String,
+    /// Average fill price.
+    #[serde(default)]
+    pub avg_fill_px: NumberString,
+    /// Position direction.
+    #[serde(default)]
+    pub direction: String,
+    /// Order side.
+    #[serde(default)]
+    pub side: String,
+    /// DCA sub-order type.
+    #[serde(default)]
+    pub ord_type: String,
+    /// Order price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Order size.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Filled size.
+    #[serde(default)]
+    pub filled_sz: NumberString,
+    /// Order state.
+    #[serde(default)]
+    pub state: String,
+    /// Accumulated fee.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Rebate amount.
+    #[serde(default)]
+    pub rebate: NumberString,
+    /// Rebate currency.
+    #[serde(default)]
+    pub rebate_ccy: String,
+    /// Leverage.
+    #[serde(default)]
+    pub lever: NumberString,
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Contract value.
+    #[serde(default)]
+    pub ct_val: NumberString,
+    /// Last fill timestamp.
+    #[serde(default)]
+    pub fill_time: NumberString,
+    /// Creation timestamp.
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Last update timestamp.
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Spot-DCA quote currency.
+    #[serde(default)]
+    pub trade_quote_ccy: String,
+}
+
+/// Current position details for a DCA bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DcaPosition {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// DCA algo order type.
+    #[serde(default)]
+    pub algo_ord_type: String,
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Current cycle ID as spelled by the OKX payload (`curCycleld`).
+    #[serde(default, rename = "curCycleld")]
+    pub cur_cycle_id: String,
+    /// Current cycle start timestamp.
+    #[serde(default)]
+    pub start_time: NumberString,
+    /// Filled manual-order count.
+    #[serde(default)]
+    pub fill_manual_ords: NumberString,
+    /// Filled safety-order count.
+    #[serde(default)]
+    pub fill_safety_ords: NumberString,
+    /// Current-cycle funding fee.
+    #[serde(default)]
+    pub funding_fee: NumberString,
+    /// Initial average open price.
+    #[serde(default)]
+    pub init_px: NumberString,
+    /// Position notional value in USD.
+    #[serde(default)]
+    pub notional_usd: NumberString,
+    /// Average open price.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Unrealized profit and loss.
+    #[serde(default)]
+    pub upl: NumberString,
+    /// Estimated liquidation price.
+    #[serde(default)]
+    pub liq_px: NumberString,
+    /// Position size in contracts.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Base-currency amount held.
+    #[serde(default)]
+    pub base_sz: NumberString,
+    /// Quote-currency amount held.
+    #[serde(default)]
+    pub quote_sz: NumberString,
+    /// Stop-loss price.
+    #[serde(default)]
+    pub sl_px: NumberString,
+    /// Take-profit price.
+    #[serde(default)]
+    pub tp_px: NumberString,
+    /// Accumulated fee.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Spot-DCA quote currency.
+    #[serde(default)]
+    pub trade_quote_ccy: String,
+}
+
+/// One completed or current DCA cycle.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DcaCycle {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// Cycle ID.
+    #[serde(default)]
+    pub cycle_id: String,
+    /// Whether this is the current cycle.
+    #[serde(default)]
+    pub current_cycle: bool,
+    /// Realized profit and loss.
+    #[serde(default)]
+    pub realized_pnl: NumberString,
+    /// Cycle start timestamp.
+    #[serde(default)]
+    pub start_time: NumberString,
+    /// Cycle end timestamp.
+    #[serde(default)]
+    pub end_time: NumberString,
+    /// Accumulated fee.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Average open price.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Take-profit price.
+    #[serde(default)]
+    pub tp_px: NumberString,
+}
