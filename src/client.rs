@@ -8,6 +8,7 @@ use serde::de::DeserializeOwned;
 
 use crate::OkxRegion;
 use crate::api::account::Account;
+use crate::api::affiliate::Affiliate;
 use crate::api::convert::Convert;
 use crate::api::copy_trading::CopyTrading;
 use crate::api::fiat::Fiat;
@@ -25,7 +26,7 @@ use crate::api::trading_bot::TradingBot;
 use crate::api::trading_data::TradingData;
 use crate::credentials::Credentials;
 use crate::error::{Error, RestError};
-use crate::model::OkxResponse;
+use crate::model::{OkxPageResponse, OkxResponse, Page};
 use crate::signing;
 use crate::transport::{DefaultTransport, Transport};
 
@@ -88,6 +89,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access the (authenticated) account endpoints.
     pub fn account(&self) -> Account<'_, T> {
         Account::new(self)
+    }
+
+    /// Access authenticated Affiliate endpoints.
+    pub fn affiliate(&self) -> Affiliate<'_, T> {
+        Affiliate::new(self)
     }
 
     /// Access the (authenticated) funding-account and asset endpoints.
@@ -172,6 +178,85 @@ impl<T: Transport> OkxClient<T> {
             authenticated,
         )
         .await
+    }
+
+    /// Send a `GET` request whose response includes `totalPage` beside `data`.
+    pub(crate) async fn get_page<Q, D>(
+        &self,
+        endpoint: &'static str,
+        query: &Q,
+        authenticated: bool,
+    ) -> Result<Page<D>, Error>
+    where
+        Q: Serialize,
+        D: DeserializeOwned,
+    {
+        let qs = serde_urlencoded::to_string(query)
+            .map_err(|e| RestError::Encode { source: e.into() })?;
+        let request_path = if qs.is_empty() {
+            endpoint.to_owned()
+        } else {
+            format!("{endpoint}?{qs}")
+        };
+        let url = format!("{}{}", self.base_url, request_path);
+        let mut builder = http::Request::builder().method(Method::GET).uri(url);
+        let headers = builder
+            .headers_mut()
+            .expect("a freshly constructed request builder has no error");
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        if self.demo {
+            headers.insert(
+                HeaderName::from_static("x-simulated-trading"),
+                HeaderValue::from_static("1"),
+            );
+        }
+        if authenticated {
+            let credentials = self.credentials.as_ref().ok_or_else(|| {
+                RestError::Configuration("authenticated endpoint requires credentials".to_owned())
+            })?;
+            let timestamp = signing::timestamp();
+            let prehash = signing::pre_hash(&timestamp, Method::GET.as_str(), &request_path, "");
+            let signature = signing::sign(&prehash, credentials.secret_key());
+            insert_header(headers, "ok-access-key", credentials.api_key())?;
+            insert_header(headers, "ok-access-sign", &signature)?;
+            insert_header(headers, "ok-access-timestamp", &timestamp)?;
+            insert_header(headers, "ok-access-passphrase", credentials.passphrase())?;
+        }
+        let request = builder
+            .body(Bytes::new())
+            .map_err(|e| RestError::Encode { source: e.into() })?;
+        let response = self
+            .transport
+            .send(request)
+            .await
+            .map_err(RestError::from)?;
+        let status = response.status();
+        let bytes = response.into_body();
+        if !status.is_success() {
+            return Err(RestError::HttpStatus {
+                endpoint,
+                status,
+                body: String::from_utf8_lossy(&bytes).into_owned(),
+            }
+            .into());
+        }
+        let envelope: OkxPageResponse<D> =
+            serde_json::from_slice(&bytes).map_err(|source| RestError::Decode {
+                endpoint,
+                source,
+            })?;
+        if envelope.code != "0" {
+            return Err(RestError::Okx {
+                endpoint,
+                code: envelope.code,
+                message: envelope.msg,
+            }
+            .into());
+        }
+        Ok(Page {
+            total_page: envelope.total_page.into(),
+            data: envelope.data,
+        })
     }
 
     /// Send a public `GET` request that is expected to return a binary body.
