@@ -4,6 +4,7 @@ use super::{
     GridAiParamRequest, GridInvestmentDataRequest, GridMinInvestmentRequest, GridOrderRequest,
     GridOrdersRequest, GridTriggerRequest, RecurringAlgoIdRequest, RecurringAmendTimeRequest,
     RecurringCurrencyRequest, RecurringOrderRequest, RecurringSubOrdersRequest,
+    SignalAlgoIdRequest, SignalCancelSubOrderRequest, SignalCreateRequest, SignalSubOrderRequest,
 };
 use crate::test_util::MockTransport;
 use crate::{Credentials, OkxClient};
@@ -247,5 +248,108 @@ async fn amend_recurring_time_uses_documented_fields() {
         mock.captured().body_str(),
         r#"{"algoId":"2837428373700509696","recurringTimeType":"1","timeZone":"8","period":"hourly","recurringHour":"8","recurringDay":"1","recurringTime":"11"}"#
     );
+    assert!(mock.captured().is_signed());
+}
+
+#[tokio::test]
+async fn create_signal_matches_official_example() {
+    let body = r#"{"code":"0","msg":"","data":[{"signalChanId":"572112109","signalChanToken":"dojuckew331lkx"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = SignalCreateRequest {
+        signal_chan_name: "my-signal".into(),
+        signal_chan_desc: Some("signal description".into()),
+    };
+
+    let rows = client
+        .trading_bot()
+        .signal()
+        .create_signal(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].signal_chan_id, "572112109");
+    assert_eq!(rows[0].signal_chan_token, "dojuckew331lkx");
+    assert_eq!(mock.captured().method, Method::POST);
+    assert_eq!(
+        mock.captured().body_str(),
+        r#"{"signalChanName":"my-signal","signalChanDesc":"signal description"}"#
+    );
+    assert!(mock.captured().is_signed());
+}
+
+#[tokio::test]
+async fn stop_signal_orders_uses_documented_top_level_array() {
+    let body = r#"{"code":"0","msg":"","data":[{"algoId":"448965992920907776","algoClOrdId":"","sCode":"0","sMsg":""}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = [SignalAlgoIdRequest {
+        algo_id: "448965992920907776".into(),
+    }];
+
+    let rows = client
+        .trading_bot()
+        .signal()
+        .stop_orders(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].s_code, "0");
+    assert_eq!(
+        mock.captured().body_str(),
+        r#"[{"algoId":"448965992920907776"}]"#
+    );
+    assert!(mock.captured().is_signed());
+}
+
+#[tokio::test]
+async fn place_signal_sub_order_accepts_documented_empty_data() {
+    let body = r#"{"code":"0","msg":"","data":[]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = SignalSubOrderRequest {
+        inst_id: "BTC-USDT-SWAP".into(),
+        algo_id: "590908157585625111".into(),
+        side: "buy".into(),
+        ord_type: "market".into(),
+        sz: "1".into(),
+        ..Default::default()
+    };
+
+    let rows = client
+        .trading_bot()
+        .signal()
+        .place_sub_order(&request)
+        .await
+        .unwrap();
+
+    assert!(rows.is_empty());
+    assert_eq!(
+        mock.captured().body_str(),
+        r#"{"instId":"BTC-USDT-SWAP","algoId":"590908157585625111","side":"buy","ordType":"market","sz":"1"}"#
+    );
+    assert!(mock.captured().is_signed());
+}
+
+#[tokio::test]
+async fn cancel_signal_sub_order_matches_official_example() {
+    let body = r#"{"code":"0","msg":"","data":[{"signalOrdId":"590908157585625111","sCode":"0","sMsg":""}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = SignalCancelSubOrderRequest {
+        algo_id: "590906493941088256".into(),
+        inst_id: "BTC-USDT-SWAP".into(),
+        signal_ord_id: "590908157585625111".into(),
+    };
+
+    let rows = client
+        .trading_bot()
+        .signal()
+        .cancel_sub_order(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].signal_ord_id, "590908157585625111");
+    assert_eq!(rows[0].s_code, "0");
     assert!(mock.captured().is_signed());
 }
