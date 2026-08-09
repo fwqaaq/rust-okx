@@ -6,6 +6,7 @@
 
 pub mod account;
 pub mod convert;
+pub mod copy_trading;
 pub mod fiat;
 pub mod finance;
 pub mod funding;
