@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **374/386 (96.9%)**
+> Progress: **380/385 (98.7%)**
 
 ## Account
 
@@ -520,15 +520,15 @@
 
 ## Affiliate
 
-- [ ] GET /api/v5/affiliate/performance/summary
-- [ ] GET /api/v5/affiliate/invitee/detail
-- [ ] GET /api/v5/affiliate/invitee/list
-- [ ] GET /api/v5/affiliate/link/list
-- [ ] GET /api/v5/affiliate/co-inviter/list
-- [ ] GET /api/v5/affiliate/sub-affiliate/list
-- [ ] GET /api/v5/users/partner/if-rebate
+- [x] GET /api/v5/affiliate/performance/summary
+- [x] GET /api/v5/affiliate/invitee/detail
+- [x] GET /api/v5/affiliate/invitee/list
+- [x] GET /api/v5/affiliate/link/list
+- [x] GET /api/v5/affiliate/co-inviter/list
+- [x] GET /api/v5/affiliate/sub-affiliate/list
 
-<!-- Affiliate: 0/7 implemented -->
+<!-- Affiliate: 6/6 implemented -->
+<!-- Excluded: users/partner/if-rebate is absent from the current OKX V5 Global API guide. -->
 
 ## Broker / Partner
 
