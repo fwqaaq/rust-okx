@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **348/388 (89.7%)**
+> Progress: **374/386 (96.9%)**
 
 ## Account
 
@@ -488,36 +488,35 @@
 
 ## Copy Trading
 
-- [ ] GET /api/v5/copytrading/current-subpositions
-- [ ] GET /api/v5/copytrading/subpositions-history
-- [ ] POST /api/v5/copytrading/algo-order
-- [ ] POST /api/v5/copytrading/close-subposition
-- [ ] GET /api/v5/copytrading/instruments
-- [ ] POST /api/v5/copytrading/set-instruments
-- [ ] GET /api/v5/copytrading/profit-sharing-details
-- [ ] GET /api/v5/copytrading/total-profit-sharing
-- [ ] GET /api/v5/copytrading/unrealized-profit-sharing-details
-- [ ] POST /api/v5/copytrading/stop-copy-trading
-- [ ] POST /api/v5/copytrading/batch-set-leverage
-- [ ] GET /api/v5/copytrading/current-lead-traders
-- [ ] GET /api/v5/copytrading/public-lead-traders
-- [ ] GET /api/v5/copytrading/public-stats
-- [ ] GET /api/v5/copytrading/public-preference-currency
-- [ ] GET /api/v5/copytrading/public-current-subpositions
-- [ ] GET /api/v5/copytrading/public-subpositions-history
-- [ ] POST /api/v5/copytrade/create-sgl-link
-- [ ] GET /api/v5/copytrading/config
-- [ ] GET /api/v5/copytrading/copy-settings
-- [ ] GET /api/v5/copytrading/public-config
-- [ ] GET /api/v5/copytrading/public-copy-traders
-- [ ] GET /api/v5/copytrading/public-pnl
-- [ ] GET /api/v5/copytrading/public-weekly-pnl
-- [ ] GET /api/v5/copytrading/total-unrealized-profit-sharing
-- [ ] POST /api/v5/copytrading/amend-copy-settings
-- [ ] POST /api/v5/copytrading/amend-profit-sharing-ratio
-- [ ] POST /api/v5/copytrading/first-copy-settings
+- [x] GET /api/v5/copytrading/current-subpositions
+- [x] GET /api/v5/copytrading/subpositions-history
+- [x] POST /api/v5/copytrading/algo-order
+- [x] POST /api/v5/copytrading/close-subposition
+- [x] GET /api/v5/copytrading/instruments
+- [x] POST /api/v5/copytrading/set-instruments
+- [x] GET /api/v5/copytrading/profit-sharing-details
+- [x] GET /api/v5/copytrading/total-profit-sharing
+- [x] GET /api/v5/copytrading/unrealized-profit-sharing-details
+- [x] POST /api/v5/copytrading/stop-copy-trading
+- [x] GET /api/v5/copytrading/current-lead-traders
+- [x] GET /api/v5/copytrading/public-lead-traders
+- [x] GET /api/v5/copytrading/public-stats
+- [x] GET /api/v5/copytrading/public-preference-currency
+- [x] GET /api/v5/copytrading/public-current-subpositions
+- [x] GET /api/v5/copytrading/public-subpositions-history
+- [x] GET /api/v5/copytrading/config
+- [x] GET /api/v5/copytrading/copy-settings
+- [x] GET /api/v5/copytrading/public-config
+- [x] GET /api/v5/copytrading/public-copy-traders
+- [x] GET /api/v5/copytrading/public-pnl
+- [x] GET /api/v5/copytrading/public-weekly-pnl
+- [x] GET /api/v5/copytrading/total-unrealized-profit-sharing
+- [x] POST /api/v5/copytrading/amend-copy-settings
+- [x] POST /api/v5/copytrading/amend-profit-sharing-ratio
+- [x] POST /api/v5/copytrading/first-copy-settings
 
-<!-- Copy Trading: 0/28 implemented -->
+<!-- Copy Trading: 26/26 implemented -->
+<!-- Excluded: batch-set-leverage and copytrade/create-sgl-link are absent from the current OKX V5 Global API guide. -->
 
 ## Affiliate
 
