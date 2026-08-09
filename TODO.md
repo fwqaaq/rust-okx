@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **245/395 (62.0%)**
+> Progress: **248/392 (63.3%)**
 
 ## Account
 
@@ -325,14 +325,13 @@
 
 ## Financial Product — Stable Rewards
 
-- [ ] GET /api/v5/finance/stable-rewards/product-info
-- [ ] POST /api/v5/finance/stable-rewards/quote
-- [ ] POST /api/v5/finance/stable-rewards/trade
-- [ ] GET /api/v5/finance/stable-rewards/balance
-- [ ] GET /api/v5/finance/stable-rewards/apy-history
-- [ ] GET /api/v5/finance/stable-rewards/subscribe-redeem-history
+<!-- Decommissioned by OKX: quote, trade, subscribe-redeem-history -->
 
-<!-- Financial Product — Stable Rewards: 0/6 implemented -->
+- [x] GET /api/v5/finance/stable-rewards/product-info
+- [x] GET /api/v5/finance/stable-rewards/balance
+- [x] GET /api/v5/finance/stable-rewards/apy-history
+
+<!-- Financial Product — Stable Rewards: 3/3 implemented -->
 
 ## Financial Product — OKUSD
 
