@@ -10,6 +10,7 @@ use crate::OkxRegion;
 use crate::api::account::Account;
 use crate::api::convert::Convert;
 use crate::api::finance::Finance;
+use crate::api::fiat::Fiat;
 use crate::api::funding::Funding;
 use crate::api::market::Market;
 use crate::api::public_data::PublicData;
@@ -98,6 +99,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access the finance endpoints.
     pub fn finance(&self) -> Finance<'_, T> {
         Finance::new(self)
+    }
+
+    /// Access the authenticated fiat endpoints.
+    pub fn fiat(&self) -> Fiat<'_, T> {
+        Fiat::new(self)
     }
 
     /// Access the (authenticated) sub-account management endpoints.
