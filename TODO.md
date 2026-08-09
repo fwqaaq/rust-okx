@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **205/395 (51.9%)**
+> Progress: **220/395 (55.7%)**
 
 ## Account
 
@@ -176,23 +176,23 @@
 
 ## Trading Data
 
-- [ ] GET /api/v5/rubik/stat/trading-data/support-coin
-- [ ] GET /api/v5/rubik/stat/taker-volume
-- [ ] GET /api/v5/rubik/stat/margin/loan-ratio
-- [ ] GET /api/v5/rubik/stat/contracts/long-short-account-ratio
-- [ ] GET /api/v5/rubik/stat/contracts/long-short-account-ratio-contract
-- [ ] GET /api/v5/rubik/stat/contracts/open-interest-volume
-- [ ] GET /api/v5/rubik/stat/contracts/open-interest-history
-- [ ] GET /api/v5/rubik/stat/option/open-interest-volume
-- [ ] GET /api/v5/rubik/stat/option/open-interest-volume-ratio
-- [ ] GET /api/v5/rubik/stat/option/open-interest-volume-expiry
-- [ ] GET /api/v5/rubik/stat/option/open-interest-volume-strike
-- [ ] GET /api/v5/rubik/stat/option/taker-block-volume
-- [ ] GET /api/v5/rubik/stat/contracts/long-short-account-ratio-contract-top-trader
-- [ ] GET /api/v5/rubik/stat/contracts/long-short-position-ratio-contract-top-trader
-- [ ] GET /api/v5/rubik/stat/taker-volume-contract
+- [x] GET /api/v5/rubik/stat/trading-data/support-coin
+- [x] GET /api/v5/rubik/stat/taker-volume
+- [x] GET /api/v5/rubik/stat/margin/loan-ratio
+- [x] GET /api/v5/rubik/stat/contracts/long-short-account-ratio
+- [x] GET /api/v5/rubik/stat/contracts/long-short-account-ratio-contract
+- [x] GET /api/v5/rubik/stat/contracts/open-interest-volume
+- [x] GET /api/v5/rubik/stat/contracts/open-interest-history
+- [x] GET /api/v5/rubik/stat/option/open-interest-volume
+- [x] GET /api/v5/rubik/stat/option/open-interest-volume-ratio
+- [x] GET /api/v5/rubik/stat/option/open-interest-volume-expiry
+- [x] GET /api/v5/rubik/stat/option/open-interest-volume-strike
+- [x] GET /api/v5/rubik/stat/option/taker-block-volume
+- [x] GET /api/v5/rubik/stat/contracts/long-short-account-ratio-contract-top-trader
+- [x] GET /api/v5/rubik/stat/contracts/long-short-position-ratio-contract-top-trader
+- [x] GET /api/v5/rubik/stat/taker-volume-contract
 
-<!-- Trading Data: 0/15 implemented -->
+<!-- Trading Data: 15/15 implemented -->
 
 ## Funding Account
 

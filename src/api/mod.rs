@@ -14,3 +14,4 @@ pub mod status;
 pub mod sub_account;
 pub mod support;
 pub mod trade;
+pub mod trading_data;
