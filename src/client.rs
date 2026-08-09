@@ -240,11 +240,8 @@ impl<T: Transport> OkxClient<T> {
             }
             .into());
         }
-        let envelope: OkxPageResponse<D> =
-            serde_json::from_slice(&bytes).map_err(|source| RestError::Decode {
-                endpoint,
-                source,
-            })?;
+        let envelope: OkxPageResponse<D> = serde_json::from_slice(&bytes)
+            .map_err(|source| RestError::Decode { endpoint, source })?;
         if envelope.code != "0" {
             return Err(RestError::Okx {
                 endpoint,
