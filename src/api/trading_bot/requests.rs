@@ -439,3 +439,173 @@ pub struct GridCopyOrderRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
 }
+
+/// One currency allocation in a recurring-buy strategy.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringCurrencyRequest {
+    /// Currency to buy.
+    pub ccy: String,
+    /// Allocation ratio.
+    pub ratio: String,
+    /// Optional minimum purchase price.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_px: Option<String>,
+    /// Optional maximum purchase price.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_px: Option<String>,
+}
+
+/// Request to place a recurring-buy algo order.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringOrderRequest {
+    /// Custom strategy name.
+    pub stgy_name: String,
+    /// Currency allocations.
+    pub recurring_list: Vec<RecurringCurrencyRequest>,
+    /// Investment period.
+    pub period: String,
+    /// Hour of day for the investment.
+    pub recurring_time: String,
+    /// UTC time zone.
+    pub time_zone: String,
+    /// Amount invested per cycle.
+    pub amt: String,
+    /// Investment currency.
+    pub investment_ccy: String,
+    /// Trading mode.
+    pub td_mode: String,
+    /// Monthly date or weekly day.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recurring_day: Option<String>,
+    /// Hourly recurrence interval.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recurring_hour: Option<String>,
+    /// Client-supplied algo order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub algo_cl_ord_id: Option<String>,
+    /// Order tag.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+    /// Quote currency used for trading.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trade_quote_ccy: Option<String>,
+    /// Funding sources.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<Vec<String>>,
+    /// Recurring time type.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recurring_time_type: Option<String>,
+}
+
+/// Request to rename a recurring-buy algo order.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringAmendRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// New strategy name.
+    pub stgy_name: String,
+}
+
+/// Request selecting one recurring-buy algo order.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringAlgoIdRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+}
+
+/// Query for active or historical recurring-buy algo orders.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringOrdersRequest {
+    /// Algo order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub algo_id: Option<String>,
+    /// Return records earlier than this algo ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records newer than this algo ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
+
+/// Query for recurring-buy sub-orders.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringSubOrdersRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Sub-order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ord_id: Option<String>,
+    /// Return records earlier than this order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records newer than this order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
+
+/// Request to add investment or amend a recurring-buy amount.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringAmountRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Investment amount.
+    pub amount: String,
+}
+
+/// One amended price range in a recurring-buy strategy.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringPriceRangeRequest {
+    /// Recurring-buy currency.
+    pub ccy: String,
+    /// Minimum price, or an empty string for no limit.
+    pub min_px: String,
+    /// Maximum price, or an empty string for no limit.
+    pub max_px: String,
+}
+
+/// Request to amend recurring-buy price ranges.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringAmendPriceRangeRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// New price ranges.
+    pub recurring_list: Vec<RecurringPriceRangeRequest>,
+}
+
+/// Request to amend a recurring-buy schedule.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecurringAmendTimeRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Recurring time type.
+    pub recurring_time_type: String,
+    /// UTC time zone.
+    pub time_zone: String,
+    /// Investment period.
+    pub period: String,
+    /// Hourly recurrence interval.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recurring_hour: Option<String>,
+    /// Monthly date or weekly day.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recurring_day: Option<String>,
+    /// Hour of day for a custom schedule.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recurring_time: Option<String>,
+}
