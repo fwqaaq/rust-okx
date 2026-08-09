@@ -9,6 +9,7 @@ use serde::de::DeserializeOwned;
 use crate::OkxRegion;
 use crate::api::account::Account;
 use crate::api::convert::Convert;
+use crate::api::copy_trading::CopyTrading;
 use crate::api::fiat::Fiat;
 use crate::api::finance::Finance;
 use crate::api::funding::Funding;
@@ -97,6 +98,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access the (authenticated) asset conversion endpoints.
     pub fn convert(&self) -> Convert<'_, T> {
         Convert::new(self)
+    }
+
+    /// Access Copy Trading endpoints.
+    pub fn copy_trading(&self) -> CopyTrading<'_, T> {
+        CopyTrading::new(self)
     }
 
     /// Access the finance endpoints.
