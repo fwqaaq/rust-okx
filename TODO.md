@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **381/383 (99.5%)**
+> Progress: **383/383 (100.0%)**
 
 ## Account
 
@@ -543,7 +543,7 @@
 
 ## Announcement
 
-- [ ] GET /api/v5/support/announcements
-- [ ] GET /api/v5/support/announcement-types
+- [x] GET /api/v5/support/announcements
+- [x] GET /api/v5/support/announcement-types
 
-<!-- Announcement: 0/2 implemented -->
+<!-- Announcement: 2/2 implemented -->
