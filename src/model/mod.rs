@@ -54,7 +54,7 @@ pub(crate) struct OkxResponse<D> {
 pub(crate) struct OkxPageResponse<D> {
     pub code: String,
     pub msg: String,
-    #[serde(default)]
+    #[serde(default, rename = "totalPage")]
     pub total_page: String,
     pub data: D,
 }
