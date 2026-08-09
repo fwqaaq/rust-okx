@@ -19,10 +19,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
     ("GET", "/api/v5/copytrading/public-weekly-pnl"),
     ("GET", "/api/v5/copytrading/subpositions-history"),
     ("GET", "/api/v5/copytrading/total-profit-sharing"),
-    (
-        "GET",
-        "/api/v5/copytrading/total-unrealized-profit-sharing",
-    ),
+    ("GET", "/api/v5/copytrading/total-unrealized-profit-sharing"),
     (
         "GET",
         "/api/v5/copytrading/unrealized-profit-sharing-details",
@@ -240,10 +237,7 @@ const TEST_SOURCES: &[(&str, &str)] = &[
     ("account/todo.rs", include_str!("account/todo.rs")),
     ("convert/read_only.rs", include_str!("convert/read_only.rs")),
     ("convert/todo.rs", include_str!("convert/todo.rs")),
-    (
-        "copy_trading_todo.rs",
-        include_str!("copy_trading_todo.rs"),
-    ),
+    ("copy_trading_todo.rs", include_str!("copy_trading_todo.rs")),
     ("finance/read_only.rs", include_str!("finance/read_only.rs")),
     ("finance/todo.rs", include_str!("finance/todo.rs")),
     ("fiat.rs", include_str!("fiat.rs")),
