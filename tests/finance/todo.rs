@@ -38,3 +38,18 @@ fn finance_mutating_endpoints_todo() {
     // STATUS: TODO — requires real balances and a product-specific rollback plan.
     todo!("run only in an isolated account with strict amount caps");
 }
+
+#[test]
+#[ignore = "requires live dual-investment products and risks real assets"]
+fn dual_investment_endpoints_todo() {
+    // API: GET /api/v5/finance/sfp/dcd/currency-pair
+    // API: GET /api/v5/finance/sfp/dcd/products
+    // API: POST /api/v5/finance/sfp/dcd/quote
+    // API: POST /api/v5/finance/sfp/dcd/trade
+    // API: POST /api/v5/finance/sfp/dcd/redeem-quote
+    // API: POST /api/v5/finance/sfp/dcd/redeem
+    // API: GET /api/v5/finance/sfp/dcd/order-status
+    // API: GET /api/v5/finance/sfp/dcd/order-history
+    // STATUS: TODO — requires a live product, short-lived quotes, and an isolated funded account.
+    todo!("exercise the two-step trade and redeem flows with strict investment caps");
+}
