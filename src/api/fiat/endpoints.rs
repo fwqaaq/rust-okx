@@ -1,0 +1,13 @@
+pub(super) const DEPOSIT_PAYMENT_METHODS: &str = "/api/v5/fiat/deposit-payment-methods";
+pub(super) const WITHDRAWAL_PAYMENT_METHODS: &str = "/api/v5/fiat/withdrawal-payment-methods";
+pub(super) const CREATE_WITHDRAWAL: &str = "/api/v5/fiat/create-withdrawal";
+pub(super) const CANCEL_WITHDRAWAL: &str = "/api/v5/fiat/cancel-withdrawal";
+pub(super) const WITHDRAWAL_ORDER_HISTORY: &str = "/api/v5/fiat/withdrawal-order-history";
+pub(super) const WITHDRAWAL: &str = "/api/v5/fiat/withdrawal";
+pub(super) const DEPOSIT_ORDER_HISTORY: &str = "/api/v5/fiat/deposit-order-history";
+pub(super) const DEPOSIT: &str = "/api/v5/fiat/deposit";
+pub(super) const BUY_SELL_CURRENCIES: &str = "/api/v5/fiat/buy-sell/currencies";
+pub(super) const BUY_SELL_CURRENCY_PAIR: &str = "/api/v5/fiat/buy-sell/currency-pair";
+pub(super) const BUY_SELL_QUOTE: &str = "/api/v5/fiat/buy-sell/quote";
+pub(super) const BUY_SELL_TRADE: &str = "/api/v5/fiat/buy-sell/trade";
+pub(super) const BUY_SELL_HISTORY: &str = "/api/v5/fiat/buy-sell/history";
