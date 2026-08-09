@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **284/390 (72.8%)**
+> Progress: **305/388 (78.6%)**
 
 ## Account
 
@@ -402,31 +402,31 @@
 
 ## Trading Bot — Grid
 
-- [ ] POST /api/v5/tradingBot/grid/order-algo
-- [ ] POST /api/v5/tradingBot/grid/amend-order-algo
-- [ ] POST /api/v5/tradingBot/grid/stop-order-algo
-- [ ] GET /api/v5/tradingBot/grid/orders-algo-pending
-- [ ] GET /api/v5/tradingBot/grid/orders-algo-history
-- [ ] GET /api/v5/tradingBot/grid/orders-algo-details
-- [ ] GET /api/v5/tradingBot/grid/sub-orders
-- [ ] GET /api/v5/tradingBot/grid/positions
-- [ ] POST /api/v5/tradingBot/grid/close-position
-- [ ] POST /api/v5/tradingBot/grid/cancel-close-order
-- [ ] POST /api/v5/tradingBot/grid/withdraw-income
-- [ ] POST /api/v5/tradingBot/grid/compute-margin-balance
-- [ ] POST /api/v5/tradingBot/grid/margin-balance
-- [ ] GET /api/v5/tradingBot/grid/ai-param
-- [ ] POST /api/v5/tradingBot/grid/min-investment
-- [ ] POST /api/v5/tradingBot/grid/adjust-investment
-- [ ] POST /api/v5/tradingBot/grid/order-instant-trigger
-- [ ] POST /api/v5/tradingBot/grid/amend-order-instant-trigger
-- [ ] POST /api/v5/tradingBot/grid/stop-order-instant-trigger
-- [ ] GET /api/v5/tradingBot/grid/grid-quantity
-- [ ] POST /api/v5/tradingBot/grid/amend-algo-basic-param
-- [ ] POST /api/v5/tradingBot/grid/copy-order-algo
-- [ ] GET /api/v5/tradingBot/public/rsi-back-testing
+<!-- Undocumented instant-trigger amend/stop paths excluded -->
 
-<!-- Trading Bot — Grid: 0/23 implemented -->
+- [x] POST /api/v5/tradingBot/grid/order-algo
+- [x] POST /api/v5/tradingBot/grid/amend-order-algo
+- [x] POST /api/v5/tradingBot/grid/stop-order-algo
+- [x] GET /api/v5/tradingBot/grid/orders-algo-pending
+- [x] GET /api/v5/tradingBot/grid/orders-algo-history
+- [x] GET /api/v5/tradingBot/grid/orders-algo-details
+- [x] GET /api/v5/tradingBot/grid/sub-orders
+- [x] GET /api/v5/tradingBot/grid/positions
+- [x] POST /api/v5/tradingBot/grid/close-position
+- [x] POST /api/v5/tradingBot/grid/cancel-close-order
+- [x] POST /api/v5/tradingBot/grid/withdraw-income
+- [x] POST /api/v5/tradingBot/grid/compute-margin-balance
+- [x] POST /api/v5/tradingBot/grid/margin-balance
+- [x] GET /api/v5/tradingBot/grid/ai-param
+- [x] POST /api/v5/tradingBot/grid/min-investment
+- [x] POST /api/v5/tradingBot/grid/adjust-investment
+- [x] POST /api/v5/tradingBot/grid/order-instant-trigger
+- [x] GET /api/v5/tradingBot/grid/grid-quantity
+- [x] POST /api/v5/tradingBot/grid/amend-algo-basic-param
+- [x] POST /api/v5/tradingBot/grid/copy-order-algo
+- [x] GET /api/v5/tradingBot/public/rsi-back-testing
+
+<!-- Trading Bot — Grid: 21/21 implemented -->
 
 ## Trading Bot — Recurring Buy
 
