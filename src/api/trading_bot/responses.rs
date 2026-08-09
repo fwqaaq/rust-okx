@@ -609,3 +609,246 @@ pub struct GridAlgoResult {
     #[serde(default)]
     pub algo_cl_ord_id: String,
 }
+
+/// Result of placing a recurring-buy algo order.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct RecurringCreateResult {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// Per-order result code.
+    #[serde(default)]
+    pub s_code: String,
+    /// Per-order result message.
+    #[serde(default)]
+    pub s_msg: String,
+    /// Order tag.
+    #[serde(default)]
+    pub tag: String,
+}
+
+/// Result of amending or stopping a recurring-buy algo order.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct RecurringActionResult {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// Per-order result code.
+    #[serde(default)]
+    pub s_code: String,
+    /// Per-order result message.
+    #[serde(default)]
+    pub s_msg: String,
+}
+
+/// Result of a recurring-buy maintenance operation.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct RecurringOperationResult {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Event result code.
+    #[serde(default)]
+    pub s_code: String,
+    /// Event result message.
+    #[serde(default)]
+    pub s_msg: String,
+}
+
+/// One currency allocation and its recurring-buy performance.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct RecurringCurrency {
+    /// Recurring-buy currency.
+    #[serde(default)]
+    pub ccy: String,
+    /// Allocation ratio.
+    #[serde(default)]
+    pub ratio: NumberString,
+    /// Minimum purchase price.
+    #[serde(default)]
+    pub min_px: NumberString,
+    /// Maximum purchase price.
+    #[serde(default)]
+    pub max_px: NumberString,
+    /// Accumulated amount in the recurring-buy currency.
+    #[serde(default)]
+    pub total_amt: NumberString,
+    /// Profit in the investment currency.
+    #[serde(default)]
+    pub profit: NumberString,
+    /// Average purchase price.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Current market price.
+    #[serde(default)]
+    pub px: NumberString,
+}
+
+/// Recurring-buy algo order details.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct RecurringOrder {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// Instrument type.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Creation timestamp.
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Last update timestamp.
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Algo order type.
+    #[serde(default)]
+    pub algo_ord_type: String,
+    /// Algo order state.
+    #[serde(default)]
+    pub state: String,
+    /// Custom strategy name.
+    #[serde(default)]
+    pub stgy_name: String,
+    /// Currency allocations and performance.
+    #[serde(default)]
+    pub recurring_list: Vec<RecurringCurrency>,
+    /// Investment period.
+    #[serde(default)]
+    pub period: String,
+    /// Monthly date or weekly day.
+    #[serde(default)]
+    pub recurring_day: NumberString,
+    /// Hourly recurrence interval.
+    #[serde(default)]
+    pub recurring_hour: NumberString,
+    /// Hour of day for the investment.
+    #[serde(default)]
+    pub recurring_time: NumberString,
+    /// UTC time zone.
+    #[serde(default)]
+    pub time_zone: NumberString,
+    /// Amount invested per cycle.
+    #[serde(default)]
+    pub amt: NumberString,
+    /// Accumulated invested amount.
+    #[serde(default)]
+    pub investment_amt: NumberString,
+    /// Investment currency.
+    #[serde(default)]
+    pub investment_ccy: String,
+    /// Next investment timestamp.
+    #[serde(default)]
+    pub next_invest_time: NumberString,
+    /// Total profit and loss.
+    #[serde(default)]
+    pub total_pnl: NumberString,
+    /// Total annualized rate.
+    #[serde(default)]
+    pub total_ann_rate: NumberString,
+    /// Profit and loss ratio.
+    #[serde(default)]
+    pub pnl_ratio: NumberString,
+    /// Current market value.
+    #[serde(default)]
+    pub mkt_cap: NumberString,
+    /// Number of completed cycles.
+    #[serde(default)]
+    pub cycles: NumberString,
+    /// Order tag.
+    #[serde(default)]
+    pub tag: String,
+    /// Quote currency used for trading.
+    #[serde(default)]
+    pub trade_quote_ccy: String,
+    /// Funding sources.
+    #[serde(default)]
+    pub source: Vec<String>,
+    /// Recurring time type.
+    #[serde(default)]
+    pub recurring_time_type: String,
+    /// Custom recurring-buy minute.
+    #[serde(default)]
+    pub recurring_time_minutes: NumberString,
+}
+
+/// A recurring-buy sub-order.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct RecurringSubOrder {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Instrument type.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Algo order type.
+    #[serde(default)]
+    pub algo_ord_type: String,
+    /// Sub-order ID.
+    #[serde(default)]
+    pub ord_id: String,
+    /// Creation timestamp.
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Last update timestamp.
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Trade mode.
+    #[serde(default)]
+    pub td_mode: String,
+    /// Order type.
+    #[serde(default)]
+    pub ord_type: String,
+    /// Order size.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Order state.
+    #[serde(default)]
+    pub state: String,
+    /// Order side.
+    #[serde(default)]
+    pub side: String,
+    /// Order price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Fee.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Fee currency.
+    #[serde(default)]
+    pub fee_ccy: String,
+    /// Average fill price.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Accumulated filled size.
+    #[serde(default)]
+    pub acc_fill_sz: NumberString,
+    /// Order tag.
+    #[serde(default)]
+    pub tag: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+}
