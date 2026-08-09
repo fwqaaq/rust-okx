@@ -192,10 +192,7 @@ async fn recurring_details_preserve_official_string_precision() {
         .unwrap();
 
     assert_eq!(rows[0].recurring_list[0].px.as_str(), "36683.2");
-    assert_eq!(
-        mock.captured().query(),
-        Some("algoId=644497312047435776")
-    );
+    assert_eq!(mock.captured().query(), Some("algoId=644497312047435776"));
     assert!(mock.captured().is_signed());
 }
 
@@ -223,7 +220,8 @@ async fn recurring_sub_orders_decode_official_example() {
 
 #[tokio::test]
 async fn amend_recurring_time_uses_documented_fields() {
-    let body = r#"{"code":"0","msg":"","data":[{"algoId":"2837428373700509696","sCode":"0","sMsg":""}]}"#;
+    let body =
+        r#"{"code":"0","msg":"","data":[{"algoId":"2837428373700509696","sCode":"0","sMsg":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = RecurringAmendTimeRequest {
