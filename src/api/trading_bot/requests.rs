@@ -891,3 +891,255 @@ pub struct SignalEventHistoryRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<String>,
 }
+
+/// Trigger configuration for a DCA bot.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaTriggerRequest {
+    /// Trigger action.
+    pub trigger_action: String,
+    /// Trigger strategy.
+    pub trigger_strategy: String,
+    /// Candlestick timeframe for an RSI trigger.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timeframe: Option<String>,
+    /// RSI threshold.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thold: Option<String>,
+    /// RSI trigger condition.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trigger_cond: Option<String>,
+    /// RSI time period.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time_period: Option<String>,
+    /// Contract-DCA price trigger.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trigger_px: Option<String>,
+}
+
+/// Request to create a DCA bot.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaCreateRequest {
+    /// Instrument ID.
+    pub inst_id: String,
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+    /// Initial order amount.
+    pub init_ord_amt: String,
+    /// Whether contract-DCA profit is reinvested.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_reinvest: Option<String>,
+    /// Safety order amount.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub safety_ord_amt: Option<String>,
+    /// Maximum number of safety orders.
+    pub max_safety_ords: String,
+    /// Safety-order price step.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub px_steps: Option<String>,
+    /// Price-step multiplier.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub px_steps_mult: Option<String>,
+    /// Safety-order amount multiplier.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vol_mult: Option<String>,
+    /// Take-profit target per cycle.
+    pub tp_pct: String,
+    /// Stop-loss target.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sl_pct: Option<String>,
+    /// Stop-loss order mode.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sl_mode: Option<String>,
+    /// Contract-DCA direction.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub direction: Option<String>,
+    /// Contract-DCA leverage.
+    pub lever: String,
+    /// Trigger settings.
+    pub trigger_params: Vec<DcaTriggerRequest>,
+    /// Lead-trader profit-sharing ratio.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profit_sharing_ratio: Option<String>,
+    /// Contract-DCA tracking mode.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tracking_mode: Option<String>,
+    /// Order tag.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+    /// Client-supplied algo order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub algo_cl_ord_id: Option<String>,
+    /// Spot-DCA quote currency.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trade_quote_ccy: Option<String>,
+}
+
+/// Request to amend Spot DCA parameters.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaAmendRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Safety-order price step.
+    pub px_steps: String,
+    /// Price-step multiplier.
+    pub px_steps_mult: String,
+    /// Safety-order amount multiplier.
+    pub vol_mult: String,
+    /// Take-profit target.
+    pub tp_pct: String,
+    /// Stop-loss target.
+    pub sl_pct: String,
+    /// Initial order amount.
+    pub init_ord_amt: String,
+    /// Safety order amount.
+    pub safety_ord_amt: String,
+    /// Maximum number of safety orders.
+    pub max_safety_ords: String,
+    /// Whether all funds are reserved.
+    pub reserve_funds: bool,
+    /// Signal trigger settings.
+    pub trigger_params: Vec<DcaTriggerRequest>,
+}
+
+/// Request to stop a DCA bot.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaStopRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+    /// Stop type.
+    pub stop_type: String,
+}
+
+/// Query for ongoing or historical DCA bots.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaOrdersRequest {
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+    /// Algo order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub algo_id: Option<String>,
+    /// Return records earlier than this algo ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records newer than this algo ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
+
+/// Query for DCA sub-orders.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaSubOrdersRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+    /// Cycle ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cycle_id: Option<String>,
+    /// Return records earlier than this sub-order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records newer than this sub-order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
+
+/// Request to add investment through a DCA sub-order.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaManualBuyRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+    /// Limit price.
+    pub price: String,
+    /// Amount to invest.
+    pub amt: String,
+    /// Spot-DCA order type.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ord_type: Option<String>,
+    /// Spot-DCA quote currency.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trade_quote_ccy: Option<String>,
+}
+
+/// Request to change Contract DCA profit reinvestment.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaReinvestmentRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+    /// Whether profit is reinvested.
+    pub allow_reinvest: bool,
+}
+
+/// Request to change Contract DCA take-profit price.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaTakeProfitRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+    /// Take-profit price.
+    pub tp_price: String,
+}
+
+/// Request selecting a DCA bot.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaAlgoRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+}
+
+/// Query for DCA cycles.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaCyclesRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// DCA algo order type.
+    pub algo_ord_type: String,
+    /// Instrument ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inst_id: Option<String>,
+    /// Return records earlier than this cycle ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records newer than this cycle ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
+
+/// Request to add or reduce Contract DCA margin.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DcaMarginRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Margin adjustment amount.
+    pub amt: String,
+}
