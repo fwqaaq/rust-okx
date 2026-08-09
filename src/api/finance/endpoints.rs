@@ -41,3 +41,8 @@ pub(super) const DUAL_REDEEM_QUOTE: &str = "/api/v5/finance/sfp/dcd/redeem-quote
 pub(super) const DUAL_REDEEM: &str = "/api/v5/finance/sfp/dcd/redeem";
 pub(super) const DUAL_ORDER_STATUS: &str = "/api/v5/finance/sfp/dcd/order-status";
 pub(super) const DUAL_ORDER_HISTORY: &str = "/api/v5/finance/sfp/dcd/order-history";
+pub(super) const STABLE_REWARDS_PRODUCT_INFO: &str =
+    "/api/v5/finance/stable-rewards/product-info";
+pub(super) const STABLE_REWARDS_BALANCE: &str = "/api/v5/finance/stable-rewards/balance";
+pub(super) const STABLE_REWARDS_APY_HISTORY: &str =
+    "/api/v5/finance/stable-rewards/apy-history";
