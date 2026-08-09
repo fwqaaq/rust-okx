@@ -3,8 +3,8 @@ use http::Method;
 use super::{
     DcaAlgoRequest, DcaCreateRequest, DcaOrdersRequest, DcaTriggerRequest, GridAiParamRequest,
     GridInvestmentDataRequest, GridMinInvestmentRequest, GridOrderRequest, GridOrdersRequest,
-    GridTriggerRequest, RecurringAlgoIdRequest, RecurringAmendTimeRequest, RecurringCurrencyRequest,
-    RecurringOrderRequest, RecurringSubOrdersRequest,
+    GridTriggerRequest, RecurringAlgoIdRequest, RecurringAmendTimeRequest,
+    RecurringCurrencyRequest, RecurringOrderRequest, RecurringSubOrdersRequest,
     SignalAlgoIdRequest, SignalCancelSubOrderRequest, SignalCreateRequest, SignalSubOrderRequest,
 };
 use crate::test_util::MockTransport;
@@ -193,10 +193,7 @@ async fn recurring_details_preserve_official_string_precision() {
         .unwrap();
 
     assert_eq!(rows[0].recurring_list[0].px.as_str(), "36683.2");
-    assert_eq!(
-        mock.captured().query(),
-        Some("algoId=644497312047435776")
-    );
+    assert_eq!(mock.captured().query(), Some("algoId=644497312047435776"));
     assert!(mock.captured().is_signed());
 }
 
@@ -224,7 +221,8 @@ async fn recurring_sub_orders_decode_official_example() {
 
 #[tokio::test]
 async fn amend_recurring_time_uses_documented_fields() {
-    let body = r#"{"code":"0","msg":"","data":[{"algoId":"2837428373700509696","sCode":"0","sMsg":""}]}"#;
+    let body =
+        r#"{"code":"0","msg":"","data":[{"algoId":"2837428373700509696","sCode":"0","sMsg":""}]}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = RecurringAmendTimeRequest {
@@ -357,7 +355,8 @@ async fn cancel_signal_sub_order_matches_official_example() {
 
 #[tokio::test]
 async fn create_dca_bot_matches_official_result() {
-    let body = r#"{"code":"0","data":[{"algoId":"447053782921515008","sCode":"0","sMsg":""}],"msg":""}"#;
+    let body =
+        r#"{"code":"0","data":[{"algoId":"447053782921515008","sCode":"0","sMsg":""}],"msg":""}"#;
     let mock = MockTransport::new(body);
     let client = signed_client(mock.clone());
     let request = DcaCreateRequest {
