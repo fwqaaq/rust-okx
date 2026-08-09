@@ -3,6 +3,7 @@ use crate::{Credentials, OkxClient};
 
 mod assets;
 mod deposits;
+mod edge;
 mod transfers;
 mod withdrawals;
 
