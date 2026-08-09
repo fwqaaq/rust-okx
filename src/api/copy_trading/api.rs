@@ -113,9 +113,7 @@ impl<'a, T: Transport> CopyTrading<'a, T> {
         &self,
         request: &ProfitSharingRequest,
     ) -> Result<Vec<ProfitSharingDetail>, Error> {
-        self.client
-            .get(PROFIT_SHARING_DETAILS, request, true)
-            .await
+        self.client.get(PROFIT_SHARING_DETAILS, request, true).await
     }
 
     /// Retrieve total realized profit sharing.
