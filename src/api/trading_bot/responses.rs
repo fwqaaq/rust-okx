@@ -852,3 +852,445 @@ pub struct RecurringSubOrder {
     #[serde(default)]
     pub algo_cl_ord_id: String,
 }
+
+/// Result of creating a signal channel.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalChannelCreated {
+    /// Signal channel ID.
+    #[serde(default)]
+    pub signal_chan_id: String,
+    /// Token that identifies the user when signals place orders.
+    #[serde(default)]
+    pub signal_chan_token: String,
+}
+
+/// Signal channel metadata.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalChannel {
+    /// Signal channel ID.
+    #[serde(default)]
+    pub signal_chan_id: String,
+    /// Signal channel name.
+    #[serde(default)]
+    pub signal_chan_name: String,
+    /// Signal channel description.
+    #[serde(default)]
+    pub signal_chan_desc: String,
+    /// Token that identifies the user when signals place orders.
+    #[serde(default)]
+    pub signal_chan_token: String,
+    /// Signal source type.
+    #[serde(default)]
+    pub signal_source_type: String,
+}
+
+/// Result of creating or stopping a signal bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalActionResult {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// Per-order result code.
+    #[serde(default)]
+    pub s_code: String,
+    /// Per-order result message.
+    #[serde(default)]
+    pub s_msg: String,
+}
+
+/// Result of a signal-bot operation that returns only an algo ID.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalAlgoResult {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+}
+
+/// Entry settings returned for a signal bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalEntrySetting {
+    /// Whether repeated entries in the same direction are allowed.
+    #[serde(default)]
+    pub allow_multiple_entry: bool,
+    /// Entry sizing type.
+    #[serde(default)]
+    pub entry_type: String,
+    /// Fixed margin or contract amount.
+    #[serde(default)]
+    pub amt: NumberString,
+    /// Percentage amount per order.
+    #[serde(default)]
+    pub ratio: NumberString,
+}
+
+/// Exit settings returned for a signal bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalExitSetting {
+    /// Take-profit/stop-loss calculation type.
+    #[serde(default)]
+    pub tp_sl_type: String,
+    /// Take-profit percentage.
+    #[serde(default)]
+    pub tp_pct: NumberString,
+    /// Stop-loss percentage.
+    #[serde(default)]
+    pub sl_pct: NumberString,
+}
+
+/// Signal-bot algo order details.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalAlgoOrder {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// Instrument type.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Instrument IDs.
+    #[serde(default)]
+    pub inst_ids: Vec<String>,
+    /// Creation timestamp.
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Last update timestamp.
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Algo order type.
+    #[serde(default)]
+    pub algo_ord_type: String,
+    /// Algo order state.
+    #[serde(default)]
+    pub state: String,
+    /// Stop reason.
+    #[serde(default)]
+    pub cancel_type: String,
+    /// Total profit and loss.
+    #[serde(default)]
+    pub total_pnl: NumberString,
+    /// Total profit and loss ratio.
+    #[serde(default)]
+    pub total_pnl_ratio: NumberString,
+    /// Total strategy-account equity.
+    #[serde(default)]
+    pub total_eq: NumberString,
+    /// Floating profit and loss.
+    #[serde(default)]
+    pub float_pnl: NumberString,
+    /// Realized profit and loss.
+    #[serde(default)]
+    pub realized_pnl: NumberString,
+    /// Frozen balance.
+    #[serde(default)]
+    pub frozen_bal: NumberString,
+    /// Available balance.
+    #[serde(default)]
+    pub avail_bal: NumberString,
+    /// Leverage.
+    #[serde(default)]
+    pub lever: NumberString,
+    /// Investment amount.
+    #[serde(default)]
+    pub invest_amt: NumberString,
+    /// Sub-order type.
+    #[serde(default)]
+    pub sub_ord_type: String,
+    /// Limit-price offset ratio.
+    #[serde(default)]
+    pub ratio: NumberString,
+    /// Entry settings.
+    #[serde(default)]
+    pub entry_setting_param: SignalEntrySetting,
+    /// Exit settings.
+    #[serde(default)]
+    pub exit_setting_param: SignalExitSetting,
+    /// Signal channel ID.
+    #[serde(default)]
+    pub signal_chan_id: String,
+    /// Signal channel name.
+    #[serde(default)]
+    pub signal_chan_name: String,
+    /// Signal source type.
+    #[serde(default)]
+    pub signal_source_type: String,
+}
+
+/// Open position held by a signal bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalPosition {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// Instrument type.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Creation timestamp.
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Last update timestamp.
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Average open price.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Margin currency.
+    #[serde(default)]
+    pub ccy: String,
+    /// Leverage.
+    #[serde(default)]
+    pub lever: NumberString,
+    /// Estimated liquidation price.
+    #[serde(default)]
+    pub liq_px: NumberString,
+    /// Position side.
+    #[serde(default)]
+    pub pos_side: String,
+    /// Position quantity.
+    #[serde(default)]
+    pub pos: NumberString,
+    /// Margin mode.
+    #[serde(default)]
+    pub mgn_mode: String,
+    /// Maintenance margin ratio.
+    #[serde(default)]
+    pub mgn_ratio: NumberString,
+    /// Initial margin requirement.
+    #[serde(default)]
+    pub imr: NumberString,
+    /// Maintenance margin requirement.
+    #[serde(default)]
+    pub mmr: NumberString,
+    /// Unrealized profit and loss.
+    #[serde(default)]
+    pub upl: NumberString,
+    /// Unrealized profit and loss ratio.
+    #[serde(default)]
+    pub upl_ratio: NumberString,
+    /// Latest traded price.
+    #[serde(default)]
+    pub last: NumberString,
+    /// Notional value in USD.
+    #[serde(default)]
+    pub notional_usd: NumberString,
+    /// Automatic-deleveraging signal level.
+    #[serde(default)]
+    pub adl: NumberString,
+    /// Mark price.
+    #[serde(default)]
+    pub mark_px: NumberString,
+}
+
+/// Historical position closed by a signal bot.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalPositionHistory {
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Margin mode.
+    #[serde(default)]
+    pub mgn_mode: String,
+    /// Position creation timestamp.
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Position update timestamp.
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Average open price.
+    #[serde(default)]
+    pub open_avg_px: NumberString,
+    /// Average close price.
+    #[serde(default)]
+    pub close_avg_px: NumberString,
+    /// Profit and loss.
+    #[serde(default)]
+    pub pnl: NumberString,
+    /// Profit and loss ratio.
+    #[serde(default)]
+    pub pnl_ratio: NumberString,
+    /// Leverage.
+    #[serde(default)]
+    pub lever: NumberString,
+    /// Position direction.
+    #[serde(default)]
+    pub direction: String,
+    /// Underlying.
+    #[serde(default)]
+    pub uly: String,
+}
+
+/// Opaque success element for placing a signal sub-order.
+///
+/// The current OKX parameter table documents no fields inside `data` and its
+/// official success example returns an empty array.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalSubOrderPlacement {}
+
+/// Result of canceling a signal sub-order.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalCancelSubOrderResult {
+    /// Signal sub-order ID.
+    #[serde(default)]
+    pub signal_ord_id: String,
+    /// Per-order result code.
+    #[serde(default)]
+    pub s_code: String,
+    /// Per-order result message.
+    #[serde(default)]
+    pub s_msg: String,
+}
+
+/// Signal-bot sub-order.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalSubOrder {
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Client-supplied algo order ID.
+    #[serde(default)]
+    pub algo_cl_ord_id: String,
+    /// Instrument type.
+    #[serde(default)]
+    pub inst_type: String,
+    /// Instrument ID.
+    #[serde(default)]
+    pub inst_id: String,
+    /// Algo order type.
+    #[serde(default)]
+    pub algo_ord_type: String,
+    /// Sub-order ID.
+    #[serde(default)]
+    pub ord_id: String,
+    /// Client-supplied sub-order ID.
+    #[serde(default)]
+    pub cl_ord_id: String,
+    /// Creation timestamp.
+    #[serde(default)]
+    pub c_time: NumberString,
+    /// Last update timestamp.
+    #[serde(default)]
+    pub u_time: NumberString,
+    /// Trade mode.
+    #[serde(default)]
+    pub td_mode: String,
+    /// Margin currency.
+    #[serde(default)]
+    pub ccy: String,
+    /// Order type.
+    #[serde(default)]
+    pub ord_type: String,
+    /// Order size.
+    #[serde(default)]
+    pub sz: NumberString,
+    /// Order state.
+    #[serde(default)]
+    pub state: String,
+    /// Order side.
+    #[serde(default)]
+    pub side: String,
+    /// Order price.
+    #[serde(default)]
+    pub px: NumberString,
+    /// Fee amount.
+    #[serde(default)]
+    pub fee: NumberString,
+    /// Fee currency.
+    #[serde(default)]
+    pub fee_ccy: String,
+    /// Average filled price.
+    #[serde(default)]
+    pub avg_px: NumberString,
+    /// Accumulated fill quantity.
+    #[serde(default)]
+    pub acc_fill_sz: NumberString,
+    /// Position side.
+    #[serde(default)]
+    pub pos_side: String,
+    /// Profit and loss.
+    #[serde(default)]
+    pub pnl: NumberString,
+    /// Contract value.
+    #[serde(default)]
+    pub ct_val: NumberString,
+    /// Leverage.
+    #[serde(default)]
+    pub lever: NumberString,
+    /// Order tag.
+    #[serde(default)]
+    pub tag: String,
+}
+
+/// Sub-order metadata attached to a signal event.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalTriggeredOrder {
+    /// Client-supplied sub-order ID.
+    #[serde(default)]
+    pub cl_ord_id: String,
+}
+
+/// Signal-bot event-history row.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SignalEvent {
+    /// Alert message.
+    #[serde(default)]
+    pub alert_msg: String,
+    /// Algo order ID.
+    #[serde(default)]
+    pub algo_id: String,
+    /// Event type.
+    #[serde(default)]
+    pub event_type: String,
+    /// Event creation timestamp.
+    #[serde(default)]
+    pub event_ctime: NumberString,
+    /// Event update timestamp.
+    #[serde(default)]
+    pub event_utime: NumberString,
+    /// Event processing message.
+    #[serde(default)]
+    pub event_process_msg: String,
+    /// Event status.
+    #[serde(default)]
+    pub event_status: String,
+    /// Triggered sub-order data.
+    #[serde(default)]
+    pub triggered_ord_data: Vec<SignalTriggeredOrder>,
+}
