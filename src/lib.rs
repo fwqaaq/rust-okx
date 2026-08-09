@@ -55,7 +55,7 @@ pub use credentials::Credentials;
 #[cfg(feature = "websocket")]
 pub use error::WsError;
 pub use error::{Error, RestError, Result};
-pub use model::NumberString;
+pub use model::{NumberString, Page};
 #[cfg(feature = "reqwest")]
 pub use transport::ReqwestTransport;
 pub use transport::{Transport, TransportError};
