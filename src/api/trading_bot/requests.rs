@@ -609,3 +609,285 @@ pub struct RecurringAmendTimeRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recurring_time: Option<String>,
 }
+
+/// Request to create a signal channel.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalCreateRequest {
+    /// Signal channel name.
+    pub signal_chan_name: String,
+    /// Optional signal channel description.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signal_chan_desc: Option<String>,
+}
+
+/// Query for signal channels.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalsRequest {
+    /// Signal source type.
+    pub signal_source_type: String,
+    /// Signal channel ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signal_chan_id: Option<String>,
+    /// Return records earlier than this timestamp.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records newer than this timestamp.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
+
+/// Entry settings for a signal bot.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalEntrySettingRequest {
+    /// Whether repeated entries in the same direction are allowed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_multiple_entry: Option<bool>,
+    /// Entry sizing type.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_type: Option<String>,
+    /// Fixed margin or contract amount.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub amt: Option<String>,
+    /// Percentage amount per order.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ratio: Option<String>,
+}
+
+/// Exit settings for a signal bot.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalExitSettingRequest {
+    /// Take-profit/stop-loss calculation type.
+    pub tp_sl_type: String,
+    /// Take-profit percentage.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tp_pct: Option<String>,
+    /// Stop-loss percentage.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sl_pct: Option<String>,
+}
+
+/// Request to create a signal bot.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalOrderRequest {
+    /// Signal channel ID.
+    pub signal_chan_id: String,
+    /// Leverage for a contract signal.
+    pub lever: String,
+    /// Investment amount.
+    pub invest_amt: String,
+    /// Sub-order type.
+    pub sub_ord_type: String,
+    /// Whether every USDT-margined contract is included.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_all: Option<bool>,
+    /// Instrument IDs.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inst_ids: Option<Vec<String>>,
+    /// Limit-price offset ratio.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ratio: Option<String>,
+    /// Entry settings.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_setting_param: Option<SignalEntrySettingRequest>,
+    /// Exit settings.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exit_setting_param: Option<SignalExitSettingRequest>,
+}
+
+/// Request selecting one signal bot by algo ID.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalAlgoIdRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+}
+
+/// Request selecting one signal bot and its algo type.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalAlgoRequest {
+    /// Signal algo order type.
+    pub algo_ord_type: String,
+    /// Algo order ID.
+    pub algo_id: String,
+}
+
+/// Query for active or historical signal bots.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalOrdersRequest {
+    /// Signal algo order type.
+    pub algo_ord_type: String,
+    /// Algo order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub algo_id: Option<String>,
+    /// Return records earlier than this timestamp.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records newer than this timestamp.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
+
+/// Request to adjust signal-bot margin.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalMarginBalanceRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Adjustment type (`add` or `reduce`).
+    pub r#type: String,
+    /// Adjustment amount.
+    pub amt: String,
+    /// Whether newly added margin is reinvested.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_reinvest: Option<bool>,
+}
+
+/// Request to amend signal-bot take-profit and stop-loss settings.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalAmendTpSlRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Replacement exit settings.
+    pub exit_setting_param: SignalExitSettingRequest,
+}
+
+/// Request to set signal-bot instruments.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalSetInstrumentsRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Instrument IDs.
+    pub inst_ids: Vec<String>,
+    /// Whether every USDT-margined contract is included.
+    pub include_all: bool,
+}
+
+/// Query for historical signal-bot positions.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalPositionHistoryRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Instrument ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inst_id: Option<String>,
+    /// Return records with earlier update times.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records with newer update times.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
+
+/// Request to close a signal-bot position.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalClosePositionRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Instrument ID.
+    pub inst_id: String,
+}
+
+/// Request to place a signal-bot sub-order.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalSubOrderRequest {
+    /// Instrument ID.
+    pub inst_id: String,
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Order side.
+    pub side: String,
+    /// Order type.
+    pub ord_type: String,
+    /// Order size.
+    pub sz: String,
+    /// Limit order price.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub px: Option<String>,
+    /// Whether the order may only reduce a position.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reduce_only: Option<bool>,
+}
+
+/// Request to cancel a signal-bot sub-order.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalCancelSubOrderRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Instrument ID.
+    pub inst_id: String,
+    /// Signal sub-order ID.
+    pub signal_ord_id: String,
+}
+
+/// Query for signal-bot sub-orders.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalSubOrdersRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Signal algo order type.
+    pub algo_ord_type: String,
+    /// Sub-order state.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub state: Option<String>,
+    /// Signal sub-order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signal_ord_id: Option<String>,
+    /// Return records earlier than this order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records newer than this order ID.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Inclusive creation-time lower bound.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub begin: Option<String>,
+    /// Inclusive creation-time upper bound.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+    /// Sub-order category.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<String>,
+}
+
+/// Query for signal-bot event history.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignalEventHistoryRequest {
+    /// Algo order ID.
+    pub algo_id: String,
+    /// Return records created earlier than this timestamp.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<String>,
+    /// Return records created newer than this timestamp.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<String>,
+    /// Page size.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<String>,
+}
