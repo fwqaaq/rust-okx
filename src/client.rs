@@ -15,6 +15,7 @@ use crate::api::funding::Funding;
 use crate::api::market::Market;
 use crate::api::public_data::PublicData;
 use crate::api::rfq::Rfq;
+use crate::api::spread::SpreadTrading;
 use crate::api::status::Status;
 use crate::api::sub_account::SubAccount;
 use crate::api::support::Support;
@@ -125,6 +126,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access block-trading RFQ endpoints.
     pub fn rfq(&self) -> Rfq<'_, T> {
         Rfq::new(self)
+    }
+
+    /// Access Nitro Spread trading endpoints.
+    pub fn spread(&self) -> SpreadTrading<'_, T> {
+        SpreadTrading::new(self)
     }
 
     /// Send a `GET` request, serializing `query` into the URL query string and
