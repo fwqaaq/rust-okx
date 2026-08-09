@@ -59,6 +59,66 @@ impl<'a, T: Transport> Finance<'a, T> {
             client: self.client,
         }
     }
+
+    /// Access Stable Rewards endpoints.
+    pub fn stable_rewards(&self) -> StableRewards<'_, T> {
+        StableRewards {
+            client: self.client,
+        }
+    }
+}
+
+/// Accessor for active Stable Rewards endpoints.
+pub struct StableRewards<'a, T> {
+    client: &'a OkxClient<T>,
+}
+
+impl<T: Transport> StableRewards<'_, T> {
+    /// Retrieve Stable Rewards product information.
+    ///
+    /// `GET /api/v5/finance/stable-rewards/product-info`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_product_info(
+        &self,
+        request: &StableRewardsCurrencyRequest<'_>,
+    ) -> Result<Vec<StableRewardsProductInfo>, Error> {
+        self.client
+            .get(STABLE_REWARDS_PRODUCT_INFO, request, true)
+            .await
+    }
+
+    /// Retrieve Stable Rewards balances.
+    ///
+    /// `GET /api/v5/finance/stable-rewards/balance`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_balance(
+        &self,
+        request: &StableRewardsBalanceRequest<'_>,
+    ) -> Result<Vec<StableRewardsBalance>, Error> {
+        self.client.get(STABLE_REWARDS_BALANCE, request, true).await
+    }
+
+    /// Retrieve Stable Rewards APY history.
+    ///
+    /// `GET /api/v5/finance/stable-rewards/apy-history`. Public.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for transport/decode failures or an OKX error.
+    pub async fn get_apy_history(
+        &self,
+        request: &StableRewardsApyHistoryRequest<'_>,
+    ) -> Result<Vec<StableRewardsApy>, Error> {
+        self.client
+            .get(STABLE_REWARDS_APY_HISTORY, request, false)
+            .await
+    }
 }
 
 /// Accessor for Dual Investment endpoints.
