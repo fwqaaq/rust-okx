@@ -14,6 +14,7 @@ use crate::api::finance::Finance;
 use crate::api::funding::Funding;
 use crate::api::market::Market;
 use crate::api::public_data::PublicData;
+use crate::api::rfq::Rfq;
 use crate::api::status::Status;
 use crate::api::sub_account::SubAccount;
 use crate::api::support::Support;
@@ -119,6 +120,11 @@ impl<T: Transport> OkxClient<T> {
     /// Access the public trading-statistics endpoints.
     pub fn trading_data(&self) -> TradingData<'_, T> {
         TradingData::new(self)
+    }
+
+    /// Access block-trading RFQ endpoints.
+    pub fn rfq(&self) -> Rfq<'_, T> {
+        Rfq::new(self)
     }
 
     /// Send a `GET` request, serializing `query` into the URL query string and
@@ -243,7 +249,7 @@ impl<T: Transport> OkxClient<T> {
         authenticated: bool,
     ) -> Result<D, Error>
     where
-        B: Serialize,
+        B: Serialize + ?Sized,
         D: DeserializeOwned,
     {
         let body = serde_json::to_vec(body).map_err(|e| RestError::Encode { source: e.into() })?;
