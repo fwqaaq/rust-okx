@@ -31,6 +31,13 @@ impl<'a, T: Transport> TradingBot<'a, T> {
             client: self.client,
         }
     }
+
+    /// Access Signal Bot endpoints.
+    pub fn signal(&self) -> SignalBot<'_, T> {
+        SignalBot {
+            client: self.client,
+        }
+    }
 }
 
 /// Accessor for Grid Bot endpoints.
@@ -530,5 +537,254 @@ impl<T: Transport> RecurringBuy<'_, T> {
         request: &RecurringAlgoIdRequest,
     ) -> Result<Vec<RecurringOperationResult>, Error> {
         self.client.post(RECURRING_RESTART, request, true).await
+    }
+}
+
+/// Accessor for Signal Bot endpoints.
+pub struct SignalBot<'a, T> {
+    client: &'a OkxClient<T>,
+}
+
+impl<T: Transport> SignalBot<'_, T> {
+    /// Create a signal channel.
+    ///
+    /// `POST /api/v5/tradingBot/signal/create-signal`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn create_signal(
+        &self,
+        request: &SignalCreateRequest,
+    ) -> Result<Vec<SignalChannelCreated>, Error> {
+        self.client.post(SIGNAL_CREATE, request, true).await
+    }
+
+    /// Retrieve signal channels.
+    ///
+    /// `GET /api/v5/tradingBot/signal/signals`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_signals(
+        &self,
+        request: &SignalsRequest,
+    ) -> Result<Vec<SignalChannel>, Error> {
+        self.client.get(SIGNAL_LIST, request, true).await
+    }
+
+    /// Create a signal bot.
+    ///
+    /// `POST /api/v5/tradingBot/signal/order-algo`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn place_order(
+        &self,
+        request: &SignalOrderRequest,
+    ) -> Result<Vec<SignalActionResult>, Error> {
+        self.client.post(SIGNAL_ORDER, request, true).await
+    }
+
+    /// Stop up to ten signal bots.
+    ///
+    /// `POST /api/v5/tradingBot/signal/stop-order-algo`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn stop_orders(
+        &self,
+        request: &[SignalAlgoIdRequest],
+    ) -> Result<Vec<SignalActionResult>, Error> {
+        self.client.post(SIGNAL_STOP, request, true).await
+    }
+
+    /// Retrieve one signal-bot order.
+    ///
+    /// `GET /api/v5/tradingBot/signal/orders-algo-details`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_order_details(
+        &self,
+        request: &SignalAlgoRequest,
+    ) -> Result<Vec<SignalAlgoOrder>, Error> {
+        self.client.get(SIGNAL_DETAILS, request, true).await
+    }
+
+    /// Retrieve active signal bots.
+    ///
+    /// `GET /api/v5/tradingBot/signal/orders-algo-pending`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_pending_orders(
+        &self,
+        request: &SignalOrdersRequest,
+    ) -> Result<Vec<SignalAlgoOrder>, Error> {
+        self.client.get(SIGNAL_PENDING, request, true).await
+    }
+
+    /// Retrieve signal-bot history.
+    ///
+    /// `GET /api/v5/tradingBot/signal/orders-algo-history`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_orders_history(
+        &self,
+        request: &SignalOrdersRequest,
+    ) -> Result<Vec<SignalAlgoOrder>, Error> {
+        self.client.get(SIGNAL_HISTORY, request, true).await
+    }
+
+    /// Retrieve signal-bot sub-orders.
+    ///
+    /// `GET /api/v5/tradingBot/signal/sub-orders`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_sub_orders(
+        &self,
+        request: &SignalSubOrdersRequest,
+    ) -> Result<Vec<SignalSubOrder>, Error> {
+        self.client.get(SIGNAL_SUB_ORDERS, request, true).await
+    }
+
+    /// Cancel an incomplete signal-bot sub-order.
+    ///
+    /// `POST /api/v5/tradingBot/signal/cancel-sub-order`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn cancel_sub_order(
+        &self,
+        request: &SignalCancelSubOrderRequest,
+    ) -> Result<Vec<SignalCancelSubOrderResult>, Error> {
+        self.client.post(SIGNAL_CANCEL_SUB_ORDER, request, true).await
+    }
+
+    /// Retrieve signal-bot event history.
+    ///
+    /// `GET /api/v5/tradingBot/signal/event-history`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_event_history(
+        &self,
+        request: &SignalEventHistoryRequest,
+    ) -> Result<Vec<SignalEvent>, Error> {
+        self.client.get(SIGNAL_EVENT_HISTORY, request, true).await
+    }
+
+    /// Retrieve open signal-bot positions.
+    ///
+    /// `GET /api/v5/tradingBot/signal/positions`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_positions(
+        &self,
+        request: &SignalAlgoRequest,
+    ) -> Result<Vec<SignalPosition>, Error> {
+        self.client.get(SIGNAL_POSITIONS, request, true).await
+    }
+
+    /// Retrieve closed signal-bot positions.
+    ///
+    /// `GET /api/v5/tradingBot/signal/positions-history`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_positions_history(
+        &self,
+        request: &SignalPositionHistoryRequest,
+    ) -> Result<Vec<SignalPositionHistory>, Error> {
+        self.client
+            .get(SIGNAL_POSITIONS_HISTORY, request, true)
+            .await
+    }
+
+    /// Amend signal-bot take-profit and stop-loss settings.
+    ///
+    /// `POST /api/v5/tradingBot/signal/amendTPSL`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn amend_tp_sl(
+        &self,
+        request: &SignalAmendTpSlRequest,
+    ) -> Result<Vec<SignalAlgoResult>, Error> {
+        self.client.post(SIGNAL_AMEND_TPSL, request, true).await
+    }
+
+    /// Close a signal-bot position.
+    ///
+    /// `POST /api/v5/tradingBot/signal/close-position`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn close_position(
+        &self,
+        request: &SignalClosePositionRequest,
+    ) -> Result<Vec<SignalAlgoResult>, Error> {
+        self.client.post(SIGNAL_CLOSE_POSITION, request, true).await
+    }
+
+    /// Adjust signal-bot margin.
+    ///
+    /// `POST /api/v5/tradingBot/signal/margin-balance`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn adjust_margin_balance(
+        &self,
+        request: &SignalMarginBalanceRequest,
+    ) -> Result<Vec<SignalAlgoResult>, Error> {
+        self.client.post(SIGNAL_MARGIN_BALANCE, request, true).await
+    }
+
+    /// Set the instruments traded by a signal bot.
+    ///
+    /// `POST /api/v5/tradingBot/signal/set-instruments`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn set_instruments(
+        &self,
+        request: &SignalSetInstrumentsRequest,
+    ) -> Result<Vec<SignalAlgoResult>, Error> {
+        self.client
+            .post(SIGNAL_SET_INSTRUMENTS, request, true)
+            .await
+    }
+
+    /// Place a signal-bot sub-order.
+    ///
+    /// `POST /api/v5/tradingBot/signal/sub-order`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn place_sub_order(
+        &self,
+        request: &SignalSubOrderRequest,
+    ) -> Result<Vec<SignalSubOrderPlacement>, Error> {
+        self.client.post(SIGNAL_SUB_ORDER, request, true).await
     }
 }
