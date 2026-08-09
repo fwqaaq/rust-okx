@@ -506,9 +506,7 @@ impl<T: Transport> RecurringBuy<'_, T> {
         &self,
         request: &RecurringAmendTimeRequest,
     ) -> Result<Vec<RecurringOperationResult>, Error> {
-        self.client
-            .post(RECURRING_AMEND_TIME, request, true)
-            .await
+        self.client.post(RECURRING_AMEND_TIME, request, true).await
     }
 
     /// Pause a recurring-buy algo order.
@@ -567,10 +565,7 @@ impl<T: Transport> SignalBot<'_, T> {
     /// # Errors
     ///
     /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
-    pub async fn get_signals(
-        &self,
-        request: &SignalsRequest,
-    ) -> Result<Vec<SignalChannel>, Error> {
+    pub async fn get_signals(&self, request: &SignalsRequest) -> Result<Vec<SignalChannel>, Error> {
         self.client.get(SIGNAL_LIST, request, true).await
     }
 
@@ -669,7 +664,9 @@ impl<T: Transport> SignalBot<'_, T> {
         &self,
         request: &SignalCancelSubOrderRequest,
     ) -> Result<Vec<SignalCancelSubOrderResult>, Error> {
-        self.client.post(SIGNAL_CANCEL_SUB_ORDER, request, true).await
+        self.client
+            .post(SIGNAL_CANCEL_SUB_ORDER, request, true)
+            .await
     }
 
     /// Retrieve signal-bot event history.
