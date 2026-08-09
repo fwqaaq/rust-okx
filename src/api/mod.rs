@@ -5,6 +5,7 @@
 //! models for that area.
 
 pub mod account;
+pub mod affiliate;
 pub mod convert;
 pub mod copy_trading;
 pub mod fiat;
