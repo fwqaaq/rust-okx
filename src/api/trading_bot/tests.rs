@@ -1,9 +1,10 @@
 use http::Method;
 
 use super::{
-    GridAiParamRequest, GridInvestmentDataRequest, GridMinInvestmentRequest, GridOrderRequest,
-    GridOrdersRequest, GridTriggerRequest, RecurringAlgoIdRequest, RecurringAmendTimeRequest,
-    RecurringCurrencyRequest, RecurringOrderRequest, RecurringSubOrdersRequest,
+    DcaAlgoRequest, DcaCreateRequest, DcaOrdersRequest, DcaTriggerRequest, GridAiParamRequest,
+    GridInvestmentDataRequest, GridMinInvestmentRequest, GridOrderRequest, GridOrdersRequest,
+    GridTriggerRequest, RecurringAlgoIdRequest, RecurringAmendTimeRequest, RecurringCurrencyRequest,
+    RecurringOrderRequest, RecurringSubOrdersRequest,
     SignalAlgoIdRequest, SignalCancelSubOrderRequest, SignalCreateRequest, SignalSubOrderRequest,
 };
 use crate::test_util::MockTransport;
@@ -351,5 +352,89 @@ async fn cancel_signal_sub_order_matches_official_example() {
 
     assert_eq!(rows[0].signal_ord_id, "590908157585625111");
     assert_eq!(rows[0].s_code, "0");
+    assert!(mock.captured().is_signed());
+}
+
+#[tokio::test]
+async fn create_dca_bot_matches_official_result() {
+    let body = r#"{"code":"0","data":[{"algoId":"447053782921515008","sCode":"0","sMsg":""}],"msg":""}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = DcaCreateRequest {
+        inst_id: "BTC-USDT-SWAP".into(),
+        algo_ord_type: "contract_dca".into(),
+        init_ord_amt: "100".into(),
+        safety_ord_amt: Some("200".into()),
+        max_safety_ords: "5".into(),
+        px_steps: Some("0.02".into()),
+        px_steps_mult: Some("1".into()),
+        vol_mult: Some("1".into()),
+        tp_pct: "0.05".into(),
+        direction: Some("long".into()),
+        lever: "3".into(),
+        trigger_params: vec![DcaTriggerRequest {
+            trigger_action: "start".into(),
+            trigger_strategy: "instant".into(),
+            ..Default::default()
+        }],
+        ..Default::default()
+    };
+
+    let rows = client.trading_bot().dca().create(&request).await.unwrap();
+
+    assert_eq!(rows[0].algo_id, "447053782921515008");
+    assert_eq!(rows[0].s_code, "0");
+    assert_eq!(mock.captured().method, Method::POST);
+    assert!(mock.captured().body_str().contains("\"contract_dca\""));
+    assert!(mock.captured().is_signed());
+}
+
+#[tokio::test]
+async fn ongoing_dca_orders_preserve_official_precision() {
+    let body = r#"{"code":"0","msg":"","data":[{"algoId":"565849588675117056","algoOrdType":"contract_dca","instId":"BTC-USDT-SWAP","copyType":"0","state":"running","direction":"long","lever":"3","initOrdAmt":"100","safetyOrdAmt":"200","maxSafetyOrds":"5","pxSteps":"0.02","pxStepsMult":"1","volMult":"1","tpPxRange":"","slPct":"","slMode":"","allowReinvest":true,"totalPnl":"12.5","pnlRatio":"0.05","totalFundingFee":"-0.5","investmentAmt":"500","investmentCcy":"USDT","arbitragePnL":"2.1","profitSharingRatio":"","trackingMode":"","triggerParams":[{"triggerAction":"start","triggerStrategy":"instant"}],"cTime":"1597026383085","uTime":"1597026383085"}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = DcaOrdersRequest {
+        algo_ord_type: "contract_dca".into(),
+        limit: Some("20".into()),
+        ..Default::default()
+    };
+
+    let rows = client
+        .trading_bot()
+        .dca()
+        .get_ongoing_orders(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].total_pnl.as_str(), "12.5");
+    assert_eq!(rows[0].total_funding_fee.as_str(), "-0.5");
+    assert_eq!(rows[0].arbitrage_pn_l.as_str(), "2.1");
+    assert_eq!(
+        mock.captured().query(),
+        Some("algoOrdType=contract_dca&limit=20")
+    );
+    assert!(mock.captured().is_signed());
+}
+
+#[tokio::test]
+async fn dca_position_decodes_documented_cur_cycleld_key() {
+    let body = r#"{"code":"0","msg":"","data":[{"algoId":"2833925189933756416","algoClOrdId":"","algoOrdType":"contract_dca","instId":"BTC-USDT-SWAP","curCycleld":"3","startTime":"1597026383085","fillManualOrds":"0","fillSafetyOrds":"2","fundingFee":"-0.05","initPx":"43200","notionalUsd":"5000","avgPx":"43000","upl":"12.5","liqPx":"38000","sz":"2","baseSz":"","quoteSz":"","slPx":"40000","tpPx":"45000","fee":"-0.2","tradeQuoteCcy":""}]}"#;
+    let mock = MockTransport::new(body);
+    let client = signed_client(mock.clone());
+    let request = DcaAlgoRequest {
+        algo_id: "2833925189933756416".into(),
+        algo_ord_type: "contract_dca".into(),
+    };
+
+    let rows = client
+        .trading_bot()
+        .dca()
+        .get_position_details(&request)
+        .await
+        .unwrap();
+
+    assert_eq!(rows[0].cur_cycle_id, "3");
+    assert_eq!(rows[0].avg_px.as_str(), "43000");
     assert!(mock.captured().is_signed());
 }
