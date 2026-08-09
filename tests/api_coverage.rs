@@ -2,6 +2,12 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
+    ("GET", "/api/v5/affiliate/co-inviter/list"),
+    ("GET", "/api/v5/affiliate/invitee/detail"),
+    ("GET", "/api/v5/affiliate/invitee/list"),
+    ("GET", "/api/v5/affiliate/link/list"),
+    ("GET", "/api/v5/affiliate/performance/summary"),
+    ("GET", "/api/v5/affiliate/sub-affiliate/list"),
     ("GET", "/api/v5/copytrading/config"),
     ("GET", "/api/v5/copytrading/copy-settings"),
     ("GET", "/api/v5/copytrading/current-lead-traders"),
@@ -220,6 +226,7 @@ const IMPLEMENTED_ENDPOINTS: &[(&str, &str)] = &[
 
 const ENDPOINT_SOURCES: &[&str] = &[
     include_str!("../src/api/account/endpoints.rs"),
+    include_str!("../src/api/affiliate/endpoints.rs"),
     include_str!("../src/api/copy_trading/endpoints.rs"),
     include_str!("../src/api/finance/endpoints.rs"),
     include_str!("../src/api/fiat/endpoints.rs"),
@@ -235,6 +242,7 @@ const TEST_SOURCES: &[(&str, &str)] = &[
     ("account/read_only.rs", include_str!("account/read_only.rs")),
     ("account/loans.rs", include_str!("account/loans.rs")),
     ("account/todo.rs", include_str!("account/todo.rs")),
+    ("affiliate_todo.rs", include_str!("affiliate_todo.rs")),
     ("convert/read_only.rs", include_str!("convert/read_only.rs")),
     ("convert/todo.rs", include_str!("convert/todo.rs")),
     ("copy_trading_todo.rs", include_str!("copy_trading_todo.rs")),

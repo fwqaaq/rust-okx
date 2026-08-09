@@ -50,6 +50,25 @@ pub(crate) struct OkxResponse<D> {
     pub data: D,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+pub(crate) struct OkxPageResponse<D> {
+    pub code: String,
+    pub msg: String,
+    #[serde(default, rename = "totalPage")]
+    pub total_page: String,
+    pub data: D,
+}
+
+/// A paginated OKX response whose pagination metadata lives beside `data`.
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub struct Page<D> {
+    /// Total number of pages reported by OKX.
+    pub total_page: NumberString,
+    /// Items returned for the requested page.
+    pub data: D,
+}
+
 /// A numeric value returned by OKX as a JSON string.
 ///
 /// OKX encodes all prices, sizes, and balances as strings to avoid floating
