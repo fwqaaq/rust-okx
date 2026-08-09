@@ -149,6 +149,59 @@ impl<'a, T: Transport> Funding<'a, T> {
         self.client.get(BILLS, request, true).await
     }
 
+    /// Retrieve all-time asset bills history.
+    ///
+    /// `GET /api/v5/asset/bills-history`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_currencies`](Self::get_currencies).
+    pub async fn get_bills_history(
+        &self,
+        request: &FundingBillsHistoryRequest<'_>,
+    ) -> Result<Vec<FundingBill>, Error> {
+        self.client.get(BILLS_HISTORY, request, true).await
+    }
+
+    /// Retrieve OKX's public exchange list.
+    ///
+    /// `GET /api/v5/asset/exchange-list`. Public.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if transport or response decoding fails, or OKX returns an error code.
+    pub async fn get_exchange_list(&self) -> Result<Vec<Exchange>, Error> {
+        self.client.get(EXCHANGE_LIST, &(), false).await
+    }
+
+    /// Apply for a monthly statement from the past year.
+    ///
+    /// `POST /api/v5/asset/monthly-statement`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_currencies`](Self::get_currencies).
+    pub async fn apply_monthly_statement(
+        &self,
+        request: &ApplyMonthlyStatementRequest,
+    ) -> Result<Vec<MonthlyStatementApplication>, Error> {
+        self.client.post(MONTHLY_STATEMENT, request, true).await
+    }
+
+    /// Retrieve a generated monthly statement from the past year.
+    ///
+    /// `GET /api/v5/asset/monthly-statement`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// See [`get_currencies`](Self::get_currencies).
+    pub async fn get_monthly_statement(
+        &self,
+        request: &MonthlyStatementRequest,
+    ) -> Result<Vec<MonthlyStatement>, Error> {
+        self.client.get(MONTHLY_STATEMENT, request, true).await
+    }
+
     /// Create or retrieve a Lightning Network deposit invoice.
     ///
     /// `GET /api/v5/asset/deposit-lightning`. Authenticated.

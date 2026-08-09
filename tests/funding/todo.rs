@@ -23,3 +23,14 @@ fn funding_asset_conversion_and_lightning_todo() {
     // STATUS: TODO — needs product-specific balances and expiring invoice fixtures.
     todo!("supply dedicated fixtures and explicit amount caps");
 }
+
+#[test]
+#[ignore = "statement generation is limited to 20 applications per month"]
+fn funding_monthly_statement_todo() {
+    // API: POST /api/v5/asset/monthly-statement
+    // API: GET /api/v5/asset/monthly-statement
+    // STATUS: TODO — requires a deliberately selected month and asynchronous generation fixture.
+    todo!(
+        "apply once for a selected month, then poll the generated statement without exhausting quota"
+    );
+}
