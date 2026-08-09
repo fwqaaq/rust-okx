@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **318/388 (82.0%)**
+> Progress: **335/388 (86.3%)**
 
 ## Account
 
@@ -448,25 +448,25 @@
 
 ## Trading Bot — Signal
 
-- [ ] POST /api/v5/tradingBot/signal/create-signal
-- [ ] GET /api/v5/tradingBot/signal/signals
-- [ ] POST /api/v5/tradingBot/signal/order-algo
-- [ ] POST /api/v5/tradingBot/signal/stop-order-algo
-- [ ] GET /api/v5/tradingBot/signal/orders-algo-details
-- [ ] GET /api/v5/tradingBot/signal/orders-algo-pending
-- [ ] GET /api/v5/tradingBot/signal/orders-algo-history
-- [ ] GET /api/v5/tradingBot/signal/sub-orders
-- [ ] POST /api/v5/tradingBot/signal/cancel-sub-order
-- [ ] GET /api/v5/tradingBot/signal/event-history
-- [ ] GET /api/v5/tradingBot/signal/positions
-- [ ] GET /api/v5/tradingBot/signal/positions-history
-- [ ] POST /api/v5/tradingBot/signal/amendTPSL
-- [ ] POST /api/v5/tradingBot/signal/close-position
-- [ ] POST /api/v5/tradingBot/signal/margin-balance
-- [ ] POST /api/v5/tradingBot/signal/set-instruments
-- [ ] POST /api/v5/tradingBot/signal/sub-order
+- [x] POST /api/v5/tradingBot/signal/create-signal
+- [x] GET /api/v5/tradingBot/signal/signals
+- [x] POST /api/v5/tradingBot/signal/order-algo
+- [x] POST /api/v5/tradingBot/signal/stop-order-algo
+- [x] GET /api/v5/tradingBot/signal/orders-algo-details
+- [x] GET /api/v5/tradingBot/signal/orders-algo-pending
+- [x] GET /api/v5/tradingBot/signal/orders-algo-history
+- [x] GET /api/v5/tradingBot/signal/sub-orders
+- [x] POST /api/v5/tradingBot/signal/cancel-sub-order
+- [x] GET /api/v5/tradingBot/signal/event-history
+- [x] GET /api/v5/tradingBot/signal/positions
+- [x] GET /api/v5/tradingBot/signal/positions-history
+- [x] POST /api/v5/tradingBot/signal/amendTPSL
+- [x] POST /api/v5/tradingBot/signal/close-position
+- [x] POST /api/v5/tradingBot/signal/margin-balance
+- [x] POST /api/v5/tradingBot/signal/set-instruments
+- [x] POST /api/v5/tradingBot/signal/sub-order
 
-<!-- Trading Bot — Signal: 0/17 implemented -->
+<!-- Trading Bot — Signal: 17/17 implemented -->
 
 ## Trading Bot — DCA
 
