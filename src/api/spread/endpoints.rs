@@ -1,0 +1,12 @@
+pub(super) const SPREADS: &str = "/api/v5/sprd/spreads";
+pub(super) const BOOKS: &str = "/api/v5/sprd/books";
+pub(super) const PUBLIC_TRADES: &str = "/api/v5/sprd/public-trades";
+pub(super) const ORDER: &str = "/api/v5/sprd/order";
+pub(super) const CANCEL_ORDER: &str = "/api/v5/sprd/cancel-order";
+pub(super) const MASS_CANCEL: &str = "/api/v5/sprd/mass-cancel";
+pub(super) const AMEND_ORDER: &str = "/api/v5/sprd/amend-order";
+pub(super) const ORDERS_PENDING: &str = "/api/v5/sprd/orders-pending";
+pub(super) const ORDERS_HISTORY: &str = "/api/v5/sprd/orders-history";
+pub(super) const ORDERS_HISTORY_ARCHIVE: &str = "/api/v5/sprd/orders-history-archive";
+pub(super) const TRADES: &str = "/api/v5/sprd/trades";
+pub(super) const CANCEL_ALL_AFTER: &str = "/api/v5/sprd/cancel-all-after";
