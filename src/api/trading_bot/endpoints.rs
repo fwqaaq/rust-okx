@@ -19,3 +19,24 @@ pub(super) const GRID_MIN_INVESTMENT: &str = "/api/v5/tradingBot/grid/min-invest
 pub(super) const GRID_RSI_BACK_TESTING: &str = "/api/v5/tradingBot/public/rsi-back-testing";
 pub(super) const GRID_QUANTITY: &str = "/api/v5/tradingBot/grid/grid-quantity";
 pub(super) const GRID_COPY_ORDER: &str = "/api/v5/tradingBot/grid/copy-order-algo";
+
+pub(super) const RECURRING_ORDER: &str = "/api/v5/tradingBot/recurring/order-algo";
+pub(super) const RECURRING_AMEND: &str = "/api/v5/tradingBot/recurring/amend-order-algo";
+pub(super) const RECURRING_STOP: &str = "/api/v5/tradingBot/recurring/stop-order-algo";
+pub(super) const RECURRING_PENDING: &str =
+    "/api/v5/tradingBot/recurring/orders-algo-pending";
+pub(super) const RECURRING_HISTORY: &str =
+    "/api/v5/tradingBot/recurring/orders-algo-history";
+pub(super) const RECURRING_DETAILS: &str =
+    "/api/v5/tradingBot/recurring/orders-algo-details";
+pub(super) const RECURRING_SUB_ORDERS: &str = "/api/v5/tradingBot/recurring/sub-orders";
+pub(super) const RECURRING_ADD_INVESTMENT: &str =
+    "/api/v5/tradingBot/recurring/add-investment";
+pub(super) const RECURRING_AMEND_PRICE_RANGE: &str =
+    "/api/v5/tradingBot/recurring/amend-price-range";
+pub(super) const RECURRING_AMEND_AMOUNT: &str =
+    "/api/v5/tradingBot/recurring/amend-recurring-amount";
+pub(super) const RECURRING_AMEND_TIME: &str =
+    "/api/v5/tradingBot/recurring/amend-recurring-time";
+pub(super) const RECURRING_PAUSE: &str = "/api/v5/tradingBot/recurring/pause";
+pub(super) const RECURRING_RESTART: &str = "/api/v5/tradingBot/recurring/restart";
