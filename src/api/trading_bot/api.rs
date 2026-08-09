@@ -24,6 +24,13 @@ impl<'a, T: Transport> TradingBot<'a, T> {
             client: self.client,
         }
     }
+
+    /// Access Recurring Buy endpoints.
+    pub fn recurring_buy(&self) -> RecurringBuy<'_, T> {
+        RecurringBuy {
+            client: self.client,
+        }
+    }
 }
 
 /// Accessor for Grid Bot endpoints.
@@ -326,5 +333,200 @@ impl<T: Transport> Grid<'_, T> {
         request: &GridCopyOrderRequest,
     ) -> Result<Vec<GridActionResult>, Error> {
         self.client.post(GRID_COPY_ORDER, request, true).await
+    }
+}
+
+/// Accessor for Recurring Buy endpoints.
+pub struct RecurringBuy<'a, T> {
+    client: &'a OkxClient<T>,
+}
+
+impl<T: Transport> RecurringBuy<'_, T> {
+    /// Place a recurring-buy algo order.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/order-algo`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn place_order(
+        &self,
+        request: &RecurringOrderRequest,
+    ) -> Result<Vec<RecurringCreateResult>, Error> {
+        self.client.post(RECURRING_ORDER, request, true).await
+    }
+
+    /// Rename a recurring-buy algo order.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/amend-order-algo`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn amend_order(
+        &self,
+        request: &RecurringAmendRequest,
+    ) -> Result<Vec<RecurringActionResult>, Error> {
+        self.client.post(RECURRING_AMEND, request, true).await
+    }
+
+    /// Stop recurring-buy algo orders.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/stop-order-algo`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn stop_orders(
+        &self,
+        request: &[RecurringAlgoIdRequest],
+    ) -> Result<Vec<RecurringActionResult>, Error> {
+        self.client.post(RECURRING_STOP, request, true).await
+    }
+
+    /// Retrieve active recurring-buy algo orders.
+    ///
+    /// `GET /api/v5/tradingBot/recurring/orders-algo-pending`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_pending_orders(
+        &self,
+        request: &RecurringOrdersRequest,
+    ) -> Result<Vec<RecurringOrder>, Error> {
+        self.client.get(RECURRING_PENDING, request, true).await
+    }
+
+    /// Retrieve historical recurring-buy algo orders.
+    ///
+    /// `GET /api/v5/tradingBot/recurring/orders-algo-history`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_orders_history(
+        &self,
+        request: &RecurringOrdersRequest,
+    ) -> Result<Vec<RecurringOrder>, Error> {
+        self.client.get(RECURRING_HISTORY, request, true).await
+    }
+
+    /// Retrieve one recurring-buy algo order.
+    ///
+    /// `GET /api/v5/tradingBot/recurring/orders-algo-details`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_order_details(
+        &self,
+        request: &RecurringAlgoIdRequest,
+    ) -> Result<Vec<RecurringOrder>, Error> {
+        self.client.get(RECURRING_DETAILS, request, true).await
+    }
+
+    /// Retrieve recurring-buy sub-orders.
+    ///
+    /// `GET /api/v5/tradingBot/recurring/sub-orders`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn get_sub_orders(
+        &self,
+        request: &RecurringSubOrdersRequest,
+    ) -> Result<Vec<RecurringSubOrder>, Error> {
+        self.client.get(RECURRING_SUB_ORDERS, request, true).await
+    }
+
+    /// Add an investment to a recurring-buy algo order.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/add-investment`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn add_investment(
+        &self,
+        request: &RecurringAmountRequest,
+    ) -> Result<Vec<RecurringOperationResult>, Error> {
+        self.client
+            .post(RECURRING_ADD_INVESTMENT, request, true)
+            .await
+    }
+
+    /// Amend recurring-buy price ranges.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/amend-price-range`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn amend_price_range(
+        &self,
+        request: &RecurringAmendPriceRangeRequest,
+    ) -> Result<Vec<RecurringOperationResult>, Error> {
+        self.client
+            .post(RECURRING_AMEND_PRICE_RANGE, request, true)
+            .await
+    }
+
+    /// Amend the amount invested by a recurring-buy algo order.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/amend-recurring-amount`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn amend_amount(
+        &self,
+        request: &RecurringAmountRequest,
+    ) -> Result<Vec<RecurringOperationResult>, Error> {
+        self.client
+            .post(RECURRING_AMEND_AMOUNT, request, true)
+            .await
+    }
+
+    /// Amend the recurring-buy schedule.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/amend-recurring-time`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn amend_time(
+        &self,
+        request: &RecurringAmendTimeRequest,
+    ) -> Result<Vec<RecurringOperationResult>, Error> {
+        self.client.post(RECURRING_AMEND_TIME, request, true).await
+    }
+
+    /// Pause a recurring-buy algo order.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/pause`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn pause(
+        &self,
+        request: &RecurringAlgoIdRequest,
+    ) -> Result<Vec<RecurringOperationResult>, Error> {
+        self.client.post(RECURRING_PAUSE, request, true).await
+    }
+
+    /// Restart a recurring-buy algo order.
+    ///
+    /// `POST /api/v5/tradingBot/recurring/restart`. Authenticated.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for missing credentials, transport/decode failures, or an OKX error.
+    pub async fn restart(
+        &self,
+        request: &RecurringAlgoIdRequest,
+    ) -> Result<Vec<RecurringOperationResult>, Error> {
+        self.client.post(RECURRING_RESTART, request, true).await
     }
 }
