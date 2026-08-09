@@ -8,7 +8,7 @@
 >
 > Completion rule: an endpoint is checked only when the repository exposes a callable Rust method that sends that exact HTTP method and path. A constant, model, test stub, or WebSocket operation alone does not count.
 >
-> Progress: **305/388 (78.6%)**
+> Progress: **318/388 (82.0%)**
 
 ## Account
 
@@ -430,21 +430,21 @@
 
 ## Trading Bot — Recurring Buy
 
-- [ ] POST /api/v5/tradingBot/recurring/order-algo
-- [ ] POST /api/v5/tradingBot/recurring/amend-order-algo
-- [ ] POST /api/v5/tradingBot/recurring/stop-order-algo
-- [ ] GET /api/v5/tradingBot/recurring/orders-algo-pending
-- [ ] GET /api/v5/tradingBot/recurring/orders-algo-history
-- [ ] GET /api/v5/tradingBot/recurring/orders-algo-details
-- [ ] GET /api/v5/tradingBot/recurring/sub-orders
-- [ ] POST /api/v5/tradingBot/recurring/add-investment
-- [ ] POST /api/v5/tradingBot/recurring/amend-price-range
-- [ ] POST /api/v5/tradingBot/recurring/amend-recurring-amount
-- [ ] POST /api/v5/tradingBot/recurring/amend-recurring-time
-- [ ] POST /api/v5/tradingBot/recurring/pause
-- [ ] POST /api/v5/tradingBot/recurring/restart
+- [x] POST /api/v5/tradingBot/recurring/order-algo
+- [x] POST /api/v5/tradingBot/recurring/amend-order-algo
+- [x] POST /api/v5/tradingBot/recurring/stop-order-algo
+- [x] GET /api/v5/tradingBot/recurring/orders-algo-pending
+- [x] GET /api/v5/tradingBot/recurring/orders-algo-history
+- [x] GET /api/v5/tradingBot/recurring/orders-algo-details
+- [x] GET /api/v5/tradingBot/recurring/sub-orders
+- [x] POST /api/v5/tradingBot/recurring/add-investment
+- [x] POST /api/v5/tradingBot/recurring/amend-price-range
+- [x] POST /api/v5/tradingBot/recurring/amend-recurring-amount
+- [x] POST /api/v5/tradingBot/recurring/amend-recurring-time
+- [x] POST /api/v5/tradingBot/recurring/pause
+- [x] POST /api/v5/tradingBot/recurring/restart
 
-<!-- Trading Bot — Recurring Buy: 0/13 implemented -->
+<!-- Trading Bot — Recurring Buy: 13/13 implemented -->
 
 ## Trading Bot — Signal
 
