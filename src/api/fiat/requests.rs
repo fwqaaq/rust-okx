@@ -132,10 +132,7 @@ pub struct FiatBuySellPairRequest<'a> {
 
 impl<'a> FiatBuySellPairRequest<'a> {
     /// Select the currency to sell and currency to buy.
-    pub fn new(
-        from_ccy: impl Into<Cow<'a, str>>,
-        to_ccy: impl Into<Cow<'a, str>>,
-    ) -> Self {
+    pub fn new(from_ccy: impl Into<Cow<'a, str>>, to_ccy: impl Into<Cow<'a, str>>) -> Self {
         Self {
             from_ccy: from_ccy.into(),
             to_ccy: to_ccy.into(),
